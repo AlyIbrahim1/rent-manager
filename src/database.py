@@ -25,6 +25,7 @@ def deleteRecord(appartmentNumber):
     cursor.execute("""DELETE FROM renters WHERE appartmentNumber = (?);"""
     , appartmentNumber
     )
+    conn.commit()
 
 def clearTable():
     cursor.execute(""" DROP TABLE renters;""")
