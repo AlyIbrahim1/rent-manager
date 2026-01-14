@@ -1,5 +1,0 @@
-Stack:
-- Python Tkinter (GUI)
-- SQLite (Database)
-- Python ReportLab (Creating and printing form)
-- PyInstaller (To Package into .exe desktop app)
