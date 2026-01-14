@@ -9,6 +9,7 @@ window = customtkinter.CTk()
 window.title("Rent Management")
 window.iconbitmap("assets/app_icon.ico")
 window.geometry("1000x650")
+window.resizable(False, False) # Makes window unresizable 
 
 frame = customtkinter.CTkFrame(master=window)
 frame.pack(pady=20, padx=20, fill="both", expand=True)
