@@ -19,7 +19,7 @@ def addRecord(appartmentNumber, name, rentAmount, lastMonthPayed, unpaidMonths, 
     cursor.execute("""INSERT INTO renters VALUES (?,?,?,?,?,?);"""
         , (appartmentNumber, name, rentAmount, lastMonthPayed, unpaidMonths, rentDue)
     )
-    conn.comit()
+    conn.commit()
 
 def deleteRecord(appartmentNumber):
     cursor.execute("""DELETE FROM renters WHERE appartmentNumber = (?);"""
@@ -29,4 +29,4 @@ def deleteRecord(appartmentNumber):
 
 def clearTable():
     cursor.execute(""" DROP TABLE renters;""")
-    conn.commmit()
+    conn.commit()
