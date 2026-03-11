@@ -1,3 +1,19 @@
 plan.txt
 .claude/
 CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# App data
+data/
+invoices/
+
+# Virtualenv
+.venv/
+
+# Brainstorming artifacts
+.superpowers/
