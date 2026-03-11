@@ -188,3 +188,77 @@ class SidePanel(ctk.CTkFrame):
     def _delete_confirm(self):
         database.deleteRecord(self.record["appartmentNumber"])
         self.on_delete()
+
+
+class AddRenterModal(ctk.CTkToplevel):
+    def __init__(self, master, on_submit, **kwargs):
+        super().__init__(master, **kwargs)
+        self.on_submit = on_submit
+        self.title("Add Renter")
+        self.geometry("360x380")
+        self.resizable(False, False)
+        self.grab_set()
+
+        ctk.CTkLabel(self, text="Add New Renter", font=("Roboto", 18, "bold")).pack(pady=(20, 10))
+
+        self._apt_var = ctk.StringVar()
+        self._name_var = ctk.StringVar()
+        self._rent_var = ctk.StringVar()
+        self._last_paid_var = ctk.StringVar()
+
+        for label, var, hint in [
+            ("Apartment Number", self._apt_var, None),
+            ("Name", self._name_var, None),
+            ("Rent Amount ($)", self._rent_var, None),
+            ("Last Month Paid (YYYY-MM)", self._last_paid_var, "optional"),
+        ]:
+            ctk.CTkLabel(self, text=label, font=("Roboto", 12)).pack(anchor="w", padx=30)
+            ctk.CTkEntry(self, textvariable=var, placeholder_text=hint or "").pack(fill="x", padx=30, pady=(0, 8))
+
+        self._error_label = ctk.CTkLabel(self, text="", text_color="red", font=("Roboto", 11))
+        self._error_label.pack()
+
+        ctk.CTkButton(self, text="Add Renter", command=self._submit).pack(pady=10)
+
+    def _submit(self):
+        try:
+            apt = int(self._apt_var.get())
+            if apt <= 0:
+                raise ValueError
+        except ValueError:
+            self._error_label.configure(text="Apartment number must be a positive integer.")
+            return
+
+        name = self._name_var.get().strip()
+        if not name:
+            self._error_label.configure(text="Name cannot be empty.")
+            return
+
+        try:
+            rent = int(self._rent_var.get())
+            if rent <= 0:
+                raise ValueError
+        except ValueError:
+            self._error_label.configure(text="Rent amount must be a positive integer.")
+            return
+
+        last_paid = self._last_paid_var.get().strip()
+        if last_paid:
+            try:
+                datetime.strptime(last_paid, "%Y-%m")
+            except ValueError:
+                self._error_label.configure(text="Last month paid must be YYYY-MM (e.g. 2026-01).")
+                return
+
+        unpaid, due = compute_rent_status(last_paid, rent)
+        if unpaid is None:
+            unpaid, due = 0, 0
+
+        try:
+            database.addRecord(apt, name, rent, last_paid, unpaid, due)
+        except sqlite3.IntegrityError:
+            self._error_label.configure(text=f"Apartment #{apt} already exists.")
+            return
+
+        self.on_submit()
+        self.destroy()
