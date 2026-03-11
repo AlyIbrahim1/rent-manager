@@ -1,2 +1,5 @@
 from src import database
-from src import ui
+from src.ui import App
+
+window = App()
+window.mainloop()

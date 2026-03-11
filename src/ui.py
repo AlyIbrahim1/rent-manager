@@ -84,5 +84,3 @@ class App(ctk.CTk):
         AddRenterModal(self, on_submit=self.refresh)
 
 
-window = App()
-window.mainloop()

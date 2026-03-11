@@ -82,7 +82,7 @@ class MarkPaidDialog(ctk.CTkToplevel):
         self.month_menu = ctk.CTkOptionMenu(row, variable=self.month_var, values=self.MONTHS, width=140)
         self.month_menu.pack(side="left", padx=5)
 
-        years = [str(now.year - i) for i in range(5)]
+        years = [str(now.year + 1 - i) for i in range(6)]
         self.year_menu = ctk.CTkOptionMenu(row, variable=self.year_var, values=years, width=90)
         self.year_menu.pack(side="left", padx=5)
 
@@ -115,6 +115,7 @@ class SidePanel(ctk.CTkFrame):
         self._rent_var = ctk.StringVar(value=str(r.get("rentAmount", "")))
         self._last_paid_var = ctk.StringVar(value=r.get("lastMonthPayed", ""))
         self._last_paid_var.trace_add("write", lambda *_: self._update_computed())
+        self._rent_var.trace_add("write", lambda *_: self._update_computed())
 
         for label, var, hint in [
             ("Name", self._name_var, None),
@@ -169,6 +170,12 @@ class SidePanel(ctk.CTkFrame):
             self._error_label.configure(text="Rent must be a positive integer.")
             return
         last_paid = self._last_paid_var.get().strip()
+        if last_paid:
+            try:
+                datetime.strptime(last_paid, "%Y-%m")
+            except ValueError:
+                self._error_label.configure(text="Last month paid must be YYYY-MM (e.g. 2026-01).")
+                return
         unpaid, due = compute_rent_status(last_paid, rent)
         if unpaid is None:
             unpaid = self.record.get("unpaidMonths", 0)

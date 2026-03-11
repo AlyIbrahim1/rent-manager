@@ -26,3 +26,14 @@ def test_update_record_does_not_affect_other_records(test_db):
     records = test_db.getAllRecords()
     jane = next(r for r in records if r["appartmentNumber"] == 202)
     assert jane["name"] == "Jane Smith"
+
+def test_delete_record_removes_it(test_db):
+    test_db.deleteRecord(101)
+    records = test_db.getAllRecords()
+    apt_numbers = [r["appartmentNumber"] for r in records]
+    assert 101 not in apt_numbers
+    assert 202 in apt_numbers
+
+def test_delete_nonexistent_record_does_not_raise(test_db):
+    test_db.deleteRecord(999)  # Should not raise
+    assert len(test_db.getAllRecords()) == 2
