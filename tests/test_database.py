@@ -10,3 +10,19 @@ def test_get_all_records_empty_table(test_db):
     test_db.conn.commit()
     records = test_db.getAllRecords()
     assert records == []
+
+def test_update_record_changes_fields(test_db):
+    test_db.updateRecord(101, "John Updated", 1500, "2026-02", 1, 1500)
+    records = test_db.getAllRecords()
+    updated = next(r for r in records if r["appartmentNumber"] == 101)
+    assert updated["name"] == "John Updated"
+    assert updated["rentAmount"] == 1500
+    assert updated["lastMonthPayed"] == "2026-02"
+    assert updated["unpaidMonths"] == 1
+    assert updated["rentDue"] == 1500
+
+def test_update_record_does_not_affect_other_records(test_db):
+    test_db.updateRecord(101, "John Updated", 1500, "2026-02", 1, 1500)
+    records = test_db.getAllRecords()
+    jane = next(r for r in records if r["appartmentNumber"] == 202)
+    assert jane["name"] == "Jane Smith"

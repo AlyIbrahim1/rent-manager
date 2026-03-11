@@ -22,9 +22,7 @@ def addRecord(appartmentNumber, name, rentAmount, lastMonthPayed, unpaidMonths, 
     conn.commit()
 
 def deleteRecord(appartmentNumber):
-    cursor.execute("""DELETE FROM renters WHERE appartmentNumber = (?);"""
-    , appartmentNumber
-    )
+    cursor.execute("DELETE FROM renters WHERE appartmentNumber = ?", (appartmentNumber,))
     conn.commit()
 
 def clearTable():
@@ -36,3 +34,11 @@ def getAllRecords():
     rows = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
     return [dict(zip(columns, row)) for row in rows]
+
+def updateRecord(appartmentNumber, name, rentAmount, lastMonthPayed, unpaidMonths, rentDue):
+    cursor.execute("""UPDATE renters
+        SET name=?, rentAmount=?, lastMonthPayed=?, unpaidMonths=?, rentDue=?
+        WHERE appartmentNumber=?""",
+        (name, rentAmount, lastMonthPayed, unpaidMonths, rentDue, appartmentNumber)
+    )
+    conn.commit()
