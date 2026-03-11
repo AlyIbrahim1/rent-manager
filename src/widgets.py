@@ -56,3 +56,41 @@ class RenterCard(ctk.CTkFrame):
 
         for widget in [self, apt_label, name_label, rent_label, unpaid_label, due_label]:
             widget.bind("<Button-1>", lambda e: self.on_click(self.record))
+
+
+class MarkPaidDialog(ctk.CTkToplevel):
+    MONTHS = ["January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"]
+
+    def __init__(self, master, on_confirm, **kwargs):
+        super().__init__(master, **kwargs)
+        self.on_confirm = on_confirm
+        self.title("Mark Month as Paid")
+        self.geometry("300x200")
+        self.resizable(False, False)
+        self.grab_set()
+
+        ctk.CTkLabel(self, text="Select month paid:", font=("Roboto", 14)).pack(pady=(20, 5))
+
+        now = datetime.now()
+        self.month_var = ctk.StringVar(value=self.MONTHS[now.month - 1])
+        self.year_var = ctk.StringVar(value=str(now.year))
+
+        row = ctk.CTkFrame(self, fg_color="transparent")
+        row.pack(pady=5)
+
+        self.month_menu = ctk.CTkOptionMenu(row, variable=self.month_var, values=self.MONTHS, width=140)
+        self.month_menu.pack(side="left", padx=5)
+
+        years = [str(now.year - i) for i in range(5)]
+        self.year_menu = ctk.CTkOptionMenu(row, variable=self.year_var, values=years, width=90)
+        self.year_menu.pack(side="left", padx=5)
+
+        ctk.CTkButton(self, text="Confirm", command=self._confirm).pack(pady=15)
+
+    def _confirm(self):
+        month_num = self.MONTHS.index(self.month_var.get()) + 1
+        year = int(self.year_var.get())
+        month_str = f"{year}-{month_num:02d}"
+        self.on_confirm(month_str)
+        self.destroy()
