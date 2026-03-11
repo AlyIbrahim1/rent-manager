@@ -94,3 +94,97 @@ class MarkPaidDialog(ctk.CTkToplevel):
         month_str = f"{year}-{month_num:02d}"
         self.on_confirm(month_str)
         self.destroy()
+
+
+class SidePanel(ctk.CTkFrame):
+    def __init__(self, master, record, on_save, on_delete, on_close, **kwargs):
+        super().__init__(master, **kwargs)
+        self.record = record
+        self.on_save = on_save
+        self.on_delete = on_delete
+        self.on_close = on_close
+        self._build()
+
+    def _build(self):
+        r = self.record
+
+        ctk.CTkButton(self, text="✕", width=30, command=self.on_close).pack(anchor="ne", padx=10, pady=(10, 0))
+        ctk.CTkLabel(self, text=f"Apt #{r['appartmentNumber']}", font=("Roboto", 18, "bold")).pack(pady=(0, 10))
+
+        self._name_var = ctk.StringVar(value=r.get("name", ""))
+        self._rent_var = ctk.StringVar(value=str(r.get("rentAmount", "")))
+        self._last_paid_var = ctk.StringVar(value=r.get("lastMonthPayed", ""))
+        self._last_paid_var.trace_add("write", lambda *_: self._update_computed())
+
+        for label, var, hint in [
+            ("Name", self._name_var, None),
+            ("Rent Amount ($)", self._rent_var, None),
+            ("Last Month Paid", self._last_paid_var, "YYYY-MM"),
+        ]:
+            ctk.CTkLabel(self, text=label, font=("Roboto", 12)).pack(anchor="w", padx=20)
+            ctk.CTkEntry(self, textvariable=var, placeholder_text=hint or "").pack(fill="x", padx=20, pady=(0, 8))
+
+        self._unpaid_label = ctk.CTkLabel(self, text="", font=("Roboto", 12))
+        self._unpaid_label.pack(anchor="w", padx=20)
+        self._due_label = ctk.CTkLabel(self, text="", font=("Roboto", 12))
+        self._due_label.pack(anchor="w", padx=20, pady=(0, 12))
+        self._update_computed()
+
+        self._error_label = ctk.CTkLabel(self, text="", text_color="red", font=("Roboto", 11))
+        self._error_label.pack()
+
+        btn_frame = ctk.CTkFrame(self, fg_color="transparent")
+        btn_frame.pack(pady=10, fill="x", padx=20)
+
+        ctk.CTkButton(btn_frame, text="Save", command=self._save).pack(side="left", padx=4)
+        ctk.CTkButton(btn_frame, text="Mark Paid", command=self._mark_paid).pack(side="left", padx=4)
+
+        self._delete_btn = ctk.CTkButton(btn_frame, text="Delete", fg_color="#e74c3c",
+                                          hover_color="#c0392b", command=self._delete_step1)
+        self._delete_btn.pack(side="left", padx=4)
+
+    def _update_computed(self):
+        try:
+            rent = int(self._rent_var.get())
+        except ValueError:
+            rent = 0
+        unpaid, due = compute_rent_status(self._last_paid_var.get(), rent)
+        if unpaid is None:
+            self._unpaid_label.configure(text="Unpaid months: N/A")
+            self._due_label.configure(text="Rent due: N/A")
+        else:
+            self._unpaid_label.configure(text=f"Unpaid months: {unpaid}")
+            self._due_label.configure(text=f"Rent due: ${due}")
+
+    def _save(self):
+        name = self._name_var.get().strip()
+        if not name:
+            self._error_label.configure(text="Name cannot be empty.")
+            return
+        try:
+            rent = int(self._rent_var.get())
+            if rent <= 0:
+                raise ValueError
+        except ValueError:
+            self._error_label.configure(text="Rent must be a positive integer.")
+            return
+        last_paid = self._last_paid_var.get().strip()
+        unpaid, due = compute_rent_status(last_paid, rent)
+        if unpaid is None:
+            unpaid = self.record.get("unpaidMonths", 0)
+            due = self.record.get("rentDue", 0)
+        database.updateRecord(self.record["appartmentNumber"], name, rent, last_paid, unpaid, due)
+        self.on_save()
+
+    def _mark_paid(self):
+        def on_confirm(month_str):
+            self._last_paid_var.set(month_str)
+            self._save()
+        MarkPaidDialog(self, on_confirm=on_confirm)
+
+    def _delete_step1(self):
+        self._delete_btn.configure(text="Are you sure?", command=self._delete_confirm)
+
+    def _delete_confirm(self):
+        database.deleteRecord(self.record["appartmentNumber"])
+        self.on_delete()
