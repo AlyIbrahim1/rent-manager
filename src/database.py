@@ -30,3 +30,9 @@ def deleteRecord(appartmentNumber):
 def clearTable():
     cursor.execute(""" DROP TABLE renters;""")
     conn.commit()
+
+def getAllRecords():
+    cursor.execute("SELECT * FROM renters")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    return [dict(zip(columns, row)) for row in rows]
