@@ -29,10 +29,10 @@ class App(ctk.CTk):
         header.pack_propagate(False)
 
         ctk.CTkLabel(header, text="Rent Management System",
-                     font=("Roboto", 22, "bold")).pack(side="left", padx=20, pady=10)
+                    font=("Roboto", 22, "bold")).pack(side="left", padx=20, pady=10)
 
         ctk.CTkButton(header, text="+ Add Renter", width=130,
-                      command=self._open_add_modal).pack(side="right", padx=20, pady=10)
+                    command=self._open_add_modal).pack(side="right", padx=20, pady=10)
 
     def _build_body(self):
         self._body = ctk.CTkFrame(self, fg_color="transparent")
@@ -53,14 +53,14 @@ class App(ctk.CTk):
         records = database.getAllRecords()
         if not records:
             ctk.CTkLabel(self._grid_frame, text="No renters yet. Add one to get started.",
-                         font=("Roboto", 14), text_color="gray").pack(pady=40)
+                        font=("Roboto", 14), text_color="gray").pack(pady=40)
             return
 
         cols = max(1, (1000 - 20) // (self.CARD_WIDTH + 16))
         for i, record in enumerate(records):
             row, col = divmod(i, cols)
             card = RenterCard(self._grid_frame, record, on_click=self._open_side_panel,
-                              width=self.CARD_WIDTH, height=self.CARD_HEIGHT)
+                            width=self.CARD_WIDTH, height=self.CARD_HEIGHT)
             card.grid(row=row, column=col, padx=8, pady=8, sticky="nw")
 
     def _open_side_panel(self, record):
