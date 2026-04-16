@@ -12,6 +12,10 @@ invoices/
 
 # Virtualenv
 .venv/
+frontend/node_modules/
+
+# Generated local databases
+backend/*.db
 
 # Brainstorming artifacts
 .superpowers/
