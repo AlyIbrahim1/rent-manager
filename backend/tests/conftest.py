@@ -1,4 +1,8 @@
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import sqlite3
+from types import SimpleNamespace
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from jose import jwt
@@ -6,6 +10,7 @@ import pytest
 
 from app.db.base import Base
 from app.db.session import engine
+from app.db.session import SessionLocal
 from app.main import create_app
 
 
@@ -70,3 +75,40 @@ def payment_payload() -> dict:
         "amountPaid": 1200,
         "name": "John Doe",
     }
+
+
+@pytest.fixture
+def sqlite_fixture(tmp_path: Path):
+    sqlite_path = tmp_path / "legacy.sqlite"
+    conn = sqlite3.connect(sqlite_path)
+    cur = conn.cursor()
+    cur.execute(
+        "CREATE TABLE renters (appartmentNumber INTEGER PRIMARY KEY, name TEXT, rentAmount INTEGER, lastMonthPayed TEXT)"
+    )
+    cur.execute(
+        "CREATE TABLE leases (appartmentNumber INTEGER, startDate TEXT, endDate TEXT, depositAmount INTEGER, depositStatus TEXT, renewalNotes TEXT)"
+    )
+    cur.execute(
+        "CREATE TABLE payments (id INTEGER PRIMARY KEY AUTOINCREMENT, appartmentNumber INTEGER, monthPaid TEXT, amountPaid INTEGER, dateRecorded TEXT)"
+    )
+    cur.execute(
+        "INSERT INTO renters(appartmentNumber, name, rentAmount, lastMonthPayed) VALUES (101, 'John Doe', 1200, '2026-01')"
+    )
+    cur.execute(
+        "INSERT INTO renters(appartmentNumber, name, rentAmount, lastMonthPayed) VALUES (102, 'Jane Roe', 1400, '2026-01')"
+    )
+    cur.execute(
+        "INSERT INTO leases(appartmentNumber, startDate, endDate, depositAmount, depositStatus, renewalNotes) VALUES (101, '2025-01-01', '2026-12-31', 1000, 'paid', 'none')"
+    )
+    cur.execute(
+        "INSERT INTO payments(appartmentNumber, monthPaid, amountPaid, dateRecorded) VALUES (101, '2026-01', 1200, '2026-01-03')"
+    )
+    conn.commit()
+    conn.close()
+    return SimpleNamespace(path=str(sqlite_path), owner_user_id=str(uuid4()))
+
+
+@pytest.fixture
+def pg_session():
+    with SessionLocal() as session:
+        yield session
