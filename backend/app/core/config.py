@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite+pysqlite:///./app.db"
     supabase_url: str = ""
-    supabase_jwt_secret: str = ""
+    supabase_jwt_secret: str = "dev-secret"
     supabase_storage_bucket: str = "receipts"
 
 
