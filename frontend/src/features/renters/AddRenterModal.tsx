@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { CreateRenterInput } from "../../api/types";
 
 type Props = {
-  onSubmit: (payload: CreateRenterInput) => Promise<void>;
+  onSubmit: (payload: CreateRenterInput) => Promise<unknown>;
 };
 
 export function AddRenterModal({ onSubmit }: Props) {

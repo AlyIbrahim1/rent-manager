@@ -63,6 +63,23 @@ Repository virtualenv (recommended in this project):
 .venv/Scripts/python.exe main.py
 ```
 
+## SaaS Web Development
+
+### Backend
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ## Architecture
 
 - src/database.py
@@ -109,6 +126,21 @@ Notes:
 
 ```bash
 python -m pytest -q
+```
+
+Backend API tests:
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m pytest -q
+```
+
+Frontend tests/build:
+
+```bash
+cd frontend
+npm run test:run
+npm run build
 ```
 
 ## License
