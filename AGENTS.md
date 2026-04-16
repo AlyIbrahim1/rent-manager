@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI Agents when working with code in this repository.
 
 ## Instructions
 
@@ -8,58 +8,94 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Running the App
 
+Backend API:
+
 ```bash
-.venv/Scripts/python.exe main.py
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 
-The app requires a `data/` directory for the SQLite database and an `assets/app_icon.ico` file to be present.
+Frontend app:
+
+```bash
+cd frontend
+npm run dev
+```
 
 ## Installing Dependencies
 
+Backend:
+
 ```bash
-pip install -r requirements.txt
+cd backend
+pip install -e .[dev]
 ```
 
-Or activate the existing virtualenv first:
+Frontend:
 
 ```bash
-.venv/Scripts/python.exe  # Windows/WSL — use this directly instead of activating
+cd frontend
+npm install
 ```
 
 ## Architecture
 
-**Entry point:** `main.py` — imports `src.database` to initialize the DB on startup, then `src/ui.py` launches the Tkinter window via `window.mainloop()`.
+**Backend entrypoint:** `backend/app/main.py` — FastAPI app factory and router registration.
 
-**Data layer (`src/database.py`):** Raw SQLite CRUD only — no business logic. Module-level connection opened at import time. Tables: `renters`, `leases`, `payments`. All DB mutations must call `conn.commit()` to persist.
+**Frontend entrypoint:** `frontend/src/main.tsx` — React bootstrap + QueryClient provider.
 
-**Business logic (`src/models.py`):** Pure Python — rent calculations, lease expiry checks, payment recording. No DB or UI imports. This is the layer to wrap when migrating to a web backend.
+**Auth layer (`backend/app/core/security.py`, `backend/app/services/auth_context_service.py`):** Verifies Supabase bearer tokens and provides tenant-scoped request context.
 
-**UI layer (`src/ui.py`, `src/widgets.py`):** CustomTkinter GUI (fixed 1000×650, unresizable). Calls `models`, never `database` directly. System appearance mode with dark-blue theme.
+**API layer (`backend/app/api/routes/*.py`):** Health, auth context (`/api/me`), renter CRUD, lease/payment operations, and receipt generation endpoints.
 
-**Invoice layer (`src/invoice.py`):** ReportLab-based PDF receipt generation. Pure function — takes a data dict, writes to `invoices/`, returns file path. No UI logic.
+**Data layer (`backend/app/models/*.py`, `backend/app/db/*`):** SQLAlchemy models and sessions over PostgreSQL/Supabase with `tenant_id` isolation.
+
+**Frontend features (`frontend/src/features/**`):** Auth gate, renter dashboard, renter cards/details, add renter, mark paid, payment history.
+
+**Migration layer (`backend/scripts/migrate_sqlite_to_supabase.py`):** Imports legacy SQLite renter/lease/payment data into tenant-scoped schema.
 
 ## Database Schema
 
-Three tables — all in `data/` (SQLite, single file):
+Primary backend tables:
 
-- **`renters`** — `appartmentNumber` PK, `name`, `rentAmount`, `lastMonthPayed`
-- **`leases`** — `appartmentNumber` FK, `startDate`, `endDate`, `depositAmount`, `depositStatus`, `renewalNotes`
-- **`payments`** — `id` PK (auto), `appartmentNumber` FK, `monthPaid`, `amountPaid`, `dateRecorded`
+- **`tenants`** — tenant workspace owner and metadata
+- **`tenant_memberships`** — user-to-tenant role mapping
+- **`renters`** — tenant-scoped renter records (`appartmentNumber`, `name`, `rentAmount`, `lastMonthPayed`)
+- **`leases`** — tenant-scoped lease details
+- **`payments`** — tenant-scoped payment history events
+- **`receipts`** — generated receipt location and download URL
 
-`unpaidMonths` and `rentDue` are **always computed, never stored**. Source of truth is `lastMonthPayed` + `rentAmount`.
+`unpaidMonths` and `rentDue` are computed in service/API output and are not persisted.
 
 ## Layer Rules
 
-- `database.py` — imports `sqlite3` only
-- `models.py` — imports `database` only
-- `ui.py` / `widgets.py` — imports `models` and `ctk` only
-- `invoice.py` — imports `reportlab` only
+- `backend/app/api/routes/*` should depend on services + schemas, not raw DB logic
+- `backend/app/services/*` should contain domain behavior and tenant-scoped checks
+- `backend/app/models/*` should remain persistence models (no API/UI behavior)
+- `frontend/src/features/*` should call `frontend/src/api/client.ts` for server interactions
 
-Keeping these boundaries clean is what enables a future web migration.
+Keep backend/frontend boundaries clean to preserve maintainability and testability.
+
+## Testing
+
+Backend:
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m pytest -q
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run test:run
+npm run build
+```
 
 ## PRD
 
-Full product requirements: `docs/superpowers/specs/2026-04-16-rent-manager-prd-design.md`
+Full product requirements: `PRD.md`
 
 ## Commit Style
 

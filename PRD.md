@@ -7,173 +7,195 @@
 
 ## 1. Product Overview
 
-**Rent Manager** is a desktop application for individual landlords to manage apartment renters, track rent payments, manage leases, and generate receipts. The primary platform is Windows desktop (CustomTkinter). The data layer and business logic must be kept platform-agnostic to enable a future web migration.
+**Rent Manager** is a multi-tenant SaaS web application for landlords and property teams to manage renters, leases, payments, and receipts.
 
-**Target user:** A single landlord managing one residential building with multiple apartment units.
+**Target user:** Property owners and staff managing one or more residential properties inside isolated tenant workspaces.
 
 **Core principles:**
-- Apartment number is the primary key — it is the anchor for all renter, lease, and payment data
-- All financial figures in whole-dollar integers
-- No authentication required (single-user desktop tool)
+- Every protected operation is tenant-scoped
+- Apartment number is a key business identifier per tenant
+- Financial values use whole-dollar integers
+- `unpaidMonths` and `rentDue` are computed, never stored
 
 ---
 
-## 2. Renter Management
+## 2. Authentication and Tenant Isolation
 
-The core of the app — a scrollable grid of apartment cards, each showing the unit's current occupant and payment status.
+- Authentication uses Supabase bearer JWTs.
+- API extracts auth context (`userId`, `tenantId`, `role`) from token claims.
+- Protected endpoints reject missing/invalid tokens with `401`.
+- Tenant isolation is enforced in service/database access; cross-tenant resources return `404`.
+
+---
+
+## 3. Renter Management
+
+Renter management is tenant-scoped and exposed via `/api/renters`.
 
 ### Renter Record Fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `appartmentNumber` | Integer PK | Positive integer, unique |
+| `id` | UUID/String | Server-generated renter identifier |
+| `appartmentNumber` | Integer | Positive integer, business-facing apartment number |
 | `name` | Text | Tenant full name |
 | `rentAmount` | Integer | Monthly rent in whole dollars |
 | `lastMonthPayed` | Text | Format: YYYY-MM |
 
-### Card Display
+### Computed Outputs
 
-Each card shows apartment number, tenant name, rent amount, unpaid months (computed), and total amount due (computed). Color-coded border: **green** if fully paid up, **red** if any months are overdue.
+API responses provide:
+- `unpaidMonths`
+- `rentDue`
+
+Both are computed from `lastMonthPayed` and `rentAmount`.
 
 ### Operations
 
-- **Add renter** — modal with apartment number, name, rent amount, optional last month paid
-- **Edit renter** — side panel with all fields editable; unpaid months and amount due update live as you type
-- **Mark paid** — dialog to select month + year; updates `lastMonthPayed` and triggers recalculation
-- **Delete renter** — two-step confirmation to prevent accidental deletion
+- **Create renter** — `POST /api/renters`
+- **List renters** — `GET /api/renters`
+- **Get renter** — `GET /api/renters/{renter_id}`
 
-### Data Integrity
+### Data Integrity Rules
 
-`unpaidMonths` and `rentDue` are always computed from `lastMonthPayed` and `rentAmount` at display time — they are **not** stored. The database keeps only the source fields.
+- Renter queries must be tenant-filtered.
+- Computed fields are never persisted.
 
 ---
 
-## 3. Lease Management
+## 4. Lease Management
 
-Each apartment unit can have an associated lease record.
+Lease operations are tenant-scoped and associated to renter records.
 
 ### Lease Record Fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `appartmentNumber` | Integer FK | Links to renter |
+| `renter_id` | UUID/String FK | Links lease to renter |
 | `startDate` | Text | YYYY-MM-DD |
 | `endDate` | Text | YYYY-MM-DD; must be after startDate |
 | `depositAmount` | Integer | Security deposit in whole dollars |
-| `depositStatus` | Text | `pending` / `paid` / `returned` |
+| `depositStatus` | Text | `unpaid` / `paid` / `returned` |
 | `renewalNotes` | Text | Free-text, optional |
-
-### Display
-
-Lease details appear in the side panel beneath renter fields. Cards for leases expiring within **30 days** display an **amber/yellow** visual accent.
 
 ### Operations
 
-- **Add / edit lease** — inline in the side panel; saved with the same Save button as renter edits
-- **Track deposit status** — dropdown to update between `pending`, `paid`, `returned`
+- **Upsert lease** — `PUT /api/renters/{renter_id}/lease`
 
 ### Constraints
 
-- One active lease per apartment at a time
-- End date must be after start date
-- Lease is optional — apartments can exist without one (backward-compatible)
+- Lease write requires renter to exist in current tenant.
+- One lease record per renter in current implementation.
 
 ---
 
-## 4. Payment Tracking
+## 5. Payment Tracking
 
-### Computed Fields (never stored)
+Payment operations are tenant-scoped and append-only.
 
-| Field | Computation |
-|---|---|
-| Unpaid months | Months elapsed since `lastMonthPayed` to today |
-| Total due | Unpaid months × `rentAmount` |
-
-Calculated live at display time on both the card and side panel.
-
-### Payment History Log
-
-Each "Mark Paid" action appends one record:
+### Payment Event Fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | Integer PK | Auto-increment |
-| `appartmentNumber` | Integer FK | |
+| `id` | UUID/String | Server-generated |
 | `monthPaid` | Text | YYYY-MM |
-| `amountPaid` | Integer | Snapshot at time of payment |
-| `dateRecorded` | Text | Auto-set to today, YYYY-MM-DD |
+| `amountPaid` | Integer | Snapshot at record time |
+| `dateRecorded` | Text | YYYY-MM-DD |
 
-### Display
+### Operations
 
-Side panel shows a scrollable history list beneath lease details — most recent first. Each row: month covered, amount paid, date recorded.
-
-### Constraints
-
-- Append-only — no editing or deletion of past records
-- Every "Mark Paid" action writes exactly one payment event
-
----
-
-## 5. Invoicing (PDF Receipts)
-
-### Receipt Contents
-
-Tenant name, apartment number, month covered, amount paid, date issued.
+- **List payments** — `GET /api/renters/{renter_id}/payments`
+- **Add payment** — `POST /api/renters/{renter_id}/payments`
 
 ### Behavior
 
-- After confirming "Mark Paid", a prompt asks: **"Generate receipt?" (Yes / No)**
-- If Yes, PDF saved to `invoices/` as `apt{N}_{YYYY-MM}.pdf`
-- Re-generatable from payment history — click any past entry → "Generate Receipt"
-- Local file only, no email delivery
-
-### Implementation
-
-- Uses ReportLab (already in `requirements.txt`)
-- Lives in `src/invoice.py` — pure function: takes a data dict, returns output file path
-- No UI logic inside the invoice module
+- On payment creation, renter `lastMonthPayed` is updated.
+- Payment history remains append-only.
 
 ---
 
-## 6. Architecture & Data Model
+## 6. Receipts
 
-### Layer Separation
+Receipt generation is available via `POST /api/receipts`.
 
-| Module | Responsibility | May import |
+### Request Fields
+
+| Field | Type | Notes |
 |---|---|---|
-| `src/database.py` | Raw SQLite CRUD only | `sqlite3` |
-| `src/models.py` *(new)* | Business logic: rent calc, lease expiry, payment recording | `database` |
-| `src/ui.py`, `src/widgets.py` | UI only | `models`, `ctk` |
-| `src/invoice.py` | Pure PDF generation | `reportlab` |
+| `appartmentNumber` | Integer | Apartment number for receipt naming |
+| `monthPaid` | Text | Covered month |
+| `amountPaid` | Integer | Paid amount |
+| `name` | Text | Renter name |
 
-No UI imports in database or models. No database imports in UI.
+### Response Fields
 
-### Database Schema
-
-**`renters`** — `appartmentNumber` PK, `name`, `rentAmount`, `lastMonthPayed`
-
-**`leases`** — `appartmentNumber` FK, `startDate`, `endDate`, `depositAmount`, `depositStatus`, `renewalNotes`
-
-**`payments`** — `id` PK (auto), `appartmentNumber` FK, `monthPaid`, `amountPaid`, `dateRecorded`
-
-### Removed Columns
-
-`unpaidMonths` and `rentDue` are dropped from `renters`. Always computed, never stored. Existing data requires a migration.
-
-### Future Web Migration Path
-
-1. Replace `src/database.py` with a PostgreSQL adapter
-2. Wrap `src/models.py` in a REST API
-3. Replace the CustomTkinter UI with a web frontend
+| Field | Type | Notes |
+|---|---|---|
+| `path` | Text | Tenant-partitioned receipt object path |
+| `downloadUrl` | Text | Signed/public URL-like link |
 
 ---
 
-## 7. Non-Functional Requirements
+## 7. Frontend Requirements
 
-- **Platform:** Windows desktop (WSL-compatible), Python 3.12+
-- **UI framework:** CustomTkinter 5.2.2
-- **Database:** SQLite, single file in `data/`
-- **PDF output:** ReportLab, saved to `invoices/`
-- **Window:** Fixed 1000×650, unresizable (relaxable in future web version)
-- **Performance:** All operations perceptibly instant for up to 200 units
-- **Auth:** None — single-user tool
+Frontend stack: React + TypeScript + Vite + Tailwind + TanStack Query.
+
+### Required UX Flows
+
+- Auth gate renders login for unauthenticated users.
+- Authenticated users see renter dashboard.
+- Dashboard supports renter listing, add renter, renter detail selection, mark paid flow.
+- Payment history is visible for selected renter.
+
+### Frontend Test Coverage
+
+- Auth gate behavior test.
+- Dashboard renter-card rendering test.
+- Playwright smoke spec for login/dashboard path.
+
+---
+
+## 8. Architecture & Data Model
+
+### Backend Layers
+
+| Module | Responsibility |
+|---|---|
+| `backend/app/api/routes/*` | HTTP routing and dependency wiring |
+| `backend/app/services/*` | Business logic and tenant checks |
+| `backend/app/models/*` | SQLAlchemy persistence models |
+| `backend/app/schemas/*` | Request/response contracts |
+| `backend/alembic/*` | Schema migration management |
+
+### Core Tables
+
+- `tenants`
+- `tenant_memberships`
+- `renters`
+- `leases`
+- `payments`
+- `receipts`
+
+### Legacy Migration
+
+`backend/scripts/migrate_sqlite_to_supabase.py` imports legacy SQLite data into tenant-scoped schema and reports import counts.
+
+---
+
+## 9. Non-Functional Requirements
+
+- **Backend runtime:** Python 3.12+
+- **Frontend runtime:** Node 20+
+- **API performance target:** CRUD operations perceptibly instant for typical small/medium portfolios
+- **Security:** Bearer token required for protected routes, tenant isolation enforced server-side
+- **Quality gates:** Backend pytest + frontend unit tests + frontend build in CI on push/PR
+- **Portability:** Web-based deployment model; no desktop UI dependency
+
+---
+
+## 10. CI Requirements
+
+- Backend CI job must install backend dev dependencies and run `pytest -q`.
+- Frontend CI job must run `npm ci` and `npm run test:run`.
+- CI runs on pushes to `main` and pull requests.
+

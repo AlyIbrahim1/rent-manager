@@ -10,23 +10,19 @@ Rent Manager is now a web-first stack:
 - Auth/Data/Storage: Supabase
 
 Core behavior:
-- Apartment number is the primary key for each unit
+- Apartment number is a core business identifier per tenant
 - Financial amounts are whole-dollar integers
 - Unpaid months and rent due are computed live (never stored)
+- Protected API operations are bearer-token authenticated and tenant scoped
 
 ## Features
 
-- Add, edit, and delete renter records
-- Mark rent paid by month/year
-- Append-only payment history per apartment
-- Optional PDF receipt generation after payment confirmation
-- Regenerate receipts from historical payment entries
-- Lease details per apartment (start/end, deposit amount/status, renewal notes)
-- Lease-expiry visual warning (within 30 days)
-- Card status accents:
-    - Green: paid up
-    - Red: overdue
-    - Amber: lease expiring soon
+- Supabase JWT-based auth context (`/api/me`)
+- Tenant-scoped renter create/list/get flows
+- Lease upsert per renter
+- Append-only payment history and mark-paid flow
+- Receipt generation endpoint with tenant-partitioned paths
+- Legacy SQLite-to-tenant migration utility
 
 ## Tech Stack
 
@@ -53,12 +49,26 @@ cd frontend
 npm install
 ```
 
+## Environment
+
+Backend uses `backend/.env` (see `backend/.env.example`):
+- `DATABASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_JWT_SECRET`
+- `SUPABASE_STORAGE_BUCKET`
+
+Frontend uses `frontend/.env` (see `frontend/.env.example`):
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_API_BASE_URL`
+
 ## Running the App
 
 ### Backend
 
 ```bash
 cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m alembic upgrade head
 /home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 
@@ -94,6 +104,21 @@ cd frontend
 npm run test:run
 npm run build
 ```
+
+## Data Migration
+
+Import legacy SQLite data into the tenant-scoped schema:
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -c "from scripts.migrate_sqlite_to_supabase import run_migration; print(run_migration('/path/to/legacy.sqlite', 'Imported Tenant'))"
+```
+
+## CI
+
+GitHub Actions workflow in `.github/workflows/ci.yml` runs:
+- Backend: install + `pytest -q`
+- Frontend: `npm ci` + `npm run test:run`
 
 ## License
 
