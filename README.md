@@ -1,10 +1,13 @@
 # Rent Manager
 
-Desktop app for individual landlords to manage renters, leases, payments, and PDF receipts.
+SaaS web application for managing renters, leases, payments, and PDF receipts.
 
 ## Overview
 
-Rent Manager is a CustomTkinter desktop application backed by SQLite. It follows a layered design so business logic can be reused in a future web migration.
+Rent Manager is now a web-first stack:
+- Backend: FastAPI + SQLAlchemy + Alembic
+- Frontend: React + TypeScript + Vite + Tailwind
+- Auth/Data/Storage: Supabase
 
 Core behavior:
 - Apartment number is the primary key for each unit
@@ -28,42 +31,29 @@ Core behavior:
 ## Tech Stack
 
 - Python 3.12+
-- CustomTkinter 5.2.2
-- SQLite (single local DB file)
+- FastAPI
+- SQLAlchemy + Alembic
+- Supabase
+- React 18 + TypeScript + Tailwind
 - ReportLab (PDF receipts)
 
 ## Installation
 
-1. Install dependencies:
+1. Backend dependencies:
 
 ```bash
-pip install -r requirements.txt
+cd backend
+pip install -e .[dev]
 ```
 
-2. Ensure required directories/files exist:
+2. Frontend dependencies:
 
 ```bash
-mkdir -p data invoices assets
+cd frontend
+npm install
 ```
-
-Required icon path:
-- assets/app_icon.ico
 
 ## Running the App
-
-Default:
-
-```bash
-python main.py
-```
-
-Repository virtualenv (recommended in this project):
-
-```bash
-.venv/Scripts/python.exe main.py
-```
-
-## SaaS Web Development
 
 ### Backend
 
@@ -76,66 +66,28 @@ cd backend
 
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
 
 ## Architecture
 
-- src/database.py
-    - Raw SQLite CRUD only
-    - Creates/migrates schema on startup
-    - No business rules
-- src/models.py
-    - Business logic (rent calculations, lease checks, payment recording)
-    - Imports database only
-- src/ui.py and src/widgets.py
-    - GUI only
-    - Imports models, never database directly
-- src/invoice.py
-    - Pure receipt PDF generation via ReportLab
-
-## Database Schema
-
-renters:
-- appartmentNumber INTEGER PRIMARY KEY
-- name TEXT NOT NULL
-- rentAmount INTEGER NOT NULL
-- lastMonthPayed TEXT
-
-leases:
-- appartmentNumber INTEGER PRIMARY KEY (FK -> renters.appartmentNumber)
-- startDate TEXT
-- endDate TEXT
-- depositAmount INTEGER
-- depositStatus TEXT
-- renewalNotes TEXT
-
-payments:
-- id INTEGER PRIMARY KEY AUTOINCREMENT
-- appartmentNumber INTEGER NOT NULL (FK -> renters.appartmentNumber)
-- monthPaid TEXT NOT NULL
-- amountPaid INTEGER NOT NULL
-- dateRecorded TEXT NOT NULL
-
-Notes:
-- unpaidMonths and rentDue are not stored in the database
-- Existing legacy renters tables are migrated automatically
+- backend/app
+    - API routes, services, DB models, auth context, migrations
+- frontend/src
+    - Auth gate, renter dashboard, query/mutation-driven UI
+- .github/workflows/ci.yml
+    - Backend and frontend CI checks
 
 ## Testing
 
-```bash
-python -m pytest -q
-```
-
-Backend API tests:
+Backend tests:
 
 ```bash
 cd backend
 /home/alyibrahim/projects/rent-manager/.venv/bin/python -m pytest -q
 ```
 
-Frontend tests/build:
+Frontend tests and build:
 
 ```bash
 cd frontend
