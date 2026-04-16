@@ -1,94 +1,115 @@
-# RentManager
+# Rent Manager
 
-A lightweight desktop application for tracking tenant rent payment status and generating PDF invoices.
+Desktop app for individual landlords to manage renters, leases, payments, and PDF receipts.
 
-## Description
+## Overview
 
-RentManager is a Python desktop application built for individual property managers and landlords who need a simple tool to manage tenant records. It stores tenant information — apartment number, name, rent amount, payment history, and outstanding balance — in a local SQLite database and provides a GUI for day-to-day management. PDF invoice generation is in progress.
+Rent Manager is a CustomTkinter desktop application backed by SQLite. It follows a layered design so business logic can be reused in a future web migration.
+
+Core behavior:
+- Apartment number is the primary key for each unit
+- Financial amounts are whole-dollar integers
+- Unpaid months and rent due are computed live (never stored)
 
 ## Features
 
-**Implemented:**
-- SQLite-backed tenant record management (add, delete, clear all)
-- CustomTkinter GUI with dark-blue theme and system appearance mode detection
-- Fixed 1000x650 application window with custom icon
+- Add, edit, and delete renter records
+- Mark rent paid by month/year
+- Append-only payment history per apartment
+- Optional PDF receipt generation after payment confirmation
+- Regenerate receipts from historical payment entries
+- Lease details per apartment (start/end, deposit amount/status, renewal notes)
+- Lease-expiry visual warning (within 30 days)
+- Card status accents:
+    - Green: paid up
+    - Red: overdue
+    - Amber: lease expiring soon
 
-**Planned:**
-- Full data table with inline CRUD forms
-- PDF invoice generation via ReportLab
-- Desktop packaging with PyInstaller
+## Tech Stack
 
-## Prerequisites
-
-- Python 3.8 or later
-- A `data/` directory at the project root (for the SQLite database)
-- `assets/app_icon.ico` present at the project root
+- Python 3.12+
+- CustomTkinter 5.2.2
+- SQLite (single local DB file)
+- ReportLab (PDF receipts)
 
 ## Installation
 
-1. Clone the repository:
-
-```bash
-git clone <repository-url>
-cd RentManagement_app
-```
-
-2. (Optional) Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate   # Windows / WSL
-# or
-source .venv/bin/activate        # Linux / macOS
-```
-
-3. Install dependencies:
+1. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
-pip install reportlab   # for invoice generation
 ```
 
-4. Create the required directories if they do not exist:
+2. Ensure required directories/files exist:
 
 ```bash
-mkdir -p data invoices
+mkdir -p data invoices assets
 ```
 
+Required icon path:
+- assets/app_icon.ico
+
 ## Running the App
+
+Default:
 
 ```bash
 python main.py
 ```
 
-## Project Structure
+Repository virtualenv (recommended in this project):
 
-```
-RentManagement_app/
-├── main.py              # Entry point; initialises DB and launches the UI
-├── requirements.txt     # Core dependencies
-├── data/                # SQLite database directory
-├── assets/
-│   └── app_icon.ico     # Application window icon
-├── invoices/            # PDF invoice output directory
-└── src/
-    ├── database.py      # Data layer; SQLite connection and renters table operations
-    ├── ui.py            # GUI layer; CustomTkinter window (1000x650, dark-blue theme)
-    └── invoice.py       # Invoice layer; ReportLab PDF generation (planned/incomplete)
+```bash
+.venv/Scripts/python.exe main.py
 ```
 
-### Database Schema
+## Architecture
 
-Table: `renters`
+- src/database.py
+    - Raw SQLite CRUD only
+    - Creates/migrates schema on startup
+    - No business rules
+- src/models.py
+    - Business logic (rent calculations, lease checks, payment recording)
+    - Imports database only
+- src/ui.py and src/widgets.py
+    - GUI only
+    - Imports models, never database directly
+- src/invoice.py
+    - Pure receipt PDF generation via ReportLab
 
-| Column           | Type    | Notes       |
-|------------------|---------|-------------|
-| appartmentNumber | INTEGER | Primary key |
-| name             | TEXT    |             |
-| rentAmount       | INTEGER |             |
-| lastMonthPayed   | TEXT    |             |
-| unpaidMonths     | INTEGER |             |
-| rentDue          | INTEGER |             |
+## Database Schema
+
+renters:
+- appartmentNumber INTEGER PRIMARY KEY
+- name TEXT NOT NULL
+- rentAmount INTEGER NOT NULL
+- lastMonthPayed TEXT
+
+leases:
+- appartmentNumber INTEGER PRIMARY KEY (FK -> renters.appartmentNumber)
+- startDate TEXT
+- endDate TEXT
+- depositAmount INTEGER
+- depositStatus TEXT
+- renewalNotes TEXT
+
+payments:
+- id INTEGER PRIMARY KEY AUTOINCREMENT
+- appartmentNumber INTEGER NOT NULL (FK -> renters.appartmentNumber)
+- monthPaid TEXT NOT NULL
+- amountPaid INTEGER NOT NULL
+- dateRecorded TEXT NOT NULL
+
+Notes:
+- unpaidMonths and rentDue are not stored in the database
+- Existing legacy renters tables are migrated automatically
+
+## Testing
+
+```bash
+python -m pytest -q
+```
 
 ## License
 
@@ -96,4 +117,4 @@ Private / Personal Use. All rights reserved.
 
 ---
 
-Last updated: 2026-03-11
+Last updated: 2026-04-16

@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from src import database
+from src import invoice, models
 from src.widgets import RenterCard, SidePanel, AddRenterModal
 
 ctk.set_appearance_mode("system")
@@ -50,7 +50,7 @@ class App(ctk.CTk):
         for widget in self._grid_frame.winfo_children():
             widget.destroy()
 
-        records = database.getAllRecords()
+        records = models.list_renters()
         if not records:
             ctk.CTkLabel(self._grid_frame, text="No renters yet. Add one to get started.",
                         font=("Roboto", 14), text_color="gray").pack(pady=40)
@@ -73,6 +73,7 @@ class App(ctk.CTk):
         self._side_panel = SidePanel(
             self._body,
             record=record,
+            on_generate_receipt=self._generate_receipt,
             on_save=self.refresh,
             on_delete=self.refresh,
             on_close=self.refresh,
@@ -82,5 +83,8 @@ class App(ctk.CTk):
 
     def _open_add_modal(self):
         AddRenterModal(self, on_submit=self.refresh)
+
+    def _generate_receipt(self, receipt_data):
+        return invoice.generate_receipt(receipt_data)
 
 

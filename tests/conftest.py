@@ -16,15 +16,28 @@ def test_db(tmp_path, monkeypatch):
         appartmentNumber INTEGER PRIMARY KEY,
         name TEXT,
         rentAmount INTEGER,
-        lastMonthPayed TEXT,
-        unpaidMonths INTEGER,
-        rentDue INTEGER
+        lastMonthPayed TEXT
+    )""")
+    cursor.execute("""CREATE TABLE leases (
+        appartmentNumber INTEGER PRIMARY KEY,
+        startDate TEXT,
+        endDate TEXT,
+        depositAmount INTEGER,
+        depositStatus TEXT,
+        renewalNotes TEXT
+    )""")
+    cursor.execute("""CREATE TABLE payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        appartmentNumber INTEGER,
+        monthPaid TEXT,
+        amountPaid INTEGER,
+        dateRecorded TEXT
     )""")
     conn.commit()
 
     # Seed two records
-    cursor.execute("INSERT INTO renters VALUES (101, 'John Doe', 1200, '2026-01', 2, 2400)")
-    cursor.execute("INSERT INTO renters VALUES (202, 'Jane Smith', 900, '2026-02', 1, 900)")
+    cursor.execute("INSERT INTO renters VALUES (101, 'John Doe', 1200, '2026-01')")
+    cursor.execute("INSERT INTO renters VALUES (202, 'Jane Smith', 900, '2026-02')")
     conn.commit()
 
     import src.database as db
