@@ -37,15 +37,20 @@ export function LoginPage() {
     setLoading(true);
 
     if (isDevShortcut) {
-      const res = await fetch(`${apiBase}/api/dev-token`, { method: "POST" });
-      if (res.ok) {
-        const { access_token } = await res.json() as { access_token: string };
-        sessionStorage.setItem("dev_token", access_token);
-        window.dispatchEvent(new Event("dev-login"));
-      } else {
-        setError("Dev login failed — is SEED_ENABLED=true in the backend?");
+      try {
+        const res = await fetch(`${apiBase}/api/dev-token`, { method: "POST" });
+        if (res.ok) {
+          const { access_token } = await res.json() as { access_token: string };
+          sessionStorage.setItem("dev_token", access_token);
+          window.dispatchEvent(new Event("dev-login"));
+        } else {
+          setError("Dev login failed — is SEED_ENABLED=true in the backend?");
+        }
+      } catch {
+        setError("Dev login failed — is the backend running?");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
       return;
     }
 
