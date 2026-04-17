@@ -6,21 +6,42 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 **On git commits:** Never add a co-author note
 
-## Running the App
+## Running the App in Dev
 
-Backend API:
+Supabase (auth, database, storage) runs remotely — no local Supabase setup needed. You only run the backend and frontend locally.
+
+**Terminal 1 — Backend** (runs at `http://localhost:8000`):
 
 ```bash
 cd backend
 /home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 
-Frontend app:
+**Terminal 2 — Frontend** (runs at `http://localhost:5173`):
 
 ```bash
 cd frontend
 npm run dev
 ```
+
+### Required `.env` files
+
+`backend/.env`:
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_JWT_SECRET=<Project Settings → API → JWT Secret>
+SUPABASE_SERVICE_ROLE_KEY=<Project Settings → API → service_role key>
+DATABASE_URL=postgresql+psycopg://postgres:<password>@db.<ref>.supabase.co:5432/postgres
+```
+
+`frontend/.env`:
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=<Project Settings → API → anon key>
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+> `CORS_ORIGINS` does not need to be set locally — it defaults to `http://localhost:5173`.
 
 ## Installing Dependencies
 
