@@ -116,6 +116,22 @@ npm run test:run
 npm run build
 ```
 
+## Playwright Dev Login
+
+When using `playwright-cli` for frontend design work, use these steps to reach the dashboard:
+
+```bash
+playwright-cli open http://localhost:5175
+playwright-cli snapshot                  # find the email field ref
+playwright-cli fill <email-ref> "dev"    # type "dev" in the email field
+playwright-cli snapshot                  # confirm "Dev mode — will sign in with sample data" banner appears
+playwright-cli click <signin-btn-ref>    # click Sign in
+# wait ~3s for seeding + navigation
+playwright-cli snapshot                  # dashboard should show 6 sample renters
+```
+
+Refs change on every page load — always snapshot first to find them. The dashboard loads with 6 sample renters: Ahmed Hassan, Sarah Mohamed, Omar Ali, Nadia Khalil, Tarek Ibrahim, Laila Farouk.
+
 ## PRD
 
 Full product requirements: `PRD.md`
