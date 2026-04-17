@@ -10,20 +10,32 @@ function useAuthSession() {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    // Seed from current session on mount
+    if (sessionStorage.getItem("dev_token")) {
+      setUser({ id: "dev", email: "dev@local" });
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       const u = data.session?.user ?? null;
       setUser(u ? { id: u.id, email: u.email } : null);
       setLoading(false);
     });
 
-    // React to sign-in / sign-out events
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u ? { id: u.id, email: u.email } : null);
     });
 
-    return () => listener.subscription.unsubscribe();
+    const onDevLogin = () => {
+      setUser({ id: "dev", email: "dev@local" });
+    };
+
+    window.addEventListener("dev-login", onDevLogin);
+    return () => {
+      listener.subscription.unsubscribe();
+      window.removeEventListener("dev-login", onDevLogin);
+    };
   }, []);
 
   return { user, loading };

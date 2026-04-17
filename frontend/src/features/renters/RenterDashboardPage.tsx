@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, LogOut, Loader2, AlertCircle } from "lucide-react";
 
@@ -26,7 +26,41 @@ export function RenterDashboardPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["renters"] }),
   });
 
-  function handleSignOut() {
+  const seedMutation = useMutation({
+    mutationFn: () => api.seedSampleData(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["renters"] }),
+  });
+
+  const seedEnabled = import.meta.env.VITE_SEED_ENABLED === "true";
+  const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+
+  useEffect(() => {
+    if (!seedEnabled) return;
+    const handleUnload = () => {
+      const token = sessionStorage.getItem("dev_token");
+      if (!token) return;
+      navigator.sendBeacon(
+        `${apiBase}/api/dev-session/cleanup`,
+        new Blob([JSON.stringify({ token })], { type: "application/json" }),
+      );
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, [seedEnabled]);
+
+  useEffect(() => {
+    if (seedEnabled && rentersQuery.data?.length === 0 && !seedMutation.isPending && !seedMutation.isSuccess) {
+      seedMutation.mutate();
+    }
+  }, [rentersQuery.data]);
+
+  async function handleSignOut() {
+    if (sessionStorage.getItem("dev_token")) {
+      await api.deleteDevSession().catch(() => {});
+      sessionStorage.removeItem("dev_token");
+      window.location.reload();
+      return;
+    }
     void supabase.auth.signOut();
   }
 
