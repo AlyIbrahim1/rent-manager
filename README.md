@@ -1,94 +1,123 @@
-# RentManager
+# Rent Manager
 
-A lightweight desktop application for tracking tenant rent payment status and generating PDF invoices.
+SaaS web application for managing renters, leases, payments, and PDF receipts.
 
-## Description
+## Overview
 
-RentManager is a Python desktop application built for individual property managers and landlords who need a simple tool to manage tenant records. It stores tenant information — apartment number, name, rent amount, payment history, and outstanding balance — in a local SQLite database and provides a GUI for day-to-day management. PDF invoice generation is in progress.
+Rent Manager is now a web-first stack:
+- Backend: FastAPI + SQLAlchemy + Alembic
+- Frontend: React + TypeScript + Vite + Tailwind
+- Auth/Data/Storage: Supabase
+
+Core behavior:
+- Apartment number is a core business identifier per tenant
+- Financial amounts are whole-dollar integers
+- Unpaid months and rent due are computed live (never stored)
+- Protected API operations are bearer-token authenticated and tenant scoped
 
 ## Features
 
-**Implemented:**
-- SQLite-backed tenant record management (add, delete, clear all)
-- CustomTkinter GUI with dark-blue theme and system appearance mode detection
-- Fixed 1000x650 application window with custom icon
+- Supabase JWT-based auth context (`/api/me`)
+- Tenant-scoped renter create/list/get flows
+- Lease upsert per renter
+- Append-only payment history and mark-paid flow
+- Receipt generation endpoint with tenant-partitioned paths
+- Legacy SQLite-to-tenant migration utility
 
-**Planned:**
-- Full data table with inline CRUD forms
-- PDF invoice generation via ReportLab
-- Desktop packaging with PyInstaller
+## Tech Stack
 
-## Prerequisites
-
-- Python 3.8 or later
-- A `data/` directory at the project root (for the SQLite database)
-- `assets/app_icon.ico` present at the project root
+- Python 3.12+
+- FastAPI
+- SQLAlchemy + Alembic
+- Supabase
+- React 18 + TypeScript + Tailwind
+- ReportLab (PDF receipts)
 
 ## Installation
 
-1. Clone the repository:
+1. Backend dependencies:
 
 ```bash
-git clone <repository-url>
-cd RentManagement_app
+cd backend
+pip install -e .[dev]
 ```
 
-2. (Optional) Create and activate a virtual environment:
+2. Frontend dependencies:
 
 ```bash
-python -m venv .venv
-source .venv/Scripts/activate   # Windows / WSL
-# or
-source .venv/bin/activate        # Linux / macOS
+cd frontend
+npm install
 ```
 
-3. Install dependencies:
+## Environment
 
-```bash
-pip install -r requirements.txt
-pip install reportlab   # for invoice generation
-```
+Backend uses `backend/.env` (see `backend/.env.example`):
+- `DATABASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_JWT_SECRET`
+- `SUPABASE_STORAGE_BUCKET`
 
-4. Create the required directories if they do not exist:
-
-```bash
-mkdir -p data invoices
-```
+Frontend uses `frontend/.env` (see `frontend/.env.example`):
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_API_BASE_URL`
 
 ## Running the App
 
+### Backend
+
 ```bash
-python main.py
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 
-## Project Structure
+### Frontend
 
-```
-RentManagement_app/
-├── main.py              # Entry point; initialises DB and launches the UI
-├── requirements.txt     # Core dependencies
-├── data/                # SQLite database directory
-├── assets/
-│   └── app_icon.ico     # Application window icon
-├── invoices/            # PDF invoice output directory
-└── src/
-    ├── database.py      # Data layer; SQLite connection and renters table operations
-    ├── ui.py            # GUI layer; CustomTkinter window (1000x650, dark-blue theme)
-    └── invoice.py       # Invoice layer; ReportLab PDF generation (planned/incomplete)
+```bash
+cd frontend
+npm run dev
 ```
 
-### Database Schema
+## Architecture
 
-Table: `renters`
+- backend/app
+    - API routes, services, DB models, auth context, migrations
+- frontend/src
+    - Auth gate, renter dashboard, query/mutation-driven UI
+- .github/workflows/ci.yml
+    - Backend and frontend CI checks
 
-| Column           | Type    | Notes       |
-|------------------|---------|-------------|
-| appartmentNumber | INTEGER | Primary key |
-| name             | TEXT    |             |
-| rentAmount       | INTEGER |             |
-| lastMonthPayed   | TEXT    |             |
-| unpaidMonths     | INTEGER |             |
-| rentDue          | INTEGER |             |
+## Testing
+
+Backend tests:
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -m pytest -q
+```
+
+Frontend tests and build:
+
+```bash
+cd frontend
+npm run test:run
+npm run build
+```
+
+## Data Migration
+
+Import legacy SQLite data into the tenant-scoped schema:
+
+```bash
+cd backend
+/home/alyibrahim/projects/rent-manager/.venv/bin/python -c "from scripts.migrate_sqlite_to_supabase import run_migration; print(run_migration('/path/to/legacy.sqlite', 'Imported Tenant'))"
+```
+
+## CI
+
+GitHub Actions workflow in `.github/workflows/ci.yml` runs:
+- Backend: install + `pytest -q`
+- Frontend: `npm ci` + `npm run test:run`
 
 ## License
 
@@ -96,4 +125,4 @@ Private / Personal Use. All rights reserved.
 
 ---
 
-Last updated: 2026-03-11
+Last updated: 2026-04-16

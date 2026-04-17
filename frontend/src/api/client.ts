@@ -1,0 +1,67 @@
+import type {
+  CreateRenterInput,
+  Payment,
+  ReceiptPayload,
+  ReceiptResponse,
+  RecordPaymentInput,
+  Renter,
+} from "./types";
+import { supabase } from "../lib/supabase";
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+
+
+async function getAuthHeader(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const authHeader = await getAuthHeader();
+  const response = await fetch(`${apiBaseUrl}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+      ...(init?.headers ?? {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+}
+
+export const api = {
+  listRenters(): Promise<Renter[]> {
+    return request<Renter[]>("/api/renters");
+  },
+
+  createRenter(input: CreateRenterInput): Promise<Renter> {
+    return request<Renter>("/api/renters", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  recordPayment(renterId: string, input: RecordPaymentInput): Promise<Payment> {
+    return request<Payment>(`/api/renters/${renterId}/payments`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  listPayments(renterId: string): Promise<Payment[]> {
+    return request<Payment[]>(`/api/renters/${renterId}/payments`);
+  },
+
+  generateReceipt(payload: ReceiptPayload): Promise<ReceiptResponse> {
+    return request<ReceiptResponse>("/api/receipts", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+};
