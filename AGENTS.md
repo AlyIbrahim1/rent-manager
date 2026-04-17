@@ -32,6 +32,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_JWT_SECRET=<Project Settings → API → JWT Secret>
 SUPABASE_SERVICE_ROLE_KEY=<Project Settings → API → service_role key>
 DATABASE_URL=postgresql+psycopg://postgres:<password>@db.<ref>.supabase.co:5432/postgres
+SEED_ENABLED=true  # dev only — enables POST /api/seed to load sample renters
 ```
 
 `frontend/.env`:
@@ -39,6 +40,7 @@ DATABASE_URL=postgresql+psycopg://postgres:<password>@db.<ref>.supabase.co:5432/
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=<Project Settings → API → anon key>
 VITE_API_BASE_URL=http://localhost:8000
+VITE_SEED_ENABLED=true   # dev only — enables "dev" login shortcut and auto-seed on empty dashboard
 ```
 
 > `CORS_ORIGINS` does not need to be set locally — it defaults to `http://localhost:5173`.
