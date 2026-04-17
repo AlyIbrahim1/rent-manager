@@ -23,6 +23,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const authHeader = await getAuthHeader();
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...authHeader,
@@ -31,7 +32,25 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+    let detail = "Request failed";
+    try {
+      const errorBody = (await response.json()) as { detail?: string };
+      if (typeof errorBody.detail === "string" && errorBody.detail.trim()) {
+        detail = errorBody.detail;
+      }
+    } catch {
+      // Keep generic message when no JSON body is available.
+    }
+    throw new Error(detail);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    return undefined as T;
   }
 
   return (await response.json()) as T;
