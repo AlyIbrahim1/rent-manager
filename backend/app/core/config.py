@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
     supabase_storage_bucket: str = "receipts"
     cors_origins: str = "http://localhost:5173"
+    seed_enabled: bool = False
 
 
 settings = Settings()
