@@ -89,6 +89,7 @@ def _insert_renters(session, tenant_id: str) -> None:
                 lastMonthPayed=item["lastMonthPayed"],
             )
         )
+        session.flush()
         lease_data = item["lease"]
         session.add(
             Lease(
