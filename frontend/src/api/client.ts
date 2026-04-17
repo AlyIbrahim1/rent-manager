@@ -6,26 +6,24 @@ import type {
   RecordPaymentInput,
   Renter,
 } from "./types";
+import { supabase } from "../lib/supabase";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
-const mockRenters: Renter[] = [
-  {
-    id: "mock-101",
-    appartmentNumber: 101,
-    name: "John Doe",
-    rentAmount: 1200,
-    lastMonthPayed: "2026-01",
-    unpaidMonths: 1,
-    rentDue: 1200,
-  },
-];
+
+async function getAuthHeader(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const authHeader = await getAuthHeader();
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...authHeader,
       ...(init?.headers ?? {}),
     },
   });
@@ -38,12 +36,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  async listRenters(): Promise<Renter[]> {
-    try {
-      return await request<Renter[]>("/api/renters");
-    } catch {
-      return mockRenters;
-    }
+  listRenters(): Promise<Renter[]> {
+    return request<Renter[]>("/api/renters");
   },
 
   createRenter(input: CreateRenterInput): Promise<Renter> {

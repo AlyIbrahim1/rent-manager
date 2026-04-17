@@ -10,15 +10,22 @@ __pycache__/
 data/
 invoices/
 
-# Virtualenv
+# env
 .venv/
+.env
+.env.local
+.env.*.local
+
 frontend/node_modules/
 frontend/dist/
 frontend/test-results/
 frontend/tsconfig.tsbuildinfo
 
 # Generated local databases
+*.db
 backend/*.db
 
 # Brainstorming artifacts
 .superpowers/
+
+passwrds.txt

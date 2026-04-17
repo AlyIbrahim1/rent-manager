@@ -2,6 +2,7 @@ from datetime import date, datetime
 from uuid import uuid4
 
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
 from app.db.session import SessionLocal
 from app.models.renter import Renter
@@ -20,7 +21,11 @@ def compute_rent_status(
     if today is None:
         today = date.today()
 
-    paid = datetime.strptime(last_month_payed, "%Y-%m").date()
+    try:
+        paid = datetime.strptime(last_month_payed, "%Y-%m").date()
+    except ValueError:
+        return None, None
+
     months = max(0, (today.year - paid.year) * 12 + (today.month - paid.month))
     return months, months * rent_amount
 
@@ -29,8 +34,11 @@ def _ensure_tenant_exists(tenant_id: str, user_id: str) -> None:
     with SessionLocal() as session:
         tenant = session.get(Tenant, tenant_id)
         if tenant is None:
-            session.add(Tenant(id=tenant_id, name=f"Tenant {tenant_id[:8]}", owner_user_id=user_id))
-            session.commit()
+            try:
+                session.add(Tenant(id=tenant_id, name=f"Tenant {tenant_id[:8]}", owner_user_id=user_id))
+                session.commit()
+            except IntegrityError:
+                session.rollback()
 
 
 def create_renter(tenant_id: str, user_id: str, payload: CreateRenterRequest) -> dict:

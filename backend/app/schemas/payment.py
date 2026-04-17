@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class AddPaymentRequest(BaseModel):
-    monthPaid: str
+    monthPaid: str = Field(..., pattern=r"^\d{4}-\d{2}$")
     amountPaid: int = Field(..., ge=0)
 
 

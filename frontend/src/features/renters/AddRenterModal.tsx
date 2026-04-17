@@ -7,10 +7,10 @@ type Props = {
 };
 
 export function AddRenterModal({ onSubmit }: Props) {
-  const [name, setName] = useState("John Doe");
-  const [appartmentNumber, setAppartmentNumber] = useState(101);
-  const [rentAmount, setRentAmount] = useState(1200);
-  const [lastMonthPayed, setLastMonthPayed] = useState("2026-01");
+  const [name, setName] = useState("");
+  const [appartmentNumber, setAppartmentNumber] = useState(0);
+  const [rentAmount, setRentAmount] = useState(0);
+  const [lastMonthPayed, setLastMonthPayed] = useState("");
 
   return (
     <form

@@ -1,3 +1,11 @@
+import os
+
+# Must be set before app modules are imported so Settings picks up test values.
+# Use direct assignment (not setdefault) to override any values from .env.
+os.environ["DATABASE_URL"] = "sqlite+pysqlite:///./test.db"
+os.environ["SUPABASE_JWT_SECRET"] = "dev-secret"
+os.environ["SUPABASE_SERVICE_ROLE_KEY"] = ""  # prevent real Supabase calls in tests
+
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sqlite3

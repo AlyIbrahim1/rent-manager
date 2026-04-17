@@ -24,7 +24,8 @@ def get_auth_context(
     payload = verify_supabase_bearer_token(credentials.credentials)
 
     user_id = payload.get("sub")
-    tenant_id = payload.get("tenant_id")
+    # Fall back to sub when no custom tenant_id claim is present (single-user tenancy)
+    tenant_id = payload.get("tenant_id") or user_id
     role = payload.get("role", "member")
     if not user_id or not tenant_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")

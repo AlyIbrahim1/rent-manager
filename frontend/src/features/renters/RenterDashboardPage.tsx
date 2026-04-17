@@ -43,6 +43,7 @@ export function RenterDashboardPage() {
           renterId={selectedRenter.id}
           renterName={selectedRenter.name}
           appartmentNumber={selectedRenter.appartmentNumber}
+          defaultAmount={selectedRenter.rentAmount}
           onComplete={() => {
             void queryClient.invalidateQueries({ queryKey: ["renters"] });
             void queryClient.invalidateQueries({ queryKey: ["payments", selectedRenter.id] });
