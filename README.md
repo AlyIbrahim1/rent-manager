@@ -68,7 +68,6 @@ Frontend uses `frontend/.env` (see `frontend/.env.example`):
 
 ```bash
 cd backend
-/home/alyibrahim/projects/rent-manager/.venv/bin/python -m alembic upgrade head
 /home/alyibrahim/projects/rent-manager/.venv/bin/python -m uvicorn app.main:app --reload
 ```
 

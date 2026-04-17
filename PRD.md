@@ -165,7 +165,7 @@ Frontend stack: React + TypeScript + Vite + Tailwind + TanStack Query.
 | `backend/app/services/*` | Business logic and tenant checks |
 | `backend/app/models/*` | SQLAlchemy persistence models |
 | `backend/app/schemas/*` | Request/response contracts |
-| `backend/alembic/*` | Schema migration management |
+| `backend/app/core/*` | Settings and JWT security |
 
 ### Core Tables
 
