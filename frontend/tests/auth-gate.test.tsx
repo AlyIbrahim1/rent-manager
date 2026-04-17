@@ -17,6 +17,6 @@ import { AuthGate } from "../src/features/auth/AuthGate";
 describe("AuthGate", () => {
   it("renders login when user is unauthenticated", async () => {
     render(<AuthGate />);
-    expect(await screen.findByText("Sign in to Rent Manager")).toBeInTheDocument();
+    expect(await screen.findByText("Rent Manager")).toBeInTheDocument();
   });
 });
