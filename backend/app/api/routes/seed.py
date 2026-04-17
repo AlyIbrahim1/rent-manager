@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
@@ -25,7 +24,7 @@ def _require_seed_enabled():
 @router.post("/dev-token")
 def dev_token():
     _require_seed_enabled()
-    session_id = str(uuid4())
+    session_id = settings.dev_seed_tenant_id
     payload = {
         "sub": session_id,
         "email": "dev@local",
