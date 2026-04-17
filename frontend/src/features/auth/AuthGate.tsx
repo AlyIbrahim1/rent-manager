@@ -32,7 +32,14 @@ function useAuthSession() {
 export function AuthGate() {
   const { user, loading } = useAuthSession();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-slate-50">
+        <div className="spinner" aria-label="Loading" />
+      </div>
+    );
+  }
+
   if (!user) return <LoginPage />;
   return <RenterDashboardPage />;
 }
