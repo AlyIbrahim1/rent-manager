@@ -47,13 +47,11 @@ def delete_dev_session(ctx: AuthContext = Depends(get_auth_context)):
 @router.post("/dev-session/cleanup", status_code=204)
 def cleanup_dev_session(payload: CleanupPayload):
     _require_seed_enabled()
-    try:
-        claims = verify_supabase_bearer_token(payload.token)
-    except HTTPException:
-        return
+    claims = verify_supabase_bearer_token(payload.token)
     tenant_id = claims.get("sub")
-    if tenant_id:
-        seed_service.delete_dev_tenant(tenant_id)
+    if not tenant_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+    seed_service.delete_dev_tenant(str(tenant_id))
 
 
 @router.post("/seed", status_code=201)
