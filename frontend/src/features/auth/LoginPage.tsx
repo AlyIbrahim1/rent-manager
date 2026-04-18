@@ -3,7 +3,7 @@ import { AlertTriangle, Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from "luc
 import { supabase } from "../../lib/supabase";
 import logoSvg from "../../assets/logo.svg";
 
-type Mode = "signin" | "signup";
+type Mode = "signin" | "signup" | "forgot_password";
 
 export function LoginPage() {
   const [mode, setMode] = useState<Mode>("signin");
@@ -53,7 +53,16 @@ export function LoginPage() {
       return;
     }
 
-    if (mode === "signin") {
+    if (mode === "forgot_password") {
+      const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (authError) {
+        setError(authError.message);
+      } else {
+        setInfo("Password reset instructions sent! Check your email.");
+      }
+    } else if (mode === "signin") {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) setError(authError.message);
     } else {
@@ -121,48 +130,54 @@ export function LoginPage() {
             </div>
 
             {/* Password Field */}
-            {isDevShortcut ? (
-              <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px] border border-[#A5D6A7]">
-                <span className="text-[14px] font-medium">Dev mode active</span>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between mb-[10px]">
-                  <label htmlFor="password" className="block text-[14px] font-bold text-black">
-                    Password
-                  </label>
-                  {mode === "signin" && (
-                     <button type="button" className="text-[13px] font-semibold tracking-wide text-[#666666] hover:text-black transition-colors bg-transparent border-0 cursor-pointer">
-                      Forgot Password?
-                    </button>
-                  )}
+            {mode !== "forgot_password" && (
+              isDevShortcut ? (
+                <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px] border border-[#A5D6A7]">
+                  <span className="text-[14px] font-medium">Dev mode active</span>
                 </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Lock size={20} strokeWidth={2} className="text-[#999999]" />
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-[10px]">
+                    <label htmlFor="password" className="block text-[14px] font-bold text-black">
+                      Password
+                    </label>
+                    {mode === "signin" && (
+                       <button 
+                        type="button" 
+                        onClick={() => { setMode("forgot_password"); setError(null); setInfo(null); }}
+                        className="text-[13px] font-semibold tracking-wide text-[#666666] hover:text-black transition-colors bg-transparent border-0 cursor-pointer p-0"
+                      >
+                        Forgot Password?
+                      </button>
+                    )}
                   </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={mode === "signup" ? 6 : undefined}
-                    className="w-full pl-[46px] pr-12 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#999999] hover:text-[#666666] transition-colors focus:outline-none cursor-pointer bg-transparent border-0"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? <EyeOff size={20} strokeWidth={2} /> : <Eye size={20} strokeWidth={2} />}
-                  </button>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Lock size={20} strokeWidth={2} className="text-[#999999]" />
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={mode === "signup" ? 6 : undefined}
+                      className="w-full pl-[46px] pr-12 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#999999] hover:text-[#666666] transition-colors focus:outline-none cursor-pointer bg-transparent border-0 p-0"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={20} strokeWidth={2} /> : <Eye size={20} strokeWidth={2} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
             )}
           </div>
 
@@ -189,7 +204,7 @@ export function LoginPage() {
                 <Loader2 size={20} className="animate-spin text-white" />
               ) : (
                 <>
-                  {mode === "signin" ? "Sign In" : "Request Access"}
+                  {mode === "signin" ? "Sign In" : mode === "signup" ? "Request Access" : "Reset Password"}
                   <ArrowRight size={20} strokeWidth={2.5} className="ml-1 text-white" />
                 </>
               )}
@@ -236,7 +251,7 @@ export function LoginPage() {
                  Request Access
                </button>
              </p>
-          ) : (
+          ) : mode === "signup" ? (
              <p className="text-[#666666] text-[14px]">
                Already have access?{" "}
                <button
@@ -245,6 +260,17 @@ export function LoginPage() {
                  className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
                >
                  Sign In
+               </button>
+             </p>
+          ) : (
+             <p className="text-[#666666] text-[14px]">
+               Remember your password?{" "}
+               <button
+                 type="button"
+                 onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+               >
+                 Back to Sign In
                </button>
              </p>
           )}
