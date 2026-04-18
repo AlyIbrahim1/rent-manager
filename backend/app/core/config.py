@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     supabase_storage_bucket: str = "receipts"
     cors_origins: str = "http://localhost:5173"
     seed_enabled: bool = False
-    dev_seed_tenant_id: str = "00000000-0000-0000-0000-000000000001"
+    dev_session_ttl_hours: int = 8
+    dev_session_cleanup_enabled: bool = True
     rate_limit_enabled: bool = True
     rate_limit_requests: int = 120
     rate_limit_window_seconds: int = 60

@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from sqlalchemy.exc import IntegrityError
 
+from app.core.config import settings
 from app.db.session import SessionLocal
+from app.models.dev_session import DevSession
 from app.models.lease import Lease
 from app.models.payment import Payment
 from app.models.renter import Renter
@@ -76,6 +79,100 @@ _SAMPLE_DATA = [
 ]
 
 
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _as_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
+def cleanup_expired_dev_sessions() -> int:
+    now = _utc_now()
+    with SessionLocal() as session:
+        expired_tenant_ids = [
+            row.tenant_id
+            for row in session.query(DevSession.tenant_id)
+            .filter(DevSession.expires_at <= now)
+            .all()
+        ]
+
+    for tenant_id in expired_tenant_ids:
+        delete_dev_tenant(tenant_id)
+
+    return len(expired_tenant_ids)
+
+
+def create_dev_session() -> tuple[str, str, datetime]:
+    if settings.dev_session_cleanup_enabled:
+        cleanup_expired_dev_sessions()
+
+    session_id = str(uuid4())
+    tenant_id = str(uuid4())
+    expires_at = _utc_now() + timedelta(hours=settings.dev_session_ttl_hours)
+
+    reset_and_seed(tenant_id, session_id)
+
+    with SessionLocal() as session:
+        session.add(
+            DevSession(
+                session_id=session_id,
+                tenant_id=tenant_id,
+                expires_at=expires_at,
+            )
+        )
+        session.commit()
+
+    return session_id, tenant_id, expires_at
+
+
+def is_dev_session_active(session_id: str, tenant_id: str) -> bool:
+    with SessionLocal() as session:
+        dev_session = (
+            session.query(DevSession)
+            .filter(
+                DevSession.session_id == session_id,
+                DevSession.tenant_id == tenant_id,
+            )
+            .first()
+        )
+
+    if dev_session is None:
+        return False
+
+    if _as_utc(dev_session.expires_at) <= _utc_now():
+        delete_dev_tenant(tenant_id)
+        return False
+
+    return True
+
+
+def cleanup_dev_session(session_id: str, tenant_id: str) -> None:
+    with SessionLocal() as session:
+        dev_session = (
+            session.query(DevSession)
+            .filter(
+                DevSession.session_id == session_id,
+                DevSession.tenant_id == tenant_id,
+            )
+            .first()
+        )
+
+        if dev_session is None:
+            return
+
+        tenant = session.get(Tenant, tenant_id)
+        if tenant is not None:
+            session.delete(tenant)
+
+        # Explicit delete keeps behavior consistent even when DB-level cascades differ.
+        session.delete(dev_session)
+
+        session.commit()
+
+
 def _insert_renters(session, tenant_id: str) -> None:
     for item in _SAMPLE_DATA:
         renter_id = str(uuid4())
@@ -117,6 +214,7 @@ def _insert_renters(session, tenant_id: str) -> None:
 
 def delete_dev_tenant(tenant_id: str) -> None:
     with SessionLocal() as session:
+        session.query(DevSession).filter(DevSession.tenant_id == tenant_id).delete()
         session.query(Renter).filter(Renter.tenant_id == tenant_id).delete()
         tenant = session.get(Tenant, tenant_id)
         if tenant is not None:
