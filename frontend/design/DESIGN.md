@@ -1,93 +1,102 @@
-```markdown
-# Design System Strategy: The Curated Ledger
+# Design System: Editorial Authority
 
-## 1. Overview & Creative North Star
-**Creative North Star: "The Architectural Editor"**
-In the world of property and rent management, "professionalism" is often mistaken for "stiffness." This design system rejects the cluttered, line-heavy density of traditional SaaS. Instead, we adopt the persona of a high-end architectural journal. 
+## 1. Overview & Creative North Star: "The Architectural Curator"
+This design system moves away from the cluttered, "widget-heavy" aesthetic of traditional dashboards toward a high-end, editorial experience. The Creative North Star is **"The Architectural Curator."** 
 
-We break the "template" look through **intentional asymmetry** and **breathable white space**. By leveraging a sophisticated interplay of deep charcoals and emerald accents, we create a "Curated Ledger"—an interface that feels less like a database and more like a premium wealth management tool. We use high-contrast typography scales and overlapping surface containers to suggest a sense of organized, tactile layers rather than a flat digital grid.
+Like a modern gallery or a premium architectural firm, the UI prioritizes structural integrity, vast "white space" (breathing room), and a hierarchy defined by tonal depth rather than decorative lines. We break the "template" look by using intentional asymmetry—placing high-contrast typography against soft, layered surfaces. Every element should feel intentional, permanent, and authoritative.
 
 ---
 
-## 2. Colors & Tonal Depth
+## 2. Brand Identity & Logo
+The brand identity serves as the foundation of trust and precision within the system.
+
+*   **Logo Design:** A minimalist architectural icon—composed of clean, geometric lines representing a structure or pillar—paired with the wordmark **"THE LEDGER"**. Can be found at `frontend/src/assets/logo.svg`.
+*   **Typography:** The wordmark is set in **Manrope**, Extra-Bold weight. To achieve a premium, authoritative feel, apply a wide letter-spacing (tracking) of +5% to +10%.
+*   **Color Application:** 
+    *   **Light Mode:** Use **Slate 900 (#0F172A)** for the icon and wordmark to ensure maximum contrast and gravitas.
+    *   **Dark Mode:** Use **White (#FFFFFF)**.
+*   **Placement Strategy:**
+    *   **Authentication/Entry:** On login and splash screens, the logo must be centered and prominent, acting as a "seal of quality."
+    *   **Operational Context:** Within internal dashboards, the logo scales down and integrates into the top-left of the navigation bar or the header of the sidebar, maintaining brand presence without competing with user data.
+
+---
+
+## 3. Colors & Surface Philosophy
 Our palette is rooted in stability. We use deep blues and greys to establish trust, while the emerald green (`tertiary`) acts as a precise surgical tool for success states and calls to action.
 
 ### The "No-Line" Rule
-To achieve a high-end editorial feel, **1px solid borders are strictly prohibited for sectioning.** Structural boundaries must be defined solely through:
-- **Tonal Shifts:** Moving from `surface` (#f7f9fb) to `surface-container-low` (#f2f4f6).
-- **Negative Space:** Using the spacing scale to create mental boundaries without visual clutter.
+**Prohibit 1px solid borders for sectioning.** Boundaries must be defined solely through background color shifts. Use `surface-container-low` sections sitting on a `surface` background to define areas of interest. Lines are artifacts of the past; tonal transitions are the future.
 
 ### Surface Hierarchy & Nesting
-Think of the UI as a series of stacked, fine-paper sheets. 
-- Use `surface-container-lowest` (#ffffff) for the primary interactive cards.
-- Place these cards on `surface-container` (#eceef0) backgrounds.
-- This "nesting" creates natural depth and directs the eye toward high-priority data without the need for heavy shadows or lines.
+Treat the UI as a series of physical layers—like stacked sheets of fine paper.
+*   **Level 0 (Base):** `surface` (#faf8ff) – The canvas.
+*   **Level 1 (Sections):** `surface-container-low` (#f2f3ff) – Large content blocks.
+*   **Level 2 (Interaction):** `surface-container` (#eaedff) – Cards and active areas.
+*   **Level 3 (Elevation):** `surface-container-highest` (#dae2fd) – Floating menus or high-priority callouts.
 
-### The "Glass & Gradient" Rule
-For floating elements like modals or pop-overs, use a Glassmorphism approach:
-- **Color:** `surface-container-lowest` at 80% opacity.
-- **Effect:** 20px - 32px backdrop-blur.
-- **CTA Soul:** Apply a subtle linear gradient from `primary` (#000000) to `primary-container` (#131b2e) for hero buttons. This adds a "weighted" feel that flat color lacks.
-
----
-
-## 3. Typography
-We use a dual-typeface system to balance editorial character with functional precision.
-
-*   **Display & Headlines (Manrope):** Use Manrope for all `display` and `headline` tokens. Its geometric yet warm proportions feel modern and authoritative.
-*   **UI & Body (Inter):** Use Inter for `title`, `body`, and `label` tokens. Inter’s tall x-height ensures that complex rental data remains legible at small sizes.
-
-**Editorial Scale:**
-- **Display-lg (3.5rem):** Use for "Big Numbers" (e.g., Total Portfolio Value) to create a dramatic focal point.
-- **Label-sm (0.6875rem):** Use for metadata, always in `on-surface-variant` (#45464d) to maintain a hierarchy of "quiet" information.
+### The "Glass & Signature" Rule
+*   **Glassmorphism:** For floating modals or navigation overlays, use a semi-transparent `surface` color with a `backdrop-blur` (20px–30px). This allows the colors of the underlying "architecture" to bleed through.
+*   **Signature Textures:** For primary CTAs, use a subtle gradient transitioning from `primary` (#000000) to `primary_container` (#131b2e) to provide a "sheen" that flat color lacks.
 
 ---
 
-## 4. Elevation & Depth
-Depth is conveyed through **Tonal Layering**, not structural scaffolding.
+## 4. Typography
+We use **Manrope** exclusively to maintain a monolinear, modern, yet technical feel.
 
-*   **The Layering Principle:** A `surface-container-lowest` card sitting on a `surface-container-low` section creates a "soft lift." This is our primary method of elevation.
-*   **Ambient Shadows:** If an element must float (e.g., a notification), use an extra-diffused shadow: `box-shadow: 0 12px 40px rgba(25, 28, 30, 0.06)`. Note the low opacity—we want the shadow to feel like ambient light, not a dark smudge.
-*   **The "Ghost Border" Fallback:** If a divider is required for accessibility in data-heavy tables, use `outline-variant` (#c6c6cd) at **15% opacity**. It should be felt, not seen.
+| Role | Token | Size | Weight / Note |
+| :--- | :--- | :--- | :--- |
+| **Display** | `display-lg` | 3.5rem | Light/Regular weight, tight leading for impact. |
+| **Headline**| `headline-md` | 1.75rem | Bold. Used for section starts. |
+| **Title**   | `title-lg` | 1.375rem | Medium. Used for card headers. |
+| **Body**    | `body-lg` | 1rem | Regular. Optimized for readability. |
+| **Label**   | `label-md` | 0.75rem | All-caps with wide tracking for "THE LEDGER" sub-branding. |
+
+**Editorial Intent:** Use `display-sm` for empty states or welcome messages to create an "editorial splash" rather than a standard system notification.
 
 ---
 
-## 5. Components
+## 5. Elevation & Depth
+Depth is achieved through **Tonal Layering** rather than shadows.
 
-### Buttons (The Anchor)
-- **Primary:** Gradient from `primary` to `primary-container`. `rounded-md` (0.375rem). Text: `on-primary` (#ffffff).
-- **Secondary:** Surface-only. Use `surface-container-high` (#e6e8ea) with `on-surface` text. No border.
-- **Tertiary (Emerald):** Use `tertiary-container` (#002114) with `tertiary-fixed` (#85f8c4) text for high-signal actions like "Receive Payment."
+*   **The Layering Principle:** Place a `surface-container-lowest` (#ffffff) card on a `surface-container-low` (#f2f3ff) section. This creates a soft, natural lift.
+*   **Ambient Shadows:** If an element must "float" (e.g., a dropdown), use a shadow with a 32px blur, 0% spread, and 6% opacity using a tint of `on-surface` (#131b2e). It should feel like an environmental occlusion, not a "drop shadow."
+*   **The "Ghost Border" Fallback:** If accessibility requires a stroke, use `outline-variant` (#c6c6cd) at **15% opacity**. It should be felt, not seen.
 
-### Data Tables (The Ledger)
-- **Forbid Dividers:** Do not use horizontal lines between rows. Use a 4px vertical gap between row containers.
-- **Row Styling:** Rows should be `surface-container-lowest`. On hover, shift the row to `secondary-container` (#d5e3fc) with a 2% opacity increase.
-- **Typography:** Header labels must be `label-md` in `outline` (#76777d), all-caps with 0.05em letter spacing.
+---
+
+## 6. Components
+
+### Buttons
+*   **Primary:** Solid `primary` (#000000) with `on-primary` (#ffffff) text. Corner radius: `md` (0.375rem).
+*   **Secondary:** `surface-container-high` (#e2e7ff) background. No border.
+*   **Tertiary (Emerald):** Use `tertiary-container` (#002114) with `tertiary-fixed` (#85f8c4) text for high-signal actions like "Receive Payment."
 
 ### Input Fields
-- **State:** Instead of a border, use `surface-container-highest` (#e0e3e5) as a solid background.
-- **Focus:** Transition the background to `primary-fixed` (#dae2fd) and add a 2px "Ghost Border" of `primary` at 20% opacity.
+*   **Styling:** Use a "filled" style using `surface-container-highest`. 
+*   **Focus:** Transition the background to `surface-container-lowest` and add a 2px bottom-bar in `primary`. Avoid full-perimeter focus rings.
 
-### Chips
-- **Status Chips:** Use `tertiary-container` for "Paid" and `error-container` for "Overdue." Use `full` (9999px) roundedness to contrast against the architectural squareness of the dashboard.
+### Cards & Lists
+*   **The No-Divider Rule:** Never use horizontal lines to separate list items. Use 16px–24px of vertical white space or alternate row colors using `surface` and `surface-container-low`.
+
+### Signature Component: The "Ledger Stat"
+A large `display-md` value paired with a `label-sm` descriptor in all-caps, placed within a `surface-container-lowest` card. This emphasizes the data-heavy nature of the system with an editorial flair.
 
 ---
 
-## 6. Do's and Don'ts
+## 7. Do's & Don'ts
 
 ### Do
-- **Do** use `display-lg` for single, impactful data points.
-- **Do** use "surface-container" shifts to group related rental properties.
-- **Do** allow for generous margins (32px+) between major modules to let the design breathe.
-- **Do** use `tertiary` (Emerald) sparingly—it is a beacon, not a primary paint.
+*   **Do** use wide letter-spacing on labels to evoke a sense of luxury.
+*   **Do** embrace asymmetry. A left-heavy layout with wide right margins feels custom and professional.
+*   **Do** use `surface-dim` for inactive or "backgrounded" content to pull it away from the user's focus.
 
 ### Don't
-- **Don't** use 1px borders to separate the sidebar from the main content. Use a background color shift.
-- **Don't** use pure black for text. Use `on-surface` (#191c1e) to keep the "ink" feeling soft and readable.
-- **Don't** use standard "drop shadows" on cards. Use tonal layering (`surface` levels) instead.
-- **Don't** cram data. If a table feels tight, move less important columns into a "detail" drawer.
+*   **Don't** use pure black (#000000) for long-form body text; use `on-surface` (#131b2e) for a softer, premium read.
+*   **Don't** use standard "Material" shadows. If it looks like a default shadow, it is too heavy.
+*   **Don't** use "Alert Red" for anything but critical errors. Use `error_container` for a more sophisticated, muted warning.
+*   **Don't** use standard "drop shadows" on cards. Use tonal layering (`surface` levels) instead.
 
 ---
 
-## 7. Signature Interaction: The "Soft Scale"
-When a user hovers over a property card or a navigation item, do not just change the color. Apply a subtle `scale(1.01)` transform and shift the background from `surface-container-lowest` to `surface-bright`. This mimics the tactile feel of a physical ledger being pulled slightly forward from a stack.```
+## 8. Signature Interaction: The "Soft Scale"
+When a user hovers over a property card or a navigation item, do not just change the color. Apply a subtle `scale(1.01)` transform and shift the background from `surface-container-lowest` to `surface-bright`. This mimics the tactile feel of a physical ledger being pulled slightly forward from a stack.
