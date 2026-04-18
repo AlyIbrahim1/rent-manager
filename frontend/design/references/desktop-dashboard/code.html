@@ -1,304 +1,411 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Dashboard - The Ledger</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "surface-container-low": "#f2f4f6",
-                    "secondary-fixed": "#d5e3fc",
-                    "tertiary-fixed": "#85f8c4",
-                    "primary-fixed-dim": "#bec6e0",
-                    "inverse-primary": "#bec6e0",
-                    "error": "#ba1a1a",
-                    "secondary-container": "#d5e3fc",
-                    "on-primary-container": "#7c839b",
-                    "on-tertiary": "#ffffff",
-                    "on-error": "#ffffff",
-                    "primary-container": "#131b2e",
-                    "background": "#f7f9fb",
-                    "inverse-on-surface": "#eff1f3",
-                    "tertiary": "#000000",
-                    "error-container": "#ffdad6",
-                    "on-secondary": "#ffffff",
-                    "on-surface-variant": "#45464d",
-                    "surface-container-highest": "#e0e3e5",
-                    "primary-fixed": "#dae2fd",
-                    "on-tertiary-container": "#069669",
-                    "on-background": "#191c1e",
-                    "on-primary-fixed-variant": "#3f465c",
-                    "tertiary-fixed-dim": "#68dba9",
-                    "on-error-container": "#93000a",
-                    "on-primary-fixed": "#131b2e",
-                    "on-secondary-fixed": "#0d1c2e",
-                    "primary": "#000000",
-                    "on-secondary-fixed-variant": "#3a485b",
-                    "on-secondary-container": "#57657a",
-                    "surface-tint": "#565e74",
-                    "on-tertiary-fixed-variant": "#005137",
-                    "on-primary": "#ffffff",
-                    "inverse-surface": "#2d3133",
-                    "outline": "#76777d",
-                    "outline-variant": "#c6c6cd",
-                    "surface": "#f7f9fb",
-                    "on-tertiary-fixed": "#002114",
-                    "surface-bright": "#f7f9fb",
-                    "tertiary-container": "#002114",
-                    "secondary-fixed-dim": "#b9c7df",
-                    "surface-dim": "#d8dadc",
-                    "surface-container-lowest": "#ffffff",
-                    "surface-container-high": "#e6e8ea",
-                    "secondary": "#515f74",
-                    "surface-container": "#eceef0",
-                    "on-surface": "#191c1e",
-                    "surface-variant": "#e0e3e5"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.125rem",
-                    "lg": "0.25rem",
-                    "xl": "0.5rem",
-                    "full": "0.75rem"
-            },
-            "fontFamily": {
-                    "headline": [
-                            "Manrope"
-                    ],
-                    "body": [
-                            "Inter"
-                    ],
-                    "label": [
-                            "Inter"
-                    ]
-            }
-        },
-        },
-      }
-    </script>
+<html class="light" lang="en">
+
+<head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>Dashboard - The Ledger</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+                rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap"
+                rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+                rel="stylesheet" />
+        <script id="tailwind-config">
+                tailwind.config = {
+                        darkMode: "class",
+                        theme: {
+                                extend: {
+                                        "colors": {
+                                                "surface-container-low": "#f2f4f6",
+                                                "secondary-fixed": "#d5e3fc",
+                                                "tertiary-fixed": "#85f8c4",
+                                                "primary-fixed-dim": "#bec6e0",
+                                                "inverse-primary": "#bec6e0",
+                                                "error": "#ba1a1a",
+                                                "secondary-container": "#d5e3fc",
+                                                "on-primary-container": "#7c839b",
+                                                "on-tertiary": "#ffffff",
+                                                "on-error": "#ffffff",
+                                                "primary-container": "#131b2e",
+                                                "background": "#f7f9fb",
+                                                "inverse-on-surface": "#eff1f3",
+                                                "tertiary": "#000000",
+                                                "error-container": "#ffdad6",
+                                                "on-secondary": "#ffffff",
+                                                "on-surface-variant": "#45464d",
+                                                "surface-container-highest": "#e0e3e5",
+                                                "primary-fixed": "#dae2fd",
+                                                "on-tertiary-container": "#069669",
+                                                "on-background": "#191c1e",
+                                                "on-primary-fixed-variant": "#3f465c",
+                                                "tertiary-fixed-dim": "#68dba9",
+                                                "on-error-container": "#93000a",
+                                                "on-primary-fixed": "#131b2e",
+                                                "on-secondary-fixed": "#0d1c2e",
+                                                "primary": "#000000",
+                                                "on-secondary-fixed-variant": "#3a485b",
+                                                "on-secondary-container": "#57657a",
+                                                "surface-tint": "#565e74",
+                                                "on-tertiary-fixed-variant": "#005137",
+                                                "on-primary": "#ffffff",
+                                                "inverse-surface": "#2d3133",
+                                                "outline": "#76777d",
+                                                "outline-variant": "#c6c6cd",
+                                                "surface": "#f7f9fb",
+                                                "on-tertiary-fixed": "#002114",
+                                                "surface-bright": "#f7f9fb",
+                                                "tertiary-container": "#002114",
+                                                "secondary-fixed-dim": "#b9c7df",
+                                                "surface-dim": "#d8dadc",
+                                                "surface-container-lowest": "#ffffff",
+                                                "surface-container-high": "#e6e8ea",
+                                                "secondary": "#515f74",
+                                                "surface-container": "#eceef0",
+                                                "on-surface": "#191c1e",
+                                                "surface-variant": "#e0e3e5"
+                                        },
+                                        "borderRadius": {
+                                                "DEFAULT": "0.125rem",
+                                                "lg": "0.25rem",
+                                                "xl": "0.5rem",
+                                                "full": "0.75rem"
+                                        },
+                                        "fontFamily": {
+                                                "headline": [
+                                                        "Manrope"
+                                                ],
+                                                "body": [
+                                                        "Inter"
+                                                ],
+                                                "label": [
+                                                        "Inter"
+                                                ]
+                                        }
+                                },
+                        },
+                }
+        </script>
 </head>
+
 <body class="bg-background text-on-surface font-body antialiased min-h-screen">
-<!-- TopNavBar -->
-<nav class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-slate-200/50 dark:shadow-none flex justify-between items-center h-16 px-8 ml-64">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-outline">search</span>
-<input class="bg-surface-container-highest focus:bg-primary-fixed focus:ring-2 focus:ring-primary/20 border-none rounded-DEFAULT text-sm font-body px-4 py-2 w-64 transition-colors text-on-surface placeholder:text-on-surface-variant" placeholder="Search properties, tenants..." type="text"/>
-</div>
-<div class="flex items-center gap-6">
-<div class="flex gap-4">
-<button class="text-slate-600 hover:text-emerald-500 transition-colors relative">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-0 right-0 w-2 h-2 bg-tertiary-fixed rounded-full"></span>
-</button>
-<button class="text-slate-600 hover:text-emerald-500 transition-colors">
-<span class="material-symbols-outlined">help_outline</span>
-</button>
-</div>
-<img alt="User Profile" class="w-8 h-8 rounded-full object-cover hover:scale-[1.05] transition-transform cursor-pointer" data-alt="professional portrait of a property manager in a modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTkx57ZYrjXo3WZ50xMh9GYovM02DNjkBCbU-W_sAjCpGXrVeaup1UdIk46uWMdUGx9hFb08tr8a3Qr7dFkZ1tFMwUhAc66AR5Nv258i9GLVOicdCuzYOuDBV348HiUz7D31CUQscPW8UIRSn6PrwgWl9Vcb8Xj593cz-ILUbFOxn-DE_Pci8zJhvs7HPmYk-ruQdp7laK-XrhGVz143PlSMdb6pSehdQtihc1mZTxK3tGfTMiQMSW7t6tSN1wBPIbz4r6EhIhEuuX"/>
-</div>
-</nav>
-<!-- SideNavBar -->
-<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-slate-50 dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800/50 flex flex-col py-8 px-4 z-50">
-<div class="mb-10 px-4">
-<h1 class="font-headline text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">The Ledger</h1>
-<p class="font-body text-sm text-slate-500 dark:text-slate-400 mt-1">Architectural Management</p>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-emerald-600 dark:text-emerald-400 font-semibold border-r-2 border-emerald-600 dark:border-emerald-400 bg-slate-200/50 dark:bg-slate-800 scale-[1.01] transition-transform ease-out" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
-<span class="font-body text-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]" href="#">
-<span class="material-symbols-outlined">apartment</span>
-<span class="font-body text-sm">Properties</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]" href="#">
-<span class="material-symbols-outlined">groups</span>
-<span class="font-body text-sm">Tenants</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]" href="#">
-<span class="material-symbols-outlined">payments</span>
-<span class="font-body text-sm">Payments</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]" href="#">
-<span class="material-symbols-outlined">analytics</span>
-<span class="font-body text-sm">Reports</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body text-sm">Settings</span>
-</a>
-</nav>
-<div class="mt-8 px-4">
-<button class="w-full py-3 px-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-label text-sm rounded-DEFAULT flex justify-center items-center gap-2 hover:opacity-90 transition-opacity">
-<span class="material-symbols-outlined text-[18px]">add</span>
-                Add Property
-            </button>
-</div>
-</aside>
-<!-- Main Content Area -->
-<main class="ml-64 mt-16 p-8 min-h-screen">
-<!-- Header Section -->
-<div class="flex justify-between items-end mb-12">
-<div>
-<h2 class="font-headline text-3xl font-bold text-on-surface">Portfolio Overview</h2>
-<p class="font-body text-on-surface-variant mt-2">Good morning. Here is the current status of your properties.</p>
-</div>
-<div class="flex gap-3">
-<button class="bg-surface-container-high text-on-surface px-4 py-2 rounded-DEFAULT font-label text-sm hover:bg-surface-variant transition-colors">Export Report</button>
-<button class="bg-tertiary-container text-tertiary-fixed px-4 py-2 rounded-DEFAULT font-label text-sm flex items-center gap-2 hover:opacity-90 transition-opacity">
-<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
-                    Receive Payment
-                </button>
-</div>
-</div>
-<!-- Metrics Grid (Bento Style) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-<!-- Revenue Card -->
-<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden group hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300">
-<div class="flex justify-between items-start mb-4">
-<span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total Revenue</span>
-<span class="material-symbols-outlined text-outline">trending_up</span>
-</div>
-<h3 class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface mb-2">$124.5k</h3>
-<p class="font-body text-sm text-tertiary-fixed-dim flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
-                    +8.2% from last month
-                </p>
-<div class="absolute bottom-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-tl-full -mr-10 -mb-10 opacity-50 group-hover:scale-110 transition-transform"></div>
-</div>
-<!-- Occupancy Card -->
-<div class="bg-surface-container-lowest p-6 rounded-xl hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300">
-<div class="flex justify-between items-start mb-4">
-<span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Occupancy Rate</span>
-<span class="material-symbols-outlined text-outline">home_work</span>
-</div>
-<div class="flex items-end gap-4 mb-2">
-<h3 class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface">94%</h3>
-<span class="font-body text-on-surface-variant pb-3">/ 150 units</span>
-</div>
-<div class="w-full bg-surface-container h-2 rounded-full mt-4 overflow-hidden">
-<div class="bg-primary h-full rounded-full" style="width: 94%"></div>
-</div>
-</div>
-<!-- Maintenance Card -->
-<div class="bg-surface-container-lowest p-6 rounded-xl hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between">
-<div class="flex justify-between items-start mb-4">
-<span class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Pending Maintenance</span>
-<span class="material-symbols-outlined text-outline">build</span>
-</div>
-<div class="flex justify-between items-end">
-<h3 class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface">12</h3>
-<button class="mb-3 text-sm font-label text-primary flex items-center hover:underline">
-                        View All <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Two Column Layout for Feed and Table -->
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-<!-- Left Column: Upcoming Rent Due (Table) -->
-<div class="xl:col-span-2 bg-surface-container-low p-8 rounded-xl">
-<div class="flex justify-between items-center mb-6">
-<h3 class="font-headline text-xl font-bold text-on-surface">Upcoming Rent Due</h3>
-<button class="text-sm font-label text-on-surface-variant hover:text-primary transition-colors">Filter</button>
-</div>
-<div class="space-y-1">
-<!-- Table Header -->
-<div class="grid grid-cols-4 gap-4 px-4 py-3 border-b border-outline-variant/15">
-<span class="font-label text-xs text-outline uppercase tracking-[0.05em]">Tenant</span>
-<span class="font-label text-xs text-outline uppercase tracking-[0.05em]">Property</span>
-<span class="font-label text-xs text-outline uppercase tracking-[0.05em]">Amount</span>
-<span class="font-label text-xs text-outline uppercase tracking-[0.05em] text-right">Status</span>
-</div>
-<!-- Table Rows -->
-<div class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
-<div class="flex items-center gap-3">
-<img alt="Sarah Jenkins" class="w-8 h-8 rounded-full object-cover" data-alt="professional headshot of a female professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0ZdpK_DTzIZfXTLpLha4bEKy2Y61qTd_CCkaU5N0eRwRNIIiFbrmuJ0huD2ZjKoGvdfvxex7DEciAYkkF6h0mB7vJhAzH_gv2Jy76IIZxB0V0dwYTs0wTQljF1vvm3MevNpHmEluPh9I-DTnADfp_yxo5RdQ9VP_HfhUkT1YSn4XegdRgyU0AFGiQLLWTwDxCf_jzn0_cpoLaQ2q6PLCTaFAUafHlE-YpK3at6oG6UdDg0rzATO6gdytZBdjhT6UhqTEOfr2OtZh1"/>
-<span class="font-body text-sm font-medium text-on-surface">Sarah Jenkins</span>
-</div>
-<span class="font-body text-sm text-on-surface-variant">The Harper, 4B</span>
-<span class="font-body text-sm font-medium text-on-surface">$2,450.00</span>
-<div class="text-right">
-<span class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label text-xs">Due in 3 days</span>
-</div>
-</div>
-<div class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed flex items-center justify-center font-label text-xs">MJ</div>
-<span class="font-body text-sm font-medium text-on-surface">Marcus Johnson</span>
-</div>
-<span class="font-body text-sm text-on-surface-variant">Oakwood Estates, 12</span>
-<span class="font-body text-sm font-medium text-on-surface">$1,800.00</span>
-<div class="text-right">
-<span class="inline-flex items-center px-3 py-1 rounded-full bg-error-container text-on-error-container font-label text-xs">Overdue</span>
-</div>
-</div>
-<div class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
-<div class="flex items-center gap-3">
-<img alt="David Chen" class="w-8 h-8 rounded-full object-cover" data-alt="professional headshot of a male professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjjRHiK2tzhaiQcXuNhkGz7JfxJCjirsWPQ36984iEi_vl2xF5UKHO8GA_IEGJnjWlFJ8hWN7Zpg23Kt1sgpadc-3GDFs4mx9SwBrVO3p5Fzfmh19wz2NNhdftKBxUoo7AGfMKsGXDeblb-esPnk-1bIPEokU-BMCx0o-zfPKSXCaWvRJDO784qPqgPJI1KDxxN-PMb0IiLPGe7NnPxCmB4zbcHqmkqAji6O_-o7SHwz9csndTZRIRS7VmR6fVQSVE7UmVFPOnvvXT"/>
-<span class="font-body text-sm font-medium text-on-surface">David Chen</span>
-</div>
-<span class="font-body text-sm text-on-surface-variant">The Harper, 2A</span>
-<span class="font-body text-sm font-medium text-on-surface">$2,600.00</span>
-<div class="text-right">
-<span class="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-container text-tertiary-fixed font-label text-xs">Paid</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Column: Recent Activity Feed -->
-<div class="bg-surface p-8 rounded-xl border border-outline-variant/15">
-<h3 class="font-headline text-xl font-bold text-on-surface mb-6">Recent Activity</h3>
-<div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-outline-variant/30 before:to-transparent">
-<!-- Activity Item -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-tertiary-container text-tertiary-fixed shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
-<span class="material-symbols-outlined text-[20px]">check_circle</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
-<div class="flex items-center justify-between space-x-2 mb-1">
-<div class="font-bold text-on-surface font-headline text-sm">Rent Paid</div>
-<time class="font-label text-xs text-on-surface-variant">2h ago</time>
-</div>
-<div class="text-on-surface-variant font-body text-sm">David Chen paid $2,600 for The Harper, 2A.</div>
-</div>
-</div>
-<!-- Activity Item -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-primary-container text-on-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
-<span class="material-symbols-outlined text-[20px]">description</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
-<div class="flex items-center justify-between space-x-2 mb-1">
-<div class="font-bold text-on-surface font-headline text-sm">New Lease Signed</div>
-<time class="font-label text-xs text-on-surface-variant">5h ago</time>
-</div>
-<div class="text-on-surface-variant font-body text-sm">Elena Rodriguez signed for Oakwood Estates, 5.</div>
-</div>
-</div>
-<!-- Activity Item -->
-<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-<div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-surface-container-high text-on-surface shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
-<span class="material-symbols-outlined text-[20px]">plumbing</span>
-</div>
-<div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
-<div class="flex items-center justify-between space-x-2 mb-1">
-<div class="font-bold text-on-surface font-headline text-sm">Maintenance Request</div>
-<time class="font-label text-xs text-on-surface-variant">1d ago</time>
-</div>
-<div class="text-on-surface-variant font-body text-sm">Plumbing issue reported at Westside Lofts, 302.</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</body></html>
+        <!-- TopNavBar -->
+        <nav
+                class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-slate-200/50 dark:shadow-none flex justify-between items-center h-16 px-8 ml-64">
+                <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-outline">search</span>
+                        <input class="bg-surface-container-highest focus:bg-primary-fixed focus:ring-2 focus:ring-primary/20 border-none rounded-DEFAULT text-sm font-body px-4 py-2 w-64 transition-colors text-on-surface placeholder:text-on-surface-variant"
+                                placeholder="Search properties, tenants..." type="text" />
+                </div>
+                <div class="flex items-center gap-6">
+                        <div class="flex gap-4">
+                                <button class="text-slate-600 hover:text-emerald-500 transition-colors relative">
+                                        <span class="material-symbols-outlined">notifications</span>
+                                        <span
+                                                class="absolute top-0 right-0 w-2 h-2 bg-tertiary-fixed rounded-full"></span>
+                                </button>
+                                <button class="text-slate-600 hover:text-emerald-500 transition-colors">
+                                        <span class="material-symbols-outlined">help_outline</span>
+                                </button>
+                        </div>
+                        <img alt="User Profile"
+                                class="w-8 h-8 rounded-full object-cover hover:scale-[1.05] transition-transform cursor-pointer"
+                                data-alt="professional portrait of a property manager in a modern office setting"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTkx57ZYrjXo3WZ50xMh9GYovM02DNjkBCbU-W_sAjCpGXrVeaup1UdIk46uWMdUGx9hFb08tr8a3Qr7dFkZ1tFMwUhAc66AR5Nv258i9GLVOicdCuzYOuDBV348HiUz7D31CUQscPW8UIRSn6PrwgWl9Vcb8Xj593cz-ILUbFOxn-DE_Pci8zJhvs7HPmYk-ruQdp7laK-XrhGVz143PlSMdb6pSehdQtihc1mZTxK3tGfTMiQMSW7t6tSN1wBPIbz4r6EhIhEuuX" />
+                </div>
+        </nav>
+        <!-- SideNavBar -->
+        <aside
+                class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-slate-50 dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800/50 flex flex-col py-8 px-4 z-50">
+                <div class="mb-10 px-4">
+                        <h1 class="font-headline text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                                The Ledger</h1>
+                        <p class="font-body text-sm text-slate-500 dark:text-slate-400 mt-1">Architectural Management
+                        </p>
+                </div>
+                <nav class="flex-1 space-y-1">
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-emerald-600 dark:text-emerald-400 font-semibold border-r-2 border-emerald-600 dark:border-emerald-400 bg-slate-200/50 dark:bg-slate-800 scale-[1.01] transition-transform ease-out"
+                                href="#">
+                                <span class="material-symbols-outlined"
+                                        style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                                <span class="font-body text-sm">Dashboard</span>
+                        </a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]"
+                                href="#">
+                                <span class="material-symbols-outlined">apartment</span>
+                                <span class="font-body text-sm">Properties</span>
+                        </a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]"
+                                href="#">
+                                <span class="material-symbols-outlined">groups</span>
+                                <span class="font-body text-sm">Tenants</span>
+                        </a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]"
+                                href="#">
+                                <span class="material-symbols-outlined">payments</span>
+                                <span class="font-body text-sm">Payments</span>
+                        </a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]"
+                                href="#">
+                                <span class="material-symbols-outlined">analytics</span>
+                                <span class="font-body text-sm">Reports</span>
+                        </a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-all duration-200 hover:scale-[1.01]"
+                                href="#">
+                                <span class="material-symbols-outlined">settings</span>
+                                <span class="font-body text-sm">Settings</span>
+                        </a>
+                </nav>
+                <div class="mt-8 px-4">
+                        <button
+                                class="w-full py-3 px-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-label text-sm rounded-DEFAULT flex justify-center items-center gap-2 hover:opacity-90 transition-opacity">
+                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                Add Property
+                        </button>
+                </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="ml-64 mt-16 p-8 min-h-screen">
+                <!-- Header Section -->
+                <div class="flex justify-between items-end mb-12">
+                        <div>
+                                <h2 class="font-headline text-3xl font-bold text-on-surface">Portfolio Overview</h2>
+                                <p class="font-body text-on-surface-variant mt-2">Good morning. Here is the current
+                                        status of your properties.</p>
+                        </div>
+                        <div class="flex gap-3">
+                                <button
+                                        class="bg-surface-container-high text-on-surface px-4 py-2 rounded-DEFAULT font-label text-sm hover:bg-surface-variant transition-colors">Export
+                                        Report</button>
+                                <button
+                                        class="bg-tertiary-container text-tertiary-fixed px-4 py-2 rounded-DEFAULT font-label text-sm flex items-center gap-2 hover:opacity-90 transition-opacity">
+                                        <span
+                                                class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+                                        Receive Payment
+                                </button>
+                        </div>
+                </div>
+                <!-- Metrics Grid (Bento Style) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <!-- Revenue Card -->
+                        <div
+                                class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden group hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300">
+                                <div class="flex justify-between items-start mb-4">
+                                        <span
+                                                class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Total
+                                                Revenue</span>
+                                        <span class="material-symbols-outlined text-outline">trending_up</span>
+                                </div>
+                                <h3
+                                        class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface mb-2">
+                                        $124.5k</h3>
+                                <p class="font-body text-sm text-tertiary-fixed-dim flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                        +8.2% from last month
+                                </p>
+                                <div
+                                        class="absolute bottom-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-tl-full -mr-10 -mb-10 opacity-50 group-hover:scale-110 transition-transform">
+                                </div>
+                        </div>
+                        <!-- Occupancy Card -->
+                        <div
+                                class="bg-surface-container-lowest p-6 rounded-xl hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300">
+                                <div class="flex justify-between items-start mb-4">
+                                        <span
+                                                class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Occupancy
+                                                Rate</span>
+                                        <span class="material-symbols-outlined text-outline">home_work</span>
+                                </div>
+                                <div class="flex items-end gap-4 mb-2">
+                                        <h3
+                                                class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface">
+                                                94%</h3>
+                                        <span class="font-body text-on-surface-variant pb-3">/ 150 units</span>
+                                </div>
+                                <div class="w-full bg-surface-container h-2 rounded-full mt-4 overflow-hidden">
+                                        <div class="bg-primary h-full rounded-full" style="width: 94%"></div>
+                                </div>
+                        </div>
+                        <!-- Maintenance Card -->
+                        <div
+                                class="bg-surface-container-lowest p-6 rounded-xl hover:bg-surface-bright hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between">
+                                <div class="flex justify-between items-start mb-4">
+                                        <span
+                                                class="font-label text-sm text-on-surface-variant uppercase tracking-wider">Pending
+                                                Maintenance</span>
+                                        <span class="material-symbols-outlined text-outline">build</span>
+                                </div>
+                                <div class="flex justify-between items-end">
+                                        <h3
+                                                class="font-headline text-display-lg text-[3.5rem] leading-tight text-on-surface">
+                                                12</h3>
+                                        <button
+                                                class="mb-3 text-sm font-label text-primary flex items-center hover:underline">
+                                                View All <span
+                                                        class="material-symbols-outlined text-[16px]">chevron_right</span>
+                                        </button>
+                                </div>
+                        </div>
+                </div>
+                <!-- Two Column Layout for Feed and Table -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                        <!-- Left Column: Upcoming Rent Due (Table) -->
+                        <div class="xl:col-span-2 bg-surface-container-low p-8 rounded-xl">
+                                <div class="flex justify-between items-center mb-6">
+                                        <h3 class="font-headline text-xl font-bold text-on-surface">Upcoming Rent Due
+                                        </h3>
+                                        <button
+                                                class="text-sm font-label text-on-surface-variant hover:text-primary transition-colors">Filter</button>
+                                </div>
+                                <div class="space-y-1">
+                                        <!-- Table Header -->
+                                        <div
+                                                class="grid grid-cols-4 gap-4 px-4 py-3 border-b border-outline-variant/15">
+                                                <span
+                                                        class="font-label text-xs text-outline uppercase tracking-[0.05em]">Tenant</span>
+                                                <span
+                                                        class="font-label text-xs text-outline uppercase tracking-[0.05em]">Property</span>
+                                                <span
+                                                        class="font-label text-xs text-outline uppercase tracking-[0.05em]">Amount</span>
+                                                <span
+                                                        class="font-label text-xs text-outline uppercase tracking-[0.05em] text-right">Status</span>
+                                        </div>
+                                        <!-- Table Rows -->
+                                        <div
+                                                class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
+                                                <div class="flex items-center gap-3">
+                                                        <img alt="Sarah Jenkins"
+                                                                class="w-8 h-8 rounded-full object-cover"
+                                                                data-alt="professional headshot of a female professional"
+                                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0ZdpK_DTzIZfXTLpLha4bEKy2Y61qTd_CCkaU5N0eRwRNIIiFbrmuJ0huD2ZjKoGvdfvxex7DEciAYkkF6h0mB7vJhAzH_gv2Jy76IIZxB0V0dwYTs0wTQljF1vvm3MevNpHmEluPh9I-DTnADfp_yxo5RdQ9VP_HfhUkT1YSn4XegdRgyU0AFGiQLLWTwDxCf_jzn0_cpoLaQ2q6PLCTaFAUafHlE-YpK3at6oG6UdDg0rzATO6gdytZBdjhT6UhqTEOfr2OtZh1" />
+                                                        <span class="font-body text-sm font-medium text-on-surface">Sarah
+                                                                Jenkins</span>
+                                                </div>
+                                                <span class="font-body text-sm text-on-surface-variant">The Harper,
+                                                        4B</span>
+                                                <span
+                                                        class="font-body text-sm font-medium text-on-surface">$2,450.00</span>
+                                                <div class="text-right">
+                                                        <span
+                                                                class="inline-flex items-center px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label text-xs">Due
+                                                                in 3 days</span>
+                                                </div>
+                                        </div>
+                                        <div
+                                                class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
+                                                <div class="flex items-center gap-3">
+                                                        <div
+                                                                class="w-8 h-8 rounded-full bg-primary-fixed-dim text-on-primary-fixed flex items-center justify-center font-label text-xs">
+                                                                MJ</div>
+                                                        <span class="font-body text-sm font-medium text-on-surface">Marcus
+                                                                Johnson</span>
+                                                </div>
+                                                <span class="font-body text-sm text-on-surface-variant">Oakwood Estates,
+                                                        12</span>
+                                                <span
+                                                        class="font-body text-sm font-medium text-on-surface">$1,800.00</span>
+                                                <div class="text-right">
+                                                        <span
+                                                                class="inline-flex items-center px-3 py-1 rounded-full bg-error-container text-on-error-container font-label text-xs">Overdue</span>
+                                                </div>
+                                        </div>
+                                        <div
+                                                class="grid grid-cols-4 gap-4 px-4 py-4 bg-surface-container-lowest rounded-lg hover:bg-secondary-container hover:bg-opacity-20 transition-colors items-center">
+                                                <div class="flex items-center gap-3">
+                                                        <img alt="David Chen" class="w-8 h-8 rounded-full object-cover"
+                                                                data-alt="professional headshot of a male professional"
+                                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjjRHiK2tzhaiQcXuNhkGz7JfxJCjirsWPQ36984iEi_vl2xF5UKHO8GA_IEGJnjWlFJ8hWN7Zpg23Kt1sgpadc-3GDFs4mx9SwBrVO3p5Fzfmh19wz2NNhdftKBxUoo7AGfMKsGXDeblb-esPnk-1bIPEokU-BMCx0o-zfPKSXCaWvRJDO784qPqgPJI1KDxxN-PMb0IiLPGe7NnPxCmB4zbcHqmkqAji6O_-o7SHwz9csndTZRIRS7VmR6fVQSVE7UmVFPOnvvXT" />
+                                                        <span class="font-body text-sm font-medium text-on-surface">David
+                                                                Chen</span>
+                                                </div>
+                                                <span class="font-body text-sm text-on-surface-variant">The Harper,
+                                                        2A</span>
+                                                <span
+                                                        class="font-body text-sm font-medium text-on-surface">$2,600.00</span>
+                                                <div class="text-right">
+                                                        <span
+                                                                class="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-container text-tertiary-fixed font-label text-xs">Paid</span>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <!-- Right Column: Recent Activity Feed -->
+                        <div class="bg-surface p-8 rounded-xl border border-outline-variant/15">
+                                <h3 class="font-headline text-xl font-bold text-on-surface mb-6">Recent Activity</h3>
+                                <div
+                                        class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-outline-variant/30 before:to-transparent">
+                                        <!-- Activity Item -->
+                                        <div
+                                                class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                <div
+                                                        class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-tertiary-container text-tertiary-fixed shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
+                                                        <span
+                                                                class="material-symbols-outlined text-[20px]">check_circle</span>
+                                                </div>
+                                                <div
+                                                        class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
+                                                        <div class="flex items-center justify-between space-x-2 mb-1">
+                                                                <div
+                                                                        class="font-bold text-on-surface font-headline text-sm">
+                                                                        Rent Paid</div>
+                                                                <time
+                                                                        class="font-label text-xs text-on-surface-variant">2h
+                                                                        ago</time>
+                                                        </div>
+                                                        <div class="text-on-surface-variant font-body text-sm">David
+                                                                Chen paid $2,600 for The Harper, 2A.</div>
+                                                </div>
+                                        </div>
+                                        <!-- Activity Item -->
+                                        <div
+                                                class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                <div
+                                                        class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-primary-container text-on-primary shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
+                                                        <span
+                                                                class="material-symbols-outlined text-[20px]">description</span>
+                                                </div>
+                                                <div
+                                                        class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
+                                                        <div class="flex items-center justify-between space-x-2 mb-1">
+                                                                <div
+                                                                        class="font-bold text-on-surface font-headline text-sm">
+                                                                        New Lease Signed</div>
+                                                                <time
+                                                                        class="font-label text-xs text-on-surface-variant">5h
+                                                                        ago</time>
+                                                        </div>
+                                                        <div class="text-on-surface-variant font-body text-sm">Elena
+                                                                Rodriguez signed for Oakwood Estates, 5.</div>
+                                                </div>
+                                        </div>
+                                        <!-- Activity Item -->
+                                        <div
+                                                class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                <div
+                                                        class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-surface-container-high text-on-surface shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
+                                                        <span
+                                                                class="material-symbols-outlined text-[20px]">plumbing</span>
+                                                </div>
+                                                <div
+                                                        class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-lg bg-surface-container-lowest shadow-[0_12px_40px_rgba(25,28,30,0.06)] hover:scale-[1.01] transition-transform">
+                                                        <div class="flex items-center justify-between space-x-2 mb-1">
+                                                                <div
+                                                                        class="font-bold text-on-surface font-headline text-sm">
+                                                                        Maintenance Request</div>
+                                                                <time
+                                                                        class="font-label text-xs text-on-surface-variant">1d
+                                                                        ago</time>
+                                                        </div>
+                                                        <div class="text-on-surface-variant font-body text-sm">Plumbing
+                                                                issue reported at Westside Lofts, 302.</div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+        </main>
+</body>
+
+</html>
