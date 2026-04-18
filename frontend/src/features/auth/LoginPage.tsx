@@ -1,20 +1,9 @@
 import { useState } from "react";
-import { AlertTriangle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { AlertTriangle, Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import logoSvg from "../../assets/logo.svg";
 
 type Mode = "signin" | "signup";
-
-function GoogleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
-      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-    </svg>
-  );
-}
-
 
 export function LoginPage() {
   const [mode, setMode] = useState<Mode>("signin");
@@ -24,7 +13,6 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState(false);
 
   const seedEnabled = import.meta.env.VITE_SEED_ENABLED === "true";
   const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
@@ -82,145 +70,185 @@ export function LoginPage() {
     setLoading(false);
   }
 
-  async function handleOAuth() {
+  async function handleGoogleSignIn() {
     setError(null);
-    setOauthLoading(true);
-    const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
-    if (authError) {
-      setError(authError.message);
-      setOauthLoading(false);
-    }
+    setLoading(true);
+    const { error: authError } = await supabase.auth.signInWithOAuth({ provider: "google" });
+    if (authError) setError(authError.message);
+    setLoading(false);
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl mb-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9,22 9,12 15,12 15,22" />
-            </svg>
-          </div>
-          <h1 className="font-display text-3xl text-slate-900 leading-tight">Rent Manager</h1>
-          <p className="text-slate-500 text-sm mt-1">
-            {mode === "signin" ? "Sign in to your workspace" : "Create your workspace"}
+    <div className="min-h-dvh flex items-center justify-center bg-[#F5F5F5] font-sans text-slate-900 selection:bg-slate-900 selection:text-white p-4 relative">
+      
+      {/* Container Card */}
+      <div className="relative w-full max-w-[450px] bg-white rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.06)] px-10 md:px-[50px] py-[60px] overflow-hidden">
+        
+        {/* Subtle pale gray circle accent */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-bl from-[#F2F2F2] to-transparent rounded-full opacity-60 pointer-events-none" />
+
+        {/* Header Section */}
+        <div className="relative z-10 flex flex-col items-center justify-center mb-8 mt-2 w-full text-center">
+          <img src={logoSvg} alt="The Ledger Logo" className="h-12 w-auto object-contain mx-auto mb-3" />
+          <p className="text-[#666666] text-[15px] font-medium tracking-wide">
+            Curated property management.
           </p>
         </div>
 
-        {/* OAuth buttons */}
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={() => handleOAuth()}
-            disabled={oauthLoading}
-            className="w-full flex items-center justify-center gap-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-800 font-medium py-3 px-4 rounded-xl transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed"
-          >
-            {oauthLoading ? <Loader2 size={18} className="animate-spin" /> : <GoogleIcon />}
-            Continue with Google
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-slate-200" />
-          <span className="text-slate-400 text-xs font-medium">or</span>
-          <div className="flex-1 h-px bg-slate-200" />
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type={isDevShortcut ? "text" : "email"}
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          {isDevShortcut ? (
-            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-              <span className="text-amber-700 text-sm font-medium">Dev mode — will sign in with sample data</span>
-            </div>
-          ) : (
+        <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
+          <div className="space-y-6">
+            {/* Email Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
-                Password
+              <label htmlFor="email" className="block text-[14px] font-bold text-black mb-[10px]">
+                Email Address
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Mail size={20} strokeWidth={2} className="text-[#999999]" />
+                </div>
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  name="email"
+                  type={isDevShortcut ? "text" : "email"}
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  minLength={mode === "signup" ? 6 : undefined}
-                  className="w-full px-4 py-3 pr-12 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="••••••••"
+                  className="w-full pl-[46px] pr-4 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] font-medium text-[15px] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
+                  placeholder="manager@domain.com"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
             </div>
-          )}
+
+            {/* Password Field */}
+            {isDevShortcut ? (
+              <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px] border border-[#A5D6A7]">
+                <span className="text-[14px] font-medium">Dev mode active</span>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-[10px]">
+                  <label htmlFor="password" className="block text-[14px] font-bold text-black">
+                    Password
+                  </label>
+                  {mode === "signin" && (
+                     <button type="button" className="text-[13px] font-semibold tracking-wide text-[#666666] hover:text-black transition-colors bg-transparent border-0 cursor-pointer">
+                      Forgot Password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Lock size={20} strokeWidth={2} className="text-[#999999]" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={mode === "signup" ? 6 : undefined}
+                    className="w-full pl-[46px] pr-12 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#999999] hover:text-[#666666] transition-colors focus:outline-none cursor-pointer bg-transparent border-0"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={20} strokeWidth={2} /> : <Eye size={20} strokeWidth={2} />}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {error && (
-            <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3" role="alert">
-              <AlertTriangle size={16} className="text-red-500 mt-0.5 shrink-0" />
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="flex items-start gap-2 bg-[#FFEBEE] border border-[#FFCDD2] text-[#C62828] rounded-[8px] px-4 py-3" role="alert">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+              <p className="text-[13px] font-medium">{error}</p>
             </div>
           )}
 
           {info && (
-            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3" role="status">
-              <p className="text-green-700 text-sm">{info}</p>
+            <div className="bg-[#E8F5E9] border border-[#A5D6A7] text-[#2E7D32] rounded-[8px] px-4 py-3" role="status">
+              <p className="text-[13px] font-medium">{info}</p>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed mt-2"
-          >
-            {loading ? (
+          <div className="pt-5 pb-5">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-[52px] flex items-center justify-center gap-2 bg-[#17172A] hover:bg-[#000000] disabled:bg-[#17172E]/70 text-white font-bold text-[16px] tracking-wide rounded-[8px] transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] cursor-pointer"
+            >
+              {loading ? (
+                <Loader2 size={20} className="animate-spin text-white" />
+              ) : (
+                <>
+                  {mode === "signin" ? "Sign In" : "Request Access"}
+                  <ArrowRight size={20} strokeWidth={2.5} className="ml-1 text-white" />
+                </>
+              )}
+            </button>
+
+            {mode === "signin" && (
               <>
-                <Loader2 size={18} className="animate-spin" />
-                {mode === "signin" ? "Signing in…" : "Creating account…"}
+                <div className="relative flex items-center justify-center my-6">
+                  <div className="absolute inset-x-0 h-[1px] bg-[#E5E5E5]"></div>
+                  <span className="relative bg-white px-4 text-[#999999] text-[12px] font-bold uppercase tracking-widest">
+                    OR
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                  className="w-full h-[52px] flex items-center justify-center gap-3 bg-[#F5F5F5] border border-transparent hover:bg-[#EAEAEA] text-[#1A1A2E] font-bold text-[15px] tracking-wide rounded-[8px] transition-all duration-200 cursor-pointer disabled:opacity-50"
+                  aria-label="Sign in with Google"
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Sign in with Google
+                </button>
               </>
-            ) : (
-              mode === "signin" ? "Sign in" : "Create account"
             )}
-          </button>
+          </div>
         </form>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
-          {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            type="button"
-            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
-            className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
-          >
-            {mode === "signin" ? "Create one" : "Sign in"}
-          </button>
-        </p>
+        <div className="text-center relative z-10 mb-2">
+          {mode === "signin" ? (
+             <p className="text-[#666666] text-[14px]">
+               Need an account?{" "}
+               <button
+                 type="button"
+                 onClick={() => { setMode("signup"); setError(null); setInfo(null); }}
+                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+               >
+                 Request Access
+               </button>
+             </p>
+          ) : (
+             <p className="text-[#666666] text-[14px]">
+               Already have access?{" "}
+               <button
+                 type="button"
+                 onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+               >
+                 Sign In
+               </button>
+             </p>
+          )}
+        </div>
       </div>
     </div>
   );
