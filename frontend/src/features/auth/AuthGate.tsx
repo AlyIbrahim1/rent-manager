@@ -5,12 +5,36 @@ import { RenterDashboardPage } from "../renters/RenterDashboardPage";
 import type { AuthUser } from "../../lib/supabase";
 import { supabase } from "../../lib/supabase";
 
+
+function hasActiveDevSession() {
+  const token = sessionStorage.getItem("dev_token");
+  if (!token) return false;
+
+  const rawMeta = sessionStorage.getItem("dev_session_meta");
+  if (!rawMeta) return true;
+
+  try {
+    const meta = JSON.parse(rawMeta) as { expiresAt?: string };
+    if (!meta.expiresAt || !Number.isFinite(Date.parse(meta.expiresAt))) {
+      return true;
+    }
+    if (Date.now() >= Date.parse(meta.expiresAt)) {
+      sessionStorage.removeItem("dev_token");
+      sessionStorage.removeItem("dev_session_meta");
+      return false;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 function useAuthSession() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem("dev_token")) {
+    if (hasActiveDevSession()) {
       setUser({ id: "dev", email: "dev@local" });
       setLoading(false);
       return;

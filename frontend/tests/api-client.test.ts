@@ -53,4 +53,32 @@ describe("api client", () => {
     await expect(api.deleteDevSession()).resolves.toBeUndefined();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it("clears expired dev session token and falls back to Supabase session", async () => {
+    sessionStorage.setItem("dev_token", "expired-dev-token");
+    sessionStorage.setItem(
+      "dev_session_meta",
+      JSON.stringify({ expiresAt: new Date(Date.now() - 60_000).toISOString() })
+    );
+
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+
+    await api.listRenters();
+
+    const [, requestInit] = fetchMock.mock.calls[0];
+    expect(requestInit).toMatchObject({
+      headers: expect.objectContaining({
+        Authorization: "Bearer supabase-access-token",
+      }),
+    });
+    expect(sessionStorage.getItem("dev_token")).toBeNull();
+    expect(sessionStorage.getItem("dev_session_meta")).toBeNull();
+  });
 });

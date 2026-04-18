@@ -13,7 +13,31 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 async function getAuthHeader(): Promise<Record<string, string>> {
   const devToken = sessionStorage.getItem("dev_token");
-  if (devToken) return { Authorization: `Bearer ${devToken}` };
+  if (devToken) {
+    const rawMeta = sessionStorage.getItem("dev_session_meta");
+    if (rawMeta) {
+      try {
+        const meta = JSON.parse(rawMeta) as { expiresAt?: string };
+        if (meta.expiresAt && Number.isFinite(Date.parse(meta.expiresAt))) {
+          const expiry = Date.parse(meta.expiresAt);
+          if (Date.now() >= expiry) {
+            sessionStorage.removeItem("dev_token");
+            sessionStorage.removeItem("dev_session_meta");
+          } else {
+            return { Authorization: `Bearer ${devToken}` };
+          }
+        } else {
+          return { Authorization: `Bearer ${devToken}` };
+        }
+      } catch {
+        // Fallback to existing behavior for malformed metadata.
+        return { Authorization: `Bearer ${devToken}` };
+      }
+    } else {
+      // Backward-compatible behavior for old sessions without metadata.
+      return { Authorization: `Bearer ${devToken}` };
+    }
+  }
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   return token ? { Authorization: `Bearer ${token}` } : {};

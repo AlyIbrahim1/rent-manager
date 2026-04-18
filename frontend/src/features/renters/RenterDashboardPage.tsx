@@ -43,6 +43,7 @@ export function RenterDashboardPage() {
         `${apiBase}/api/dev-session/cleanup`,
         new Blob([JSON.stringify({ token })], { type: "application/json" }),
       );
+      sessionStorage.removeItem("dev_session_meta");
     };
     window.addEventListener("beforeunload", handleUnload);
     return () => window.removeEventListener("beforeunload", handleUnload);
@@ -58,6 +59,7 @@ export function RenterDashboardPage() {
     if (sessionStorage.getItem("dev_token")) {
       await api.deleteDevSession().catch(() => {});
       sessionStorage.removeItem("dev_token");
+      sessionStorage.removeItem("dev_session_meta");
       window.location.reload();
       return;
     }

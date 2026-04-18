@@ -40,8 +40,19 @@ export function LoginPage() {
       try {
         const res = await fetch(`${apiBase}/api/dev-token`, { method: "POST" });
         if (res.ok) {
-          const { access_token } = await res.json() as { access_token: string };
+          const { access_token, sessionId, tenantId, expiresAt } = await res.json() as {
+            access_token: string;
+            sessionId?: string;
+            tenantId?: string;
+            expiresAt?: string;
+          };
           sessionStorage.setItem("dev_token", access_token);
+          if (sessionId && tenantId && expiresAt) {
+            sessionStorage.setItem(
+              "dev_session_meta",
+              JSON.stringify({ sessionId, tenantId, expiresAt })
+            );
+          }
           window.dispatchEvent(new Event("dev-login"));
         } else {
           setError("Dev login failed — is SEED_ENABLED=true in the backend?");
