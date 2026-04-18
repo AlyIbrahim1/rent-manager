@@ -39,6 +39,7 @@ def _token_for(tenant_id: str, user_id: str) -> str:
         "sub": user_id,
         "tenant_id": tenant_id,
         "role": "owner",
+        "aud": "authenticated",
         "exp": int((datetime.now(timezone.utc) + timedelta(minutes=30)).timestamp()),
     }
     return jwt.encode(payload, "dev-secret", algorithm="HS256")

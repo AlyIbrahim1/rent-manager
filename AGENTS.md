@@ -32,6 +32,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_JWT_SECRET=<Project Settings → API → JWT Secret>
 SUPABASE_SERVICE_ROLE_KEY=<Project Settings → API → service_role key>
 DATABASE_URL=postgresql+psycopg://postgres:<password>@db.<ref>.supabase.co:5432/postgres
+SEED_ENABLED=true  # dev only — enables POST /api/seed to load sample renters
 ```
 
 `frontend/.env`:
@@ -39,6 +40,7 @@ DATABASE_URL=postgresql+psycopg://postgres:<password>@db.<ref>.supabase.co:5432/
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=<Project Settings → API → anon key>
 VITE_API_BASE_URL=http://localhost:8000
+VITE_SEED_ENABLED=true   # dev only — enables "dev" login shortcut and auto-seed on empty dashboard
 ```
 
 > `CORS_ORIGINS` does not need to be set locally — it defaults to `http://localhost:5173`.
@@ -113,6 +115,22 @@ cd frontend
 npm run test:run
 npm run build
 ```
+
+## Playwright Dev Login
+
+When using `playwright-cli` for frontend design work, use these steps to reach the dashboard:
+
+```bash
+playwright-cli open http://localhost:5175
+playwright-cli snapshot                  # find the email field ref
+playwright-cli fill <email-ref> "dev"    # type "dev" in the email field
+playwright-cli snapshot                  # confirm "Dev mode — will sign in with sample data" banner appears
+playwright-cli click <signin-btn-ref>    # click Sign in
+# wait ~3s for seeding + navigation
+playwright-cli snapshot                  # dashboard should show 6 sample renters
+```
+
+Refs change on every page load — always snapshot first to find them. The dashboard loads with 6 sample renters: Ahmed Hassan, Sarah Mohamed, Omar Ali, Nadia Khalil, Tarek Ibrahim, Laila Farouk.
 
 ## PRD
 

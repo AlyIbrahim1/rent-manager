@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.security import verify_supabase_bearer_token
+from app.services import seed_service
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -13,6 +14,7 @@ class AuthContext:
     user_id: str
     tenant_id: str
     role: str
+    is_dev_session: bool
 
 
 def get_auth_context(
@@ -24,10 +26,26 @@ def get_auth_context(
     payload = verify_supabase_bearer_token(credentials.credentials)
 
     user_id = payload.get("sub")
-    # Fall back to sub when no custom tenant_id claim is present (single-user tenancy)
-    tenant_id = payload.get("tenant_id") or user_id
-    role = payload.get("role", "member")
+    is_dev_session = bool(payload.get("dev_session"))
+
+    if is_dev_session:
+        tenant_id = payload.get("tenant_id")
+        role = payload.get("role", "authenticated")
+        if not user_id or not tenant_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        if not seed_service.is_dev_session_active(str(user_id), str(tenant_id)):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Dev session expired or invalid")
+    else:
+        # Fall back to sub when no custom tenant_id claim is present (single-user tenancy)
+        tenant_id = payload.get("tenant_id") or user_id
+        role = payload.get("role", "member")
+
     if not user_id or not tenant_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
 
-    return AuthContext(user_id=str(user_id), tenant_id=str(tenant_id), role=str(role))
+    return AuthContext(
+        user_id=str(user_id),
+        tenant_id=str(tenant_id),
+        role=str(role),
+        is_dev_session=is_dev_session,
+    )
