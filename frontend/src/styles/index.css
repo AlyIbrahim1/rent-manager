@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
   --bg-page: #f8fafc;
   --bg-card: #ffffff;
   --color-primary: #2563eb;
