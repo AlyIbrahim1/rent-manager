@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 228 48" fill="none" role="img" aria-label="The Ledger">
 
+  <style>
+    .logo-mark {
+      stroke: #1A1A2E;
+    }
+
+    .logo-wordmark {
+      fill: #1A1A2E;
+    }
+  </style>
+
   <!-- Icon: 32×48 (preserves 100:150 aspect ratio of ledger-logo.svg) -->
   <svg x="0" y="0" width="32" height="48" viewBox="0 0 100 150">
     <g transform="translate(0, 15) skewY(-15)">
@@ -15,7 +25,7 @@
         M 20 50 H 80
         M 40 30 H 80
         M 60 10 H 80
-      " stroke="#0F172A" stroke-width="9" stroke-linecap="square" fill="none"/>
+      " class="logo-mark" stroke-width="9" stroke-linecap="square" fill="none"/>
     </g>
   </svg>
 
@@ -27,7 +37,7 @@
     font-weight="700"
     font-size="20"
     letter-spacing="0.35em"
-    fill="#0F172A"
+    class="logo-wordmark"
   >THE LEDGER</text>
 
 </svg>
