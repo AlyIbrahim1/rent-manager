@@ -9,10 +9,12 @@ export function LoginPage() {
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const passwordsMismatch = mode === "signup" && confirmPassword.length > 0 && password !== confirmPassword;
 
   const seedEnabled = import.meta.env.VITE_SEED_ENABLED === "true";
   const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
@@ -66,6 +68,12 @@ export function LoginPage() {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) setError(authError.message);
     } else {
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        setLoading(false);
+        return;
+      }
+
       const { error: authError } = await supabase.auth.signUp({ email, password });
       if (authError) {
         setError(authError.message);
@@ -73,6 +81,7 @@ export function LoginPage() {
         setInfo("Account created! Check your email to confirm, then sign in.");
         setMode("signin");
         setPassword("");
+        setConfirmPassword("");
       }
     }
 
@@ -144,7 +153,12 @@ export function LoginPage() {
                     {mode === "signin" && (
                       <button
                         type="button"
-                        onClick={() => { setMode("forgot_password"); setError(null); setInfo(null); }}
+                        onClick={() => {
+                          setMode("forgot_password");
+                          setError(null);
+                          setInfo(null);
+                          setConfirmPassword("");
+                        }}
                         className="text-[13px] font-semibold tracking-wide text-[#666666] hover:text-black transition-colors bg-transparent border-0 cursor-pointer p-0"
                       >
                         Forgot Password?
@@ -178,6 +192,40 @@ export function LoginPage() {
                   </div>
                 </div>
               )
+            )}
+
+            {mode === "signup" && !isDevShortcut && (
+              <div>
+                <label htmlFor="confirm-password" className="block text-[14px] font-bold text-black mb-[10px]">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Lock size={20} strokeWidth={2} className="text-[#999999]" />
+                  </div>
+                  <input
+                    id="confirm-password"
+                    name="confirm-password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                      className={`w-full pl-[46px] pr-4 h-[52px] border rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none transition-all duration-200 ${
+                        passwordsMismatch
+                          ? "bg-[#FFF5F5] border-[#EF5350] focus:ring-2 focus:ring-[#C62828]/20"
+                          : "bg-[#F5F5F5] border-transparent focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white"
+                      }`}
+                    placeholder="••••••••"
+                  />
+                </div>
+                  {passwordsMismatch && (
+                    <p className="mt-2 text-[13px] font-medium text-[#C62828]" role="alert">
+                      Passwords do not match.
+                    </p>
+                  )}
+              </div>
             )}
           </div>
 
@@ -245,7 +293,12 @@ export function LoginPage() {
               Don't have an account?{" "}
               <button
                 type="button"
-                onClick={() => { setMode("signup"); setError(null); setInfo(null); }}
+                onClick={() => {
+                  setMode("signup");
+                  setError(null);
+                  setInfo(null);
+                  setConfirmPassword("");
+                }}
                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
               >
                 Sign Up
@@ -256,7 +309,12 @@ export function LoginPage() {
               Already have access?{" "}
               <button
                 type="button"
-                onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                  setInfo(null);
+                  setConfirmPassword("");
+                }}
                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
               >
                 Sign In
@@ -267,7 +325,12 @@ export function LoginPage() {
               Remember your password?{" "}
               <button
                 type="button"
-                onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                  setInfo(null);
+                  setConfirmPassword("");
+                }}
                 className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
               >
                 Back to Sign In
