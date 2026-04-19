@@ -107,6 +107,7 @@ export function LoginPage() {
 
         {/* Header Section */}
         <div className="relative z-10 flex flex-col items-center justify-center mb-8 mt-2 w-full text-center">
+          <h1 className="sr-only">Rent Manager</h1>
           <img src={logoSvg} alt="The Ledger Logo" className="h-12 w-auto object-contain mx-auto mb-3" />
           <p className="text-[#666666] text-[15px] font-medium tracking-wide">
             Curated property management.
