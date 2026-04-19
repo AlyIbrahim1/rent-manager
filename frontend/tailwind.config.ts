@@ -6,14 +6,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#faf8ff",
-        surface: "#faf8ff",
+        background: "#f8fafc",
+        surface: "#f8fafc",
         "surface-container-lowest": "#ffffff",
         "surface-container-low": "#f2f3ff",
         "surface-container": "#eaedff",
         "surface-container-high": "#e2e7ff",
         "surface-container-highest": "#dae2fd",
-        primary: "#000000",
+        "surface-bright": "#ffffff",
+        "surface-dim": "#d8dadc",
+        primary: "#0f172a",
         "primary-container": "#131b2e",
         "on-primary": "#ffffff",
         "on-surface": "#131b2e",
