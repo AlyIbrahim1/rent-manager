@@ -66,54 +66,54 @@ export function MarkPaidModal({ isOpen, onClose, renterId, renterName, appartmen
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/45 p-4 backdrop-blur-xl"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-modal-in">
-        <div className="flex items-center justify-between px-8 pt-8 pb-6 border-b border-slate-100">
+      <div className="animate-modal-in w-full max-w-md rounded-md bg-surface/90 p-6 shadow-floating">
+        <div className="flex items-center justify-between pb-3">
           <div>
-            <h2 className="font-display text-xl text-slate-900">Record Payment</h2>
-            <p className="text-slate-500 text-sm mt-0.5">
-              {renterName} · <span className="mono">Apt #{appartmentNumber}</span>
+            <h2 className="font-heading text-[1.4rem] font-bold text-on-surface">Record Payment</h2>
+            <p className="mt-0.5 text-sm text-on-surface-muted">
+              {renterName} · Apt #{appartmentNumber}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1 rounded-lg hover:bg-slate-100"
+            className="rounded-sm bg-surface-container-high p-1.5 text-on-surface-muted transition-colors hover:bg-surface-container"
             aria-label="Close"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="px-8 py-6 space-y-5">
+        <div className="space-y-5 pt-3">
           <div>
-            <label htmlFor="month-paid" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Month paid <span className="text-red-500">*</span>
+            <label htmlFor="month-paid" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
+              Month paid
             </label>
             <input
               id="month-paid"
               type="month"
               value={monthPaid}
               onChange={(e) => setMonthPaid(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full rounded-sm bg-surface-container-highest px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-muted focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
             />
           </div>
 
           <div>
-            <label htmlFor="amount-paid" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Amount paid <span className="text-red-500">*</span>
+            <label htmlFor="amount-paid" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
+              Amount paid
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium mono text-sm">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-on-surface-muted">$</span>
               <input
                 id="amount-paid"
                 type="number"
                 min="0"
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(Number(e.target.value))}
-                className="w-full pl-8 pr-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 mono"
+                className="w-full rounded-sm bg-surface-container-highest py-3 pl-8 pr-4 text-sm text-on-surface focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
               />
             </div>
           </div>
@@ -126,16 +126,16 @@ export function MarkPaidModal({ isOpen, onClose, renterId, renterName, appartmen
                 onChange={(e) => setShouldGenerateReceipt(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-10 h-6 bg-slate-200 rounded-full peer-checked:bg-blue-600 transition-colors duration-200" />
+              <div className="h-6 w-10 rounded-full bg-surface-container-high peer-checked:bg-[#059669] transition-colors duration-200" />
               <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-4" />
             </div>
-            <span className="text-sm font-medium text-slate-700">Generate receipt</span>
+            <span className="text-sm font-medium text-on-surface">Generate receipt</span>
           </label>
 
           {error && (
-            <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3" role="alert">
-              <AlertTriangle size={16} className="text-red-500 mt-0.5 shrink-0" />
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="flex items-start gap-2.5 rounded-sm bg-[#ffe9ec] px-4 py-3" role="alert">
+              <AlertTriangle size={16} className="mt-0.5 shrink-0 text-[#be123c]" />
+              <p className="text-sm text-[#9f1239]">{error}</p>
             </div>
           )}
 
@@ -143,7 +143,7 @@ export function MarkPaidModal({ isOpen, onClose, renterId, renterName, appartmen
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors duration-200 cursor-pointer"
+              className="flex-1 rounded-sm bg-surface-container-high px-4 py-2.5 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
             >
               Cancel
             </button>
@@ -151,7 +151,7 @@ export function MarkPaidModal({ isOpen, onClose, renterId, renterName, appartmen
               type="button"
               onClick={submit}
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed"
+              className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-tertiary-container px-4 py-2.5 text-sm font-semibold text-tertiary-fixed transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <><Loader2 size={16} className="animate-spin" /> Recording…</>

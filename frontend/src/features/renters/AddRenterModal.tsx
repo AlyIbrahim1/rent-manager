@@ -43,26 +43,26 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/45 p-4 backdrop-blur-xl"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-modal-in">
-        <div className="flex items-center justify-between px-8 pt-8 pb-6 border-b border-slate-100">
-          <h2 className="font-display text-xl text-slate-900">Add Renter</h2>
+      <div className="animate-modal-in w-full max-w-md rounded-md bg-surface/90 p-6 shadow-floating">
+        <div className="flex items-center justify-between pb-3">
+          <h2 className="font-heading text-[1.4rem] font-bold text-on-surface">Add Renter</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1 rounded-lg hover:bg-slate-100"
+            className="rounded-sm bg-surface-container-high p-1.5 text-on-surface-muted transition-colors hover:bg-surface-container"
             aria-label="Close"
           >
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-8 py-6 space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 pt-3">
           <div>
-            <label htmlFor="add-name" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Full name <span className="text-red-500">*</span>
+            <label htmlFor="add-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
+              Full name
             </label>
             <input
               id="add-name"
@@ -70,14 +70,14 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full rounded-sm bg-surface-container-highest px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-muted focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
               placeholder="Jane Smith"
             />
           </div>
 
           <div>
-            <label htmlFor="add-apt" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Apartment number <span className="text-red-500">*</span>
+            <label htmlFor="add-apt" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
+              Apartment number
             </label>
             <input
               id="add-apt"
@@ -86,17 +86,17 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
               value={appartmentNumber || ""}
               onChange={(e) => setAppartmentNumber(Number(e.target.value))}
               required
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full rounded-sm bg-surface-container-highest px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-muted focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
               placeholder="101"
             />
           </div>
 
           <div>
-            <label htmlFor="add-rent" className="block text-sm font-medium text-slate-700 mb-1.5">
-              Monthly rent ($) <span className="text-red-500">*</span>
+            <label htmlFor="add-rent" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
+              Monthly rent
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium mono text-sm">$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-on-surface-muted">$</span>
               <input
                 id="add-rent"
                 type="number"
@@ -104,23 +104,23 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
                 value={rentAmount || ""}
                 onChange={(e) => setRentAmount(Number(e.target.value))}
                 required
-                className="w-full pl-8 pr-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 mono"
+                className="w-full rounded-sm bg-surface-container-highest py-3 pl-8 pr-4 text-sm text-on-surface placeholder:text-on-surface-muted focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
                 placeholder="1200"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="add-lastpaid" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label htmlFor="add-lastpaid" className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-on-surface-muted">
               Last month paid
-              <span className="text-slate-400 font-normal ml-1">(YYYY-MM)</span>
+              <span className="ml-1 font-medium tracking-normal text-on-surface-muted">(YYYY-MM)</span>
             </label>
             <input
               id="add-lastpaid"
               type="month"
               value={lastMonthPayed}
               onChange={(e) => setLastMonthPayed(e.target.value)}
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full rounded-sm bg-surface-container-highest px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-muted focus:bg-surface-container-lowest focus:outline-none focus:[box-shadow:inset_0_-2px_0_0_#0f172a]"
             />
           </div>
 
@@ -128,14 +128,14 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors duration-200 cursor-pointer"
+              className="flex-1 rounded-sm bg-surface-container-high px-4 py-2.5 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors duration-200 cursor-pointer disabled:cursor-not-allowed"
+              className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-4 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? <><Loader2 size={16} className="animate-spin" /> Adding…</> : "Add Renter"}
             </button>
