@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
@@ -40,11 +40,23 @@ function formatCurrency(amount: number) {
   return `$${amount.toLocaleString()}`;
 }
 
+function matchesSearch(renter: Renter, normalizedQuery: string) {
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  return (
+    renter.name.toLowerCase().includes(normalizedQuery) ||
+    renter.appartmentNumber.toString().includes(normalizedQuery)
+  );
+}
+
 export function RenterDashboardPage() {
   const queryClient = useQueryClient();
   const [selectedRenterId, setSelectedRenterId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMarkPaidModal, setShowMarkPaidModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const rentersQuery = useQuery({
     queryKey: ["renters"],
@@ -86,12 +98,29 @@ export function RenterDashboardPage() {
   }, [seedEnabled, rentersQuery.data, seedMutation]);
 
   const renters = rentersQuery.data ?? [];
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+  const filteredRenters = useMemo(
+    () => renters.filter((renter) => matchesSearch(renter, normalizedSearchQuery)),
+    [renters, normalizedSearchQuery]
+  );
   const selectedRenter = renters.find((renter) => renter.id === selectedRenterId) ?? null;
   const overdueRenters = renters.filter((renter) => (renter.rentDue ?? 0) > 0);
   const onTimeCount = Math.max(renters.length - overdueRenters.length, 0);
   const collectionRate = renters.length > 0 ? Math.round((onTimeCount / renters.length) * 100) : 100;
   const totalMonthlyRevenue = renters.reduce((sum, renter) => sum + renter.rentAmount, 0);
   const totalDue = renters.reduce((sum, renter) => sum + Math.max(renter.rentDue ?? 0, 0), 0);
+
+  useEffect(() => {
+    if (!selectedRenterId) {
+      return;
+    }
+
+    if (filteredRenters.some((renter) => renter.id === selectedRenterId)) {
+      return;
+    }
+
+    setSelectedRenterId(null);
+  }, [filteredRenters, selectedRenterId]);
 
   async function handleSignOut() {
     if (sessionStorage.getItem("dev_token")) {
@@ -165,8 +194,8 @@ export function RenterDashboardPage() {
                 <Search size={16} />
                 <input
                   type="text"
-                  value=""
-                  readOnly
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
                   aria-label="Search"
                   placeholder="Search properties, tenants..."
                   className="w-full bg-transparent text-sm text-on-surface placeholder:text-on-surface-muted focus:outline-none"
@@ -267,7 +296,7 @@ export function RenterDashboardPage() {
                 <div className="flex items-center gap-3">
                   <h2 className="font-heading text-[1.35rem] font-bold text-on-surface sm:text-2xl">Renters Ledger</h2>
                   <span className="inline-flex items-center rounded-full bg-surface-container-high px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-on-surface-muted">
-                    {renters.length}
+                    {filteredRenters.length}
                   </span>
                 </div>
                 <button
@@ -309,9 +338,9 @@ export function RenterDashboardPage() {
                 </div>
               )}
 
-              {rentersQuery.data && renters.length > 0 && (
+              {rentersQuery.data && renters.length > 0 && filteredRenters.length > 0 && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {renters.map((renter) => (
+                  {filteredRenters.map((renter) => (
                     <RenterCard
                       key={renter.id}
                       renter={renter}
@@ -319,6 +348,20 @@ export function RenterDashboardPage() {
                       onSelect={(selected: Renter) => setSelectedRenterId((prev) => (prev === selected.id ? null : selected.id))}
                     />
                   ))}
+                </div>
+              )}
+
+              {rentersQuery.data && renters.length > 0 && filteredRenters.length === 0 && (
+                <div className="rounded-md bg-surface-container-lowest px-6 py-16 text-center">
+                  <p className="font-heading text-3xl font-semibold text-on-surface">No renters match your search</p>
+                  <p className="mt-2 text-sm text-on-surface-muted">Try a renter name or apartment number.</p>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="mt-6 inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container"
+                  >
+                    Clear search
+                  </button>
                 </div>
               )}
             </div>
