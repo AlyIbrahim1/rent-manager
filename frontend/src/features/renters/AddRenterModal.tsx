@@ -24,6 +24,33 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const { style: bodyStyle } = document.body;
+    const { style: htmlStyle } = document.documentElement;
+    const previousBodyOverflow = bodyStyle.overflow;
+    const previousBodyPaddingRight = bodyStyle.paddingRight;
+    const previousBodyTouchAction = bodyStyle.touchAction;
+    const previousHtmlOverflow = htmlStyle.overflow;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    bodyStyle.overflow = "hidden";
+    bodyStyle.touchAction = "none";
+    htmlStyle.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+      bodyStyle.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      bodyStyle.overflow = previousBodyOverflow;
+      bodyStyle.paddingRight = previousBodyPaddingRight;
+      bodyStyle.touchAction = previousBodyTouchAction;
+      htmlStyle.overflow = previousHtmlOverflow;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   async function handleSubmit(e: React.FormEvent) {
