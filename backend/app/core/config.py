@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
     supabase_storage_bucket: str = "receipts"
     cors_origins: str = "http://localhost:5173"
+    cors_origin_regex: str | None = None
     seed_enabled: bool = False
     dev_session_ttl_hours: int = 8
     dev_session_cleanup_enabled: bool = True
