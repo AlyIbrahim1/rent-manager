@@ -109,7 +109,7 @@ export function RenterDashboardPage() {
       <aside className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-72 lg:flex-col lg:bg-surface-container-low lg:px-4 lg:py-8">
         <div className="px-4">
           <img src={logoSvg} alt="The Ledger" className="h-10 w-auto" />
-          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-on-surface-muted">Architectural Management</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-on-surface-muted">Property Management</p>
         </div>
 
         <nav className="mt-8 flex-1 space-y-1 px-2">
