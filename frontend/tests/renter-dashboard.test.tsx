@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
 const renters = vi.hoisted(() => [
@@ -33,15 +34,29 @@ const renters = vi.hoisted(() => [
   },
 ]);
 
+const signOutMock = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }));
+
 vi.mock("../src/api/client", () => ({
   api: {
     listRenters: vi.fn().mockResolvedValue(renters),
   },
 }));
 
+vi.mock("../src/lib/supabase", () => ({
+  supabase: {
+    auth: {
+      signOut: signOutMock,
+    },
+  },
+}));
+
 import { RenterDashboardPage } from "../src/features/renters/RenterDashboardPage";
 
 describe("RenterDashboardPage", () => {
+  beforeEach(() => {
+    signOutMock.mockClear();
+  });
+
   it("renders renter card from api data", async () => {
     const queryClient = new QueryClient();
     render(
@@ -113,5 +128,44 @@ describe("RenterDashboardPage", () => {
     fireEvent.change(searchInput, { target: { value: "sarah" } });
 
     expect(getReceivePaymentButtons().every((button) => button.disabled)).toBe(true);
+  });
+
+  it("opens a sign-out confirmation screen before logging out", async () => {
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RenterDashboardPage />
+      </QueryClientProvider>
+    );
+
+    await screen.findByText(/Apt #101/);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /sign out/i })[0]);
+
+    expect(screen.getByRole("heading", { name: /confirm sign out/i })).toBeInTheDocument();
+    expect(signOutMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(screen.queryByRole("heading", { name: /confirm sign out/i })).not.toBeInTheDocument();
+    expect(signOutMock).not.toHaveBeenCalled();
+  });
+
+  it("signs out only after user confirms", async () => {
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RenterDashboardPage />
+      </QueryClientProvider>
+    );
+
+    await screen.findByText(/Apt #101/);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /sign out/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /yes, sign out/i }));
+
+    await waitFor(() => {
+      expect(signOutMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

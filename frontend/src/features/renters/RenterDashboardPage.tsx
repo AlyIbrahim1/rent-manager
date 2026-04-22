@@ -21,6 +21,7 @@ import {
 import { api } from "../../api/client";
 import { supabase } from "../../lib/supabase";
 import type { CreateRenterInput, Renter } from "../../api/types";
+import { SignOutConfirmDialog } from "../../components/SignOutConfirmDialog";
 import { AddRenterModal } from "./AddRenterModal";
 import { MarkPaidModal } from "./MarkPaidModal";
 import { RenterCard } from "./RenterCard";
@@ -56,6 +57,8 @@ export function RenterDashboardPage() {
   const [selectedRenterId, setSelectedRenterId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showMarkPaidModal, setShowMarkPaidModal] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const rentersQuery = useQuery({
@@ -123,14 +126,32 @@ export function RenterDashboardPage() {
   }, [filteredRenters, selectedRenterId]);
 
   async function handleSignOut() {
-    if (sessionStorage.getItem("dev_token")) {
-      await api.deleteDevSession().catch(() => {});
-      sessionStorage.removeItem("dev_token");
-      sessionStorage.removeItem("dev_session_meta");
-      window.location.reload();
+    if (isSigningOut) {
       return;
     }
-    void supabase.auth.signOut();
+
+    setIsSigningOut(true);
+    try {
+      if (sessionStorage.getItem("dev_token")) {
+        await api.deleteDevSession().catch(() => {});
+        sessionStorage.removeItem("dev_token");
+        sessionStorage.removeItem("dev_session_meta");
+        window.location.reload();
+        return;
+      }
+
+      await supabase.auth.signOut();
+    } finally {
+      setIsSigningOut(false);
+      setShowSignOutConfirm(false);
+    }
+  }
+
+  function openSignOutConfirm() {
+    if (isSigningOut) {
+      return;
+    }
+    setShowSignOutConfirm(true);
   }
 
   return (
@@ -175,7 +196,7 @@ export function RenterDashboardPage() {
           </button>
           <button
             type="button"
-            onClick={handleSignOut}
+            onClick={openSignOutConfirm}
             className="flex w-full items-center justify-center gap-2 rounded-md bg-surface-container-high px-4 py-3 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
             aria-label="Sign out"
           >
@@ -221,7 +242,7 @@ export function RenterDashboardPage() {
               </button>
               <button
                 type="button"
-                onClick={handleSignOut}
+                onClick={openSignOutConfirm}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-sm bg-surface-container-high text-on-surface transition-colors hover:bg-surface-container lg:hidden"
                 aria-label="Sign out"
               >
@@ -453,6 +474,15 @@ export function RenterDashboardPage() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSubmit={async (payload) => createMutation.mutateAsync(payload)}
+      />
+
+      <SignOutConfirmDialog
+        isOpen={showSignOutConfirm}
+        isSubmitting={isSigningOut}
+        onCancel={() => setShowSignOutConfirm(false)}
+        onConfirm={() => {
+          void handleSignOut();
+        }}
       />
 
       {selectedRenter && (
