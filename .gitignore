@@ -29,4 +29,4 @@ backend/*.db
 # Brainstorming artifacts
 .superpowers/
 
-passwrds.txt
+internal-docs/
