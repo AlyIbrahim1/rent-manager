@@ -52,29 +52,34 @@ vi.mock("@/shared/lib/supabase", () => ({
 
 import { RenterDashboardPage } from "@/features/renters/pages/RenterDashboardPage";
 
+function renderDashboard() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  render(
+    <QueryClientProvider client={queryClient}>
+      <RenterDashboardPage />
+    </QueryClientProvider>
+  );
+}
+
 describe("RenterDashboardPage", () => {
   beforeEach(() => {
     signOutMock.mockClear();
   });
 
   it("renders renter card from api data", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     expect(await screen.findByText(/Apt #101/)).toBeInTheDocument();
   });
 
   it("filters renters by name and apartment number", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     expect(await screen.findByText(/Apt #101/)).toBeInTheDocument();
 
@@ -93,12 +98,7 @@ describe("RenterDashboardPage", () => {
   });
 
   it("shows an empty state when no renters match", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     await screen.findByText(/Apt #101/);
 
@@ -110,12 +110,7 @@ describe("RenterDashboardPage", () => {
   });
 
   it("clears the selected renter when search hides it", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     await screen.findByText(/Apt #101/);
 
@@ -130,13 +125,31 @@ describe("RenterDashboardPage", () => {
     expect(getReceivePaymentButtons().every((button) => button.disabled)).toBe(true);
   });
 
+  it("wires each sign-out trigger to the confirmation dialog", async () => {
+    renderDashboard();
+
+    await screen.findByText(/Apt #101/);
+
+    const signOutButtons = screen.getAllByRole("button", { name: /sign out/i });
+    expect(signOutButtons.length).toBeGreaterThanOrEqual(2);
+
+    for (const trigger of signOutButtons) {
+      fireEvent.click(trigger);
+
+      expect(screen.getByRole("heading", { name: /confirm sign out/i })).toBeInTheDocument();
+      expect(signOutMock).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole("heading", { name: /confirm sign out/i })).not.toBeInTheDocument();
+      });
+      expect(signOutMock).not.toHaveBeenCalled();
+    }
+  });
+
   it("opens a sign-out confirmation screen before logging out", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     await screen.findByText(/Apt #101/);
 
@@ -152,12 +165,7 @@ describe("RenterDashboardPage", () => {
   });
 
   it("signs out only after user confirms", async () => {
-    const queryClient = new QueryClient();
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RenterDashboardPage />
-      </QueryClientProvider>
-    );
+    renderDashboard();
 
     await screen.findByText(/Apt #101/);
 
