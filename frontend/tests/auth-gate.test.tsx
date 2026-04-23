@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
-vi.mock("../src/lib/supabase", () => ({
+vi.mock("@/shared/lib/supabase", () => ({
   supabase: {
     auth: {
       getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
@@ -12,7 +12,7 @@ vi.mock("../src/lib/supabase", () => ({
   },
 }));
 
-import { AuthGate } from "../src/features/auth/AuthGate";
+import { AuthGate } from "../src/features/auth/components/AuthGate";
 
 describe("AuthGate", () => {
   it("renders login when user is unauthenticated", async () => {

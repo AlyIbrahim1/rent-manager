@@ -36,13 +36,13 @@ const renters = vi.hoisted(() => [
 
 const signOutMock = vi.hoisted(() => vi.fn().mockResolvedValue({ error: null }));
 
-vi.mock("../src/api/client", () => ({
+vi.mock("@/shared/api/client", () => ({
   api: {
     listRenters: vi.fn().mockResolvedValue(renters),
   },
 }));
 
-vi.mock("../src/lib/supabase", () => ({
+vi.mock("@/shared/lib/supabase", () => ({
   supabase: {
     auth: {
       signOut: signOutMock,
@@ -50,7 +50,7 @@ vi.mock("../src/lib/supabase", () => ({
   },
 }));
 
-import { RenterDashboardPage } from "../src/features/renters/RenterDashboardPage";
+import { RenterDashboardPage } from "@/features/renters/pages/RenterDashboardPage";
 
 describe("RenterDashboardPage", () => {
   beforeEach(() => {

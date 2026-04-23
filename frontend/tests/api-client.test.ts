@@ -4,7 +4,7 @@ const { getSessionMock } = vi.hoisted(() => ({
   getSessionMock: vi.fn(),
 }));
 
-vi.mock("../src/lib/supabase", () => ({
+vi.mock("@/shared/lib/supabase", () => ({
   supabase: {
     auth: {
       getSession: getSessionMock,
@@ -12,7 +12,7 @@ vi.mock("../src/lib/supabase", () => ({
   },
 }));
 
-import { api } from "../src/api/client";
+import { api } from "@/shared/api/client";
 
 describe("api client", () => {
   beforeEach(() => {
