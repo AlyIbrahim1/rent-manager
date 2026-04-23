@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import { App } from "./App";
-import { queryClient } from "./lib/query-client";
-import "./styles/index.css";
+import { App } from "@/app/App";
+import { queryClient } from "@/app/providers/query-client";
+import "@/shared/styles/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
