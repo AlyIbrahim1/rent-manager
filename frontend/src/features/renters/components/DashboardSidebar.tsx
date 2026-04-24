@@ -1,9 +1,8 @@
-import { Plus, LogOut, LayoutDashboard, Building2, Users2, HandCoins, BarChart3, Settings } from "lucide-react";
+import { Plus, LayoutDashboard, Building2, Users2, HandCoins, BarChart3, Settings } from "lucide-react";
 
 type Props = {
   logoSrc: string;
   onAddRenter: () => void;
-  onSignOut: () => void;
 };
 
 const navItems = [
@@ -15,7 +14,7 @@ const navItems = [
   { label: "Settings", icon: Settings, active: false },
 ] as const;
 
-export function DashboardSidebar({ logoSrc, onAddRenter, onSignOut }: Props) {
+export function DashboardSidebar({ logoSrc, onAddRenter }: Props) {
   return (
     <aside className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-72 lg:flex-col lg:bg-surface-container-low lg:px-4 lg:py-8">
       <div className="px-4">
@@ -53,15 +52,6 @@ export function DashboardSidebar({ logoSrc, onAddRenter, onSignOut }: Props) {
         >
           <Plus size={16} />
           Add Renter
-        </button>
-        <button
-          type="button"
-          onClick={onSignOut}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-surface-container-high px-4 py-3 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
-          aria-label="Sign out"
-        >
-          <LogOut size={16} />
-          Sign out
         </button>
       </div>
     </aside>

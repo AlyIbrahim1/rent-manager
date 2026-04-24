@@ -77,5 +77,5 @@ export function AuthGate() {
   }
 
   if (!user) return <LoginPage />;
-  return <RenterDashboardPage />;
+  return <RenterDashboardPage user={user} />;
 }
