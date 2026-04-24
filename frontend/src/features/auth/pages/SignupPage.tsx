@@ -1,105 +1,112 @@
-import logoSvg from "@/shared/assets/logo.svg";
+import { useState, type FormEvent } from "react";
+
+import {
+  AuthActions,
+  AuthForm,
+  EmailField,
+  ErrorMessage,
+  GoogleButton,
+  HelperErrorText,
+  PasswordField,
+  SocialDivider,
+  SubmitButton,
+} from "@/features/auth/components/AuthFormFields";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { footerLinkButtonStyle, footerTextStyle, footerWrapStyle } from "@/features/auth/components/authStyles";
+import { setAuthFlashMessage, syncAuthPath } from "@/features/auth/lib/authRoute";
+import { supabase } from "@/shared/lib/supabase";
 
 export function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const passwordsMismatch = confirmPassword.length > 0 && confirmPassword !== password;
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    const { error: authError } = await supabase.auth.signUp({ email, password });
+    if (authError) {
+      setError(authError.message);
+    } else {
+      setAuthFlashMessage("Account created! Check your email to confirm, then sign in.");
+      syncAuthPath("signin", { replace: true });
+      setPassword("");
+      setConfirmPassword("");
+    }
+
+    setLoading(false);
+  }
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    setLoading(true);
+    const { error: authError } = await supabase.auth.signInWithOAuth({ provider: "google" });
+    if (authError) {
+      setError(authError.message);
+    }
+    setLoading(false);
+  }
+
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 16,
-        fontFamily: "Inter, sans-serif",
-        background:
-          "radial-gradient(circle at 10% 8%, rgba(236,238,240,0.92), transparent 32%), radial-gradient(circle at 88% 14%, rgba(213,227,252,0.26), transparent 28%), linear-gradient(180deg, #f7f9fb 0%, #f4f6f8 100%)",
-      }}
+    <AuthShell
+      footer={
+        <div style={footerWrapStyle}>
+          <p style={footerTextStyle}>
+            <button type="button" onClick={() => syncAuthPath("signin")} style={footerLinkButtonStyle}>
+              Back to Sign In
+            </button>
+          </p>
+        </div>
+      }
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 440,
-          background: "rgba(255,255,255,0.85)",
-          backdropFilter: "blur(24px)",
-          borderRadius: 16,
-          boxShadow: "0 12px 40px rgba(25,28,30,0.06)",
-          padding: "56px 44px",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
+      <AuthForm onSubmit={handleSubmit}>
+        <EmailField value={email} onChange={setEmail} />
+
+        <PasswordField
+          value={password}
+          onChange={setPassword}
+          showPassword={showPassword}
+          onToggleVisibility={() => setShowPassword((value) => !value)}
+          autoComplete="new-password"
+          minLength={6}
+        />
+
+        <PasswordField
+          id="confirm-password"
+          label="Confirm Password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          showPassword={showPassword}
+          onToggleVisibility={() => setShowPassword((value) => !value)}
+          autoComplete="new-password"
+          minLength={6}
           style={{
-            position: "absolute",
-            top: -48,
-            right: -48,
-            width: 192,
-            height: 192,
-            background: "radial-gradient(circle, #F2F2F2, transparent)",
-            borderRadius: "50%",
-            opacity: 0.6,
-            pointerEvents: "none",
+            border: passwordsMismatch ? "1px solid #EF5350" : "1px solid transparent",
+            background: passwordsMismatch ? "#FFF5F5" : "#F5F5F5",
           }}
         />
 
-        <div style={{ textAlign: "center", marginBottom: 28, position: "relative", zIndex: 1 }}>
-          <img src={logoSvg} alt="The Ledger" style={{ height: 44, width: "auto", margin: "0 auto 10px", display: "block" }} />
-          <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>Rent Manager</span>
-          <p style={{ margin: 0, color: "#666", fontSize: 14, fontWeight: 500, letterSpacing: "0.03em" }}>
-            Curated property management.
-          </p>
-        </div>
-
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ marginBottom: 22 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#000", marginBottom: 8 }}>Status</p>
-            <div
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                padding: "16px 18px",
-                background: "#F5F5F5",
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: 500,
-                color: "#45464d",
-                lineHeight: 1.6,
-              }}
-            >
-              Standalone sign-up is prepared, but the live app still uses the unified auth screen.
-            </div>
-          </div>
-
-          <button
-            type="button"
-            disabled
-            style={{
-              width: "100%",
-              height: 50,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              background: "linear-gradient(135deg, #0f172a, #131b2e)",
-              color: "#fff",
-              fontSize: 15,
-              fontWeight: 700,
-              letterSpacing: "0.03em",
-              border: "none",
-              borderRadius: 8,
-              fontFamily: "inherit",
-              opacity: 0.8,
-              cursor: "not-allowed",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            }}
-          >
-            Route reserved for future activation
-          </button>
-
-          <p style={{ margin: "18px 0 0", textAlign: "center", fontSize: 13, color: "#666" }}>
-            Future auth routes can reuse the same exact Ledger shell without changing the visual system.
-          </p>
-        </div>
-      </div>
-    </div>
+        {passwordsMismatch ? <HelperErrorText message="Passwords do not match." /> : null}
+        {error ? <ErrorMessage message={error} /> : null}
+        <AuthActions>
+          <SubmitButton loading={loading} label="Create Account" />
+          <SocialDivider />
+          <GoogleButton loading={loading} label="Sign up with Google" onClick={handleGoogleSignIn} />
+        </AuthActions>
+      </AuthForm>
+    </AuthShell>
   );
 }
