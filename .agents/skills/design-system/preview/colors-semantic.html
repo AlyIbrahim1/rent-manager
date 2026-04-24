@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f7f9fb; font-family: 'Inter', sans-serif; padding: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  .group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #76777d; padding: 0 4px; margin-bottom: 2px; }
+  .swatch { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 6px; padding: 12px 16px; min-width: 200px; box-shadow: 0 12px 40px rgba(25,28,30,0.06); }
+  .dot { width: 40px; height: 40px; border-radius: 6px; flex-shrink: 0; }
+  .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #45464d; }
+  .hex { font-size: 13px; font-weight: 600; color: #191c1e; margin-top: 2px; }
+  .preview-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 9999px; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div class="group">
+    <div class="group-label">Emerald — CTA</div>
+    <div class="swatch"><div class="dot" style="background:#002114"></div><div><div class="label">tertiary-container</div><div class="hex">#002114</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#85f8c4;border:1px solid #eceef0"></div><div><div class="label">tertiary-fixed</div><div class="hex">#85f8c4</div></div></div>
+  </div>
+  <div class="group">
+    <div class="group-label">Success</div>
+    <div class="swatch"><div class="dot" style="background:#dff5ed;border:1px solid #eceef0"></div><div><div class="label">success-bg</div><div class="hex">#dff5ed</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#047857"></div><div><div class="label">success-text</div><div class="hex">#047857</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#059669"></div><div><div class="label">success-alt</div><div class="hex">#059669</div></div></div>
+  </div>
+  <div class="group">
+    <div class="group-label">Overdue / Error</div>
+    <div class="swatch"><div class="dot" style="background:#ffe9ec;border:1px solid #eceef0"></div><div><div class="label">overdue-bg</div><div class="hex">#ffe9ec</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#9f1239"></div><div><div class="label">overdue-text</div><div class="hex">#9f1239</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#be123c"></div><div><div class="label">overdue-amount</div><div class="hex">#be123c</div></div></div>
+    <div class="swatch"><div class="dot" style="background:#ba1a1a"></div><div><div class="label">error-container</div><div class="hex">#ba1a1a</div></div></div>
+  </div>
+  <div class="group">
+    <div class="group-label">Contextual</div>
+    <div class="swatch"><div class="dot" style="background:#d5e3fc;border:1px solid #eceef0"></div><div><div class="label">secondary-container</div><div class="hex">#d5e3fc</div></div></div>
+    <div style="background:#fff;border-radius:6px;padding:14px 16px;box-shadow:0 12px 40px rgba(25,28,30,0.06)">
+      <div class="label" style="margin-bottom:10px">Status chips in context</div>
+      <div class="preview-row">
+        <span class="chip" style="background:#dff5ed;color:#047857">Paid</span>
+        <span class="chip" style="background:#ffe9ec;color:#9f1239">⚠ Overdue</span>
+        <span class="chip" style="background:#e6e8ea;color:#45464d">Scaffolded</span>
+        <span class="chip" style="background:#002114;color:#85f8c4">Receive Payment</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

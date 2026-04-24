@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 228 48" fill="none" role="img" aria-label="The Ledger">
+  
+  <svg x="0" y="0" width="32" height="48" viewBox="0 0 100 150">
+    <g transform="translate(0, 15) skewY(-15)">
+      <path d="&#xA;        M 10 130 H 90&#xA;        M 20 50 V 130&#xA;        M 40 30 V 130&#xA;        M 60 10 V 130&#xA;        M 80 10 V 130&#xA;        M 20 110 H 80&#xA;        M 20 90 H 80&#xA;        M 20 70 H 80&#xA;        M 20 50 H 80&#xA;        M 40 30 H 80&#xA;        M 60 10 H 80&#xA;      " class="logo-mark" stroke-width="9" stroke-linecap="square" fill="none"></path>
+    </g>
+  </svg>
+  <text x="44" y="32" font-family="&#39;Manrope&#39;, &#39;Inter&#39;, system-ui, sans-serif" font-weight="700" font-size="20" letter-spacing="0.35em" class="logo-wordmark">THE LEDGER</text>
+</svg>
