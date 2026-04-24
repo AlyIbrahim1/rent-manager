@@ -1,4 +1,4 @@
-import { Wallet, ArrowUpRight, Building2, AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowUpRight, Building2, Wallet } from "lucide-react";
 
 type Props = {
   totalMonthlyRevenue: number;
@@ -23,65 +23,124 @@ export function PortfolioOverviewSection({
   canReceivePayment,
   onReceivePayment,
 }: Props) {
+  const cardStyle: React.CSSProperties = {
+    background: "#fff",
+    borderRadius: 6,
+    padding: "20px 22px",
+    boxShadow: "0 12px 40px rgba(25,28,30,0.06)",
+    animation: "ledger-reveal-up 0.4s both",
+  };
+
   return (
-    <>
-      <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
-          <h1 className="font-heading text-[2.25rem] font-bold leading-tight text-on-surface sm:text-[2.5rem]">Portfolio Overview</h1>
-          <p className="mt-2 text-sm text-on-surface-muted">Status summary and current renter ledger across active units.</p>
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: "Manrope, sans-serif",
+              fontSize: "2.3rem",
+              fontWeight: 700,
+              color: "#191c1e",
+              lineHeight: 1.1,
+            }}
+          >
+            Portfolio Overview
+          </h1>
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#45464d" }}>
+            Status summary and current renter ledger across active units.
+          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             type="button"
-            className="rounded-sm bg-surface-container-high px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
+            style={{
+              padding: "9px 16px",
+              background: "#e6e8ea",
+              color: "#191c1e",
+              fontSize: 13,
+              fontWeight: 500,
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
           >
             Export Report
           </button>
           <button
             type="button"
-            onClick={onReceivePayment}
+            onClick={canReceivePayment ? onReceivePayment : undefined}
             disabled={!canReceivePayment}
-            className="inline-flex items-center gap-2 rounded-sm bg-tertiary-container px-4 py-2 text-sm font-semibold text-tertiary-fixed transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "9px 16px",
+              background: "#002114",
+              color: "#85f8c4",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderRadius: 4,
+              cursor: canReceivePayment ? "pointer" : "not-allowed",
+              opacity: canReceivePayment ? 1 : 0.5,
+              fontFamily: "inherit",
+            }}
           >
-            <Wallet size={15} />
+            <Wallet size={14} color="#85f8c4" />
             Receive Payment
           </button>
         </div>
-      </section>
+      </div>
 
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
-        <article className="animate-reveal-up col-span-2 rounded-md bg-surface-container-lowest p-5 shadow-layer md:col-span-1 md:p-6" style={{ animationDelay: "30ms" }}>
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-on-surface-muted">Total Revenue</span>
-            <ArrowUpRight size={16} className="text-on-surface-muted" />
+      <div className="grid gap-3 md:grid-cols-[1.2fr_1fr_1fr]">
+        <article style={{ ...cardStyle, animationDelay: "30ms" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#45464d" }}>
+              Total Revenue
+            </span>
+            <ArrowUpRight size={15} color="#45464d" />
           </div>
-          <p className="font-heading text-[2.9rem] font-bold leading-none text-on-surface sm:text-[3.3rem]">{formatCurrency(totalMonthlyRevenue)}</p>
-          <p className="mt-3 text-sm text-[#059669]">{collectionRate}% collection rate this cycle</p>
+          <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "2.8rem", fontWeight: 700, color: "#191c1e", lineHeight: 1 }}>
+            {formatCurrency(totalMonthlyRevenue)}
+          </p>
+          <p style={{ margin: "10px 0 0", fontSize: 13, color: "#059669" }}>{collectionRate}% collection rate this cycle</p>
         </article>
 
-        <article className="animate-reveal-up rounded-md bg-surface-container-lowest p-5 shadow-layer md:p-6" style={{ animationDelay: "80ms" }}>
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-on-surface-muted">Occupancy Rate</span>
-            <Building2 size={16} className="text-on-surface-muted" />
+        <article style={{ ...cardStyle, animationDelay: "80ms" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#45464d" }}>
+              Occupancy Rate
+            </span>
+            <Building2 size={15} color="#45464d" />
           </div>
-          <div className="flex items-end gap-2">
-            <p className="font-heading text-[2.7rem] font-bold leading-none text-on-surface sm:text-[3.3rem]">{rentersCount > 0 ? "100%" : "0%"}</p>
-            <p className="pb-2 text-sm text-on-surface-muted">{rentersCount} units tracked</p>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
+            <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "2.8rem", fontWeight: 700, color: "#191c1e", lineHeight: 1 }}>
+              {rentersCount > 0 ? "100%" : "0%"}
+            </p>
+            <p style={{ margin: "0 0 6px", fontSize: 13, color: "#45464d" }}>{rentersCount} units</p>
           </div>
-          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-surface-container">
-            <div className="h-full rounded-full bg-primary" style={{ width: rentersCount > 0 ? "100%" : "0%" }} />
+          <div style={{ marginTop: 14, height: 8, background: "#eceef0", borderRadius: 9999, overflow: "hidden" }}>
+            <div style={{ height: "100%", background: "#0f172a", borderRadius: 9999, width: rentersCount > 0 ? "100%" : "0%" }} />
           </div>
         </article>
 
-        <article className="animate-reveal-up rounded-md bg-surface-container-lowest p-5 shadow-layer md:p-6" style={{ animationDelay: "130ms" }}>
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-on-surface-muted">Pending Balance</span>
-            <AlertCircle size={16} className="text-on-surface-muted" />
+        <article style={{ ...cardStyle, animationDelay: "130ms" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#45464d" }}>
+              Pending Balance
+            </span>
+            <AlertCircle size={15} color="#45464d" />
           </div>
-          <p className="font-heading text-[2.7rem] font-bold leading-none text-on-surface sm:text-[3.3rem]">{formatCurrency(totalDue)}</p>
-          <p className="mt-3 text-sm text-[#F43F5E]">{overdueCount} overdue {overdueCount === 1 ? "renter" : "renters"}</p>
+          <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "2.8rem", fontWeight: 700, color: "#191c1e", lineHeight: 1 }}>
+            {formatCurrency(totalDue)}
+          </p>
+          <p style={{ margin: "10px 0 0", fontSize: 13, color: "#F43F5E" }}>
+            {overdueCount} overdue {overdueCount === 1 ? "renter" : "renters"}
+          </p>
         </article>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }

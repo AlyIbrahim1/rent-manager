@@ -29,6 +29,12 @@ export default {
         "secondary-container": "#d5e3fc",
         "outline-variant": "#c6c6cd",
         "error-container": "#ba1a1a",
+        "success-container": "#dff5ed",
+        "success-foreground": "#047857",
+        "success-strong": "#059669",
+        "error-soft": "#ffe9ec",
+        "error-foreground": "#9f1239",
+        "error-strong": "#be123c",
       },
       fontFamily: {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],

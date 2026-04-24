@@ -1,28 +1,21 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  LayoutDashboard,
-  Users2,
-  HandCoins,
-  BarChart3,
-} from "lucide-react";
+import { BarChart3, HandCoins, LayoutDashboard, Users2 } from "lucide-react";
 
+import { AddRenterModal } from "@/features/renters/components/AddRenterModal";
+import { DashboardHeader } from "@/features/renters/components/DashboardHeader";
+import { DashboardSidebar } from "@/features/renters/components/DashboardSidebar";
+import { MarkPaidModal } from "@/features/renters/components/MarkPaidModal";
+import { PortfolioOverviewSection } from "@/features/renters/components/PortfolioOverviewSection";
+import { RenterDetailsPanel } from "@/features/renters/components/RenterDetailsPanel";
+import { RentersLedgerSection } from "@/features/renters/components/RentersLedgerSection";
 import { api } from "@/shared/api/client";
+import type { CreateRenterInput, Renter } from "@/shared/api/types";
 import { supabase } from "@/shared/lib/supabase";
 import type { AuthUser } from "@/shared/lib/supabase";
-import type { CreateRenterInput, Renter } from "@/shared/api/types";
-import { SignOutConfirmDialog } from "@/shared/ui/SignOutConfirmDialog";
 import { FeatureScaffoldDialog } from "@/shared/ui/FeatureScaffoldDialog";
 import type { FeatureScaffoldConfig } from "@/shared/ui/FeatureScaffoldDialog";
-import { modalSheetBackdropClass, modalSheetPanelClass } from "@/shared/ui/modalActionStyles";
-import { useAnimatedPresence } from "@/shared/ui/useAnimatedPresence";
-import { AddRenterModal } from "@/features/renters/components/AddRenterModal";
-import { MarkPaidModal } from "@/features/renters/components/MarkPaidModal";
-import { RenterDetailsPanel } from "@/features/renters/components/RenterDetailsPanel";
-import { DashboardSidebar } from "@/features/renters/components/DashboardSidebar";
-import { DashboardHeader } from "@/features/renters/components/DashboardHeader";
-import { PortfolioOverviewSection } from "@/features/renters/components/PortfolioOverviewSection";
-import { RentersLedgerSection } from "@/features/renters/components/RentersLedgerSection";
+import { SignOutConfirmDialog } from "@/shared/ui/SignOutConfirmDialog";
 import logoSvg from "@/shared/assets/logo.svg";
 
 type RenterDashboardPageProps = {
@@ -34,18 +27,18 @@ const featureScaffolds: Record<FeatureScaffoldConfig["key"], FeatureScaffoldConf
     key: "notifications",
     eyebrow: "Scaffolded queue",
     title: "Notifications",
-    description: "This inbox is scaffolded so we can attach rent reminders, overdue nudges, and receipt confirmations without redesigning the header later.",
+    description: "This inbox is scaffolded so payment reminders, overdue nudges, and receipt confirmations can land in a consistent dashboard surface.",
     highlights: [
       "Payment reminders and overdue renter alerts will stack here.",
       "Lease renewal and document milestones will arrive in the same queue.",
-      "Future work will support read state, filtering, and direct drill-ins.",
+      "Future work will support filtering, read state, and direct drill-ins.",
     ],
   },
   profile: {
     key: "profile",
     eyebrow: "Scaffolded workspace view",
     title: "View Profile",
-    description: "This profile surface is in place for manager identity, workspace membership, and quick contact details once the account model expands beyond email-only auth.",
+    description: "This profile surface is reserved for manager identity, workspace membership, and quick contact details when the account model expands.",
     highlights: [
       "Manager details and workspace membership will live here.",
       "Avatar upload and role metadata are reserved for this panel.",
@@ -56,7 +49,7 @@ const featureScaffolds: Record<FeatureScaffoldConfig["key"], FeatureScaffoldConf
     key: "settings",
     eyebrow: "Scaffolded controls",
     title: "Account Settings",
-    description: "Account settings are scaffolded so preferences, notification rules, and workspace defaults can ship into a real destination instead of another temporary dropdown action.",
+    description: "Account settings are scaffolded so preferences, notification rules, and workspace defaults can land in a real destination instead of a temporary dropdown action.",
     highlights: [
       "Notification preferences will be configurable here.",
       "Workspace defaults like currency and rent cadence fit this section.",
@@ -76,15 +69,19 @@ const featureScaffolds: Record<FeatureScaffoldConfig["key"], FeatureScaffoldConf
   },
 };
 
+const mobileNavItems = [
+  { label: "Portfolio", icon: LayoutDashboard, active: true },
+  { label: "Ledger", icon: Users2, active: false },
+  { label: "Payments", icon: HandCoins, active: false },
+  { label: "Insight", icon: BarChart3, active: false },
+] as const;
+
 function matchesSearch(renter: Renter, normalizedQuery: string) {
   if (!normalizedQuery) {
     return true;
   }
 
-  return (
-    renter.name.toLowerCase().includes(normalizedQuery) ||
-    renter.appartmentNumber.toString().includes(normalizedQuery)
-  );
+  return renter.name.toLowerCase().includes(normalizedQuery) || String(renter.appartmentNumber).includes(normalizedQuery);
 }
 
 export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
@@ -96,7 +93,6 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [activeFeatureScaffold, setActiveFeatureScaffold] = useState<FeatureScaffoldConfig["key"] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sheetRenter, setSheetRenter] = useState<Renter | null>(null);
 
   const rentersQuery = useQuery({
     queryKey: ["renters"],
@@ -108,70 +104,25 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["renters"] }),
   });
 
-  const seedMutation = useMutation({
-    mutationFn: () => api.seedSampleData(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["renters"] }),
-  });
-
-  const seedEnabled = import.meta.env.VITE_SEED_ENABLED === "true";
-  const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-
-  useEffect(() => {
-    if (!seedEnabled) return;
-    const handleUnload = () => {
-      const token = sessionStorage.getItem("dev_token");
-      if (!token) return;
-      navigator.sendBeacon(
-        `${apiBase}/api/dev-session/cleanup`,
-        new Blob([JSON.stringify({ token })], { type: "application/json" }),
-      );
-      sessionStorage.removeItem("dev_session_meta");
-    };
-    window.addEventListener("beforeunload", handleUnload);
-    return () => window.removeEventListener("beforeunload", handleUnload);
-  }, [seedEnabled, apiBase]);
-
-  useEffect(() => {
-    if (seedEnabled && rentersQuery.data?.length === 0 && !seedMutation.isPending && !seedMutation.isSuccess) {
-      seedMutation.mutate();
-    }
-  }, [seedEnabled, rentersQuery.data, seedMutation]);
-
   const renters = rentersQuery.data ?? [];
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const filteredRenters = useMemo(
     () => renters.filter((renter) => matchesSearch(renter, normalizedSearchQuery)),
-    [renters, normalizedSearchQuery]
+    [renters, normalizedSearchQuery],
   );
   const selectedRenter = renters.find((renter) => renter.id === selectedRenterId) ?? null;
-  const { isMounted: isRenterSheetMounted, state: renterSheetState } = useAnimatedPresence(Boolean(selectedRenter));
   const overdueRenters = renters.filter((renter) => (renter.rentDue ?? 0) > 0);
-  const onTimeCount = Math.max(renters.length - overdueRenters.length, 0);
-  const collectionRate = renters.length > 0 ? Math.round((onTimeCount / renters.length) * 100) : 100;
+  const collectionRate = renters.length > 0 ? Math.round(((renters.length - overdueRenters.length) / renters.length) * 100) : 100;
   const totalMonthlyRevenue = renters.reduce((sum, renter) => sum + renter.rentAmount, 0);
   const totalDue = renters.reduce((sum, renter) => sum + Math.max(renter.rentDue ?? 0, 0), 0);
-
-  useEffect(() => {
-    if (selectedRenter) {
-      setSheetRenter(selectedRenter);
-    }
-  }, [selectedRenter]);
-
-  useEffect(() => {
-    if (!isRenterSheetMounted) {
-      setSheetRenter(null);
-    }
-  }, [isRenterSheetMounted]);
 
   useEffect(() => {
     if (!selectedRenterId) {
       return;
     }
-
     if (filteredRenters.some((renter) => renter.id === selectedRenterId)) {
       return;
     }
-
     setSelectedRenterId(null);
   }, [filteredRenters, selectedRenterId]);
 
@@ -197,39 +148,24 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
     }
   }
 
-  function openSignOutConfirm() {
-    if (isSigningOut) {
-      return;
-    }
-    setShowSignOutConfirm(true);
-  }
-
-  function openFeatureScaffold(feature: FeatureScaffoldConfig["key"]) {
-    setActiveFeatureScaffold(feature);
-  }
-
   return (
-    <div className="min-h-dvh bg-surface text-on-surface">
-      <DashboardSidebar
-        logoSrc={logoSvg}
-        onAddRenter={() => setShowAddModal(true)}
-      />
+    <div style={{ minHeight: "100dvh" }}>
+      <DashboardSidebar logoSrc={logoSvg} onAddRenter={() => setShowAddModal(true)} />
 
-      <div className="lg:pl-72">
+      <div className="lg:block" style={{ paddingLeft: 272 }}>
         <DashboardHeader
           logoSrc={logoSvg}
           userEmail={user.email}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onAddRenter={() => setShowAddModal(true)}
-          onOpenNotifications={() => openFeatureScaffold("notifications")}
-          onOpenProfile={() => openFeatureScaffold("profile")}
-          onOpenSettings={() => openFeatureScaffold("settings")}
-          onOpenSupport={() => openFeatureScaffold("support")}
-          onSignOut={openSignOutConfirm}
+          onOpenNotifications={() => setActiveFeatureScaffold("notifications")}
+          onOpenProfile={() => setActiveFeatureScaffold("profile")}
+          onOpenSettings={() => setActiveFeatureScaffold("settings")}
+          onOpenSupport={() => setActiveFeatureScaffold("support")}
+          onSignOut={() => setShowSignOutConfirm(true)}
         />
 
-        <main className="space-y-6 px-4 pb-28 pt-4 sm:space-y-8 sm:px-6 sm:pt-8 lg:px-10 lg:pb-10">
+        <main style={{ padding: "24px 32px 60px", display: "flex", flexDirection: "column", gap: 28 }}>
           <PortfolioOverviewSection
             totalMonthlyRevenue={totalMonthlyRevenue}
             totalDue={totalDue}
@@ -240,7 +176,7 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
             onReceivePayment={() => setShowMarkPaidModal(true)}
           />
 
-          <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
             <RentersLedgerSection
               isLoading={rentersQuery.isLoading}
               isError={rentersQuery.isError}
@@ -248,98 +184,83 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
               renters={renters}
               filteredRenters={filteredRenters}
               selectedRenterId={selectedRenter?.id ?? null}
-              onSelectRenter={(selected: Renter) => {
-                setSelectedRenterId((prev) => (prev === selected.id ? null : selected.id));
-              }}
+              onSelectRenter={(renter) => setSelectedRenterId((prev) => (prev === renter.id ? null : renter.id))}
               onAddRenter={() => setShowAddModal(true)}
               onClearSearch={() => setSearchQuery("")}
             />
 
-            <div className="hidden space-y-5 xl:block">
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <RenterDetailsPanel
                 renter={selectedRenter}
                 onMarkPaid={() => setShowMarkPaidModal(true)}
                 onClose={() => setSelectedRenterId(null)}
               />
 
-              <section className="rounded-md bg-surface-container-low p-5 sm:p-6">
-                <div className="mb-4 flex items-center justify-between gap-2">
-                  <h3 className="font-heading text-xl font-bold text-on-surface">Recent Activity</h3>
-                  <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-on-surface-muted">
+              <section style={{ background: "#f2f4f6", borderRadius: 6, padding: "18px 20px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                  <h3 style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#191c1e" }}>
+                    Recent Activity
+                  </h3>
+                  <span
+                    style={{
+                      background: "#e6e8ea",
+                      borderRadius: 9999,
+                      padding: "3px 9px",
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: "#45464d",
+                    }}
+                  >
                     Scaffolded
                   </span>
                 </div>
-                <div className="space-y-3">
-                  <div className="rounded-sm bg-surface-container-lowest p-4">
-                    <p className="text-sm font-semibold text-on-surface">Payment timeline</p>
-                    <p className="mt-1 text-sm text-on-surface-muted">Upcoming integration with backend payment events.</p>
-                  </div>
-                  <div className="rounded-sm bg-surface-container-lowest p-4">
-                    <p className="text-sm font-semibold text-on-surface">Lease workflow</p>
-                    <p className="mt-1 text-sm text-on-surface-muted">Signature and renewal milestones will appear here.</p>
-                  </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {["Payment timeline", "Lease workflow"].map((label) => (
+                    <div key={label} style={{ background: "#fff", borderRadius: 4, padding: "12px 14px" }}>
+                      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#191c1e" }}>{label}</p>
+                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#45464d" }}>Upcoming integration with backend events.</p>
+                    </div>
+                  ))}
                 </div>
               </section>
             </div>
-          </section>
-
-          <section className="rounded-md bg-surface-container-low p-4 xl:hidden">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="font-heading text-lg font-bold text-on-surface">Recent Activity</h3>
-              <span className="rounded-full bg-surface-container-high px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-on-surface-muted">
-                Soon
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-on-surface-muted">Payment timeline and lease milestones will appear in this panel.</p>
-          </section>
+          </div>
         </main>
       </div>
 
-      {isRenterSheetMounted && sheetRenter && (
-        <div
-          className={`fixed inset-0 z-30 bg-[#0b1220]/55 backdrop-blur-sm xl:hidden ${modalSheetBackdropClass}`}
-          data-state={renterSheetState}
-          onClick={() => setSelectedRenterId(null)}
-          aria-hidden="true"
-        >
-          <div
-            className={`absolute inset-x-0 bottom-16 max-h-[72dvh] overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-3 pb-4 shadow-floating ${modalSheetPanelClass}`}
-            data-state={renterSheetState}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-outline-variant/40" />
-            <RenterDetailsPanel
-              renter={sheetRenter}
-              onMarkPaid={() => setShowMarkPaidModal(true)}
-              onClose={() => setSelectedRenterId(null)}
-              variant="sheet"
-            />
-          </div>
-        </div>
-      )}
-
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant/20 bg-surface-container-lowest/95 px-2 py-3 backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/5 bg-white/95 px-2 py-3 backdrop-blur-xl lg:hidden">
         <div className="grid grid-cols-4 gap-1">
-          <button type="button" className="flex flex-col items-center gap-1 rounded-sm bg-[#dff5ed] py-2 text-[#047857]">
-            <LayoutDashboard size={16} />
-            <span className="text-[10px] font-semibold">Portfolio</span>
-          </button>
-          <button type="button" disabled className="flex flex-col items-center gap-1 rounded-sm py-2 text-on-surface-muted">
-            <Users2 size={16} />
-            <span className="text-[10px] font-semibold">Ledger</span>
-          </button>
-          <button type="button" disabled className="flex flex-col items-center gap-1 rounded-sm py-2 text-on-surface-muted">
-            <HandCoins size={16} />
-            <span className="text-[10px] font-semibold">Payments</span>
-          </button>
-          <button type="button" disabled className="flex flex-col items-center gap-1 rounded-sm py-2 text-on-surface-muted">
-            <BarChart3 size={16} />
-            <span className="text-[10px] font-semibold">Insight</span>
-          </button>
+          {mobileNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                disabled={!item.active}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 4,
+                  borderRadius: 4,
+                  padding: "8px 0",
+                  border: "none",
+                  background: item.active ? "#dff5ed" : "transparent",
+                  color: item.active ? "#047857" : "#45464d",
+                  fontSize: 10,
+                  fontWeight: 600,
+                }}
+              >
+                <Icon size={16} />
+                {item.label}
+              </button>
+            );
+          })}
         </div>
       </nav>
 
-      {/* Modals */}
       <AddRenterModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -360,7 +281,7 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
         }}
       />
 
-      {selectedRenter && (
+      {selectedRenter ? (
         <MarkPaidModal
           isOpen={showMarkPaidModal}
           onClose={() => setShowMarkPaidModal(false)}
@@ -373,7 +294,7 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
             void queryClient.invalidateQueries({ queryKey: ["payments", selectedRenter.id] });
           }}
         />
-      )}
+      ) : null}
     </div>
   );
 }

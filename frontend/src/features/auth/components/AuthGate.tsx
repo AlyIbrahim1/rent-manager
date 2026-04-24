@@ -4,6 +4,7 @@ import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RenterDashboardPage } from "@/features/renters/pages/RenterDashboardPage";
 import type { AuthUser } from "@/shared/lib/supabase";
 import { supabase } from "@/shared/lib/supabase";
+import { ledgerPageShellClass } from "@/shared/ui/ledgerPrimitives";
 
 
 function hasActiveDevSession() {
@@ -70,7 +71,7 @@ export function AuthGate() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-slate-50">
+      <div className={`${ledgerPageShellClass} flex items-center justify-center`}>
         <div className="spinner" aria-label="Loading" />
       </div>
     );

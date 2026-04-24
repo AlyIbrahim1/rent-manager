@@ -1,9 +1,22 @@
 import { useState } from "react";
-import { AlertTriangle, Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/shared/lib/supabase";
+import { AlertTriangle, ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
+
 import logoSvg from "@/shared/assets/logo.svg";
+import { supabase } from "@/shared/lib/supabase";
 
 type Mode = "signin" | "signup" | "forgot_password";
+
+function getTitle(mode: Mode) {
+  if (mode === "signup") {
+    return "Create Account";
+  }
+
+  if (mode === "forgot_password") {
+    return "Reset Password";
+  }
+
+  return "Sign In";
+}
 
 export function LoginPage() {
   const [mode, setMode] = useState<Mode>("signin");
@@ -14,23 +27,25 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const passwordsMismatch = mode === "signup" && confirmPassword.length > 0 && password !== confirmPassword;
 
   const seedEnabled = import.meta.env.VITE_SEED_ENABLED === "true";
   const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
   const isDevShortcut = seedEnabled && email.trim() === "dev";
+  const passwordsMismatch = mode === "signup" && confirmPassword.length > 0 && confirmPassword !== password;
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setError(null);
     setInfo(null);
     setLoading(true);
 
     if (isDevShortcut) {
       try {
-        const res = await fetch(`${apiBase}/api/dev-token`, { method: "POST" });
-        if (res.ok) {
-          const { access_token, sessionId, tenantId, expiresAt } = await res.json() as {
+        const response = await fetch(`${apiBase}/api/dev-token`, { method: "POST" });
+        if (!response.ok) {
+          setError("Dev login failed. Confirm the backend is running with seed mode enabled.");
+        } else {
+          const { access_token, sessionId, tenantId, expiresAt } = (await response.json()) as {
             access_token: string;
             sessionId?: string;
             tenantId?: string;
@@ -38,17 +53,12 @@ export function LoginPage() {
           };
           sessionStorage.setItem("dev_token", access_token);
           if (sessionId && tenantId && expiresAt) {
-            sessionStorage.setItem(
-              "dev_session_meta",
-              JSON.stringify({ sessionId, tenantId, expiresAt })
-            );
+            sessionStorage.setItem("dev_session_meta", JSON.stringify({ sessionId, tenantId, expiresAt }));
           }
           window.dispatchEvent(new Event("dev-login"));
-        } else {
-          setError("Dev login failed — is SEED_ENABLED=true in the backend?");
         }
       } catch {
-        setError("Dev login failed — is the backend running?");
+        setError("Dev login failed. Confirm the backend is reachable.");
       } finally {
         setLoading(false);
       }
@@ -62,27 +72,35 @@ export function LoginPage() {
       if (authError) {
         setError(authError.message);
       } else {
-        setInfo("Password reset instructions sent! Check your email.");
+        setInfo("Password reset instructions sent. Check the linked email inbox.");
       }
-    } else if (mode === "signin") {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-      if (authError) setError(authError.message);
-    } else {
-      if (password !== confirmPassword) {
-        setError("Passwords do not match.");
-        setLoading(false);
-        return;
-      }
+      setLoading(false);
+      return;
+    }
 
-      const { error: authError } = await supabase.auth.signUp({ email, password });
+    if (mode === "signin") {
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
         setError(authError.message);
-      } else {
-        setInfo("Account created! Check your email to confirm, then sign in.");
-        setMode("signin");
-        setPassword("");
-        setConfirmPassword("");
       }
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    const { error: authError } = await supabase.auth.signUp({ email, password });
+    if (authError) {
+      setError(authError.message);
+    } else {
+      setInfo("Account created! Check your email to confirm, then sign in.");
+      setMode("signin");
+      setPassword("");
+      setConfirmPassword("");
     }
 
     setLoading(false);
@@ -92,178 +110,316 @@ export function LoginPage() {
     setError(null);
     setLoading(true);
     const { error: authError } = await supabase.auth.signInWithOAuth({ provider: "google" });
-    if (authError) setError(authError.message);
+    if (authError) {
+      setError(authError.message);
+    }
     setLoading(false);
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    boxSizing: "border-box",
+    paddingLeft: 44,
+    paddingRight: 16,
+    height: 50,
+    background: "#F5F5F5",
+    border: "1px solid transparent",
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: 500,
+    color: "#000",
+    outline: "none",
+    fontFamily: "inherit",
+    transition: "all 200ms",
+  };
+
+  const passwordStyle: React.CSSProperties = {
+    ...inputStyle,
+    paddingRight: 44,
+    fontSize: 20,
+    fontFamily: "monospace",
+    letterSpacing: "0.2em",
+  };
+
   return (
-    <div className="min-h-dvh flex items-center justify-center font-sans text-slate-900 selection:bg-slate-900 selection:text-white p-4 relative">
+    <div
+      style={{
+        minHeight: "100dvh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        fontFamily: "Inter, sans-serif",
+        background:
+          "radial-gradient(circle at 10% 8%, rgba(236,238,240,0.92), transparent 32%), radial-gradient(circle at 88% 14%, rgba(213,227,252,0.26), transparent 28%), linear-gradient(180deg, #f7f9fb 0%, #f4f6f8 100%)",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 440,
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(24px)",
+          borderRadius: 16,
+          boxShadow: "0 12px 40px rgba(25,28,30,0.06)",
+          padding: "56px 44px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -48,
+            right: -48,
+            width: 192,
+            height: 192,
+            background: "radial-gradient(circle, #F2F2F2, transparent)",
+            borderRadius: "50%",
+            opacity: 0.6,
+            pointerEvents: "none",
+          }}
+        />
 
-      {/* Container Card */}
-      <div className="relative w-full max-w-[450px] bg-white/85 backdrop-blur-[24px] rounded-[16px] shadow-[0_12px_40px_rgba(25,28,30,0.06)] px-10 md:px-[50px] py-[60px] overflow-hidden">
-
-        {/* Subtle pale gray circle accent */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-bl from-[#F2F2F2] to-transparent rounded-full opacity-60 pointer-events-none" />
-
-        {/* Header Section */}
-        <div className="relative z-10 flex flex-col items-center justify-center mb-8 mt-2 w-full text-center">
-          <h1 className="sr-only">Rent Manager</h1>
-          <img src={logoSvg} alt="The Ledger Logo" className="h-12 w-auto object-contain mx-auto mb-3" />
-          <p className="text-[#666666] text-[15px] font-medium tracking-wide">
+        <div style={{ textAlign: "center", marginBottom: 28, position: "relative", zIndex: 1 }}>
+          <img src={logoSvg} alt="The Ledger" style={{ height: 44, width: "auto", margin: "0 auto 10px", display: "block" }} />
+          <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>Rent Manager</span>
+          <p style={{ margin: 0, color: "#666", fontSize: 14, fontWeight: 500, letterSpacing: "0.03em" }}>
             Curated property management.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
-          <div className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-[14px] font-bold text-black mb-[10px]">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Mail size={20} strokeWidth={2} className="text-[#999999]" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type={isDevShortcut ? "text" : "email"}
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-[46px] pr-4 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] font-medium text-[15px] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
-                  placeholder="manager@domain.com"
-                />
-              </div>
+        <form style={{ position: "relative", zIndex: 1 }} onSubmit={handleSubmit}>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#000", marginBottom: 8 }} htmlFor="email">
+              Email Address
+            </label>
+            <div style={{ position: "relative" }}>
+              <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                <Mail size={18} color="#999" />
+              </span>
+              <input
+                id="email"
+                name="email"
+                type={isDevShortcut ? "text" : "email"}
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="manager@domain.com"
+                style={inputStyle}
+                aria-label="Email address"
+              />
             </div>
-
-            {/* Password Field */}
-            {mode !== "forgot_password" && (
-              isDevShortcut ? (
-                <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px]">
-                  <span className="text-[14px] font-medium">Dev mode active</span>
-                </div>
-              ) : (
-                <div>
-                  <div className="flex items-center justify-between mb-[10px]">
-                    <label htmlFor="password" className="block text-[14px] font-bold text-black">
-                      Password
-                    </label>
-                    {mode === "signin" && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMode("forgot_password");
-                          setError(null);
-                          setInfo(null);
-                          setConfirmPassword("");
-                        }}
-                        className="text-[13px] font-semibold tracking-wide text-[#666666] hover:text-black transition-colors bg-transparent border-0 cursor-pointer p-0"
-                      >
-                        Forgot Password?
-                      </button>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock size={20} strokeWidth={2} className="text-[#999999]" />
-                    </div>
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={mode === "signup" ? 6 : undefined}
-                      className="w-full pl-[46px] pr-12 h-[52px] bg-[#F5F5F5] border border-transparent rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white transition-all duration-200"
-                      placeholder="••••••••"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#999999] hover:text-[#666666] transition-colors focus:outline-none cursor-pointer bg-transparent border-0 p-0"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <Eye size={20} strokeWidth={2} /> : <EyeOff size={20} strokeWidth={2} />}
-                    </button>
-                  </div>
-                </div>
-              )
-            )}
-
-            {mode === "signup" && !isDevShortcut && (
-              <div>
-                <label htmlFor="confirm-password" className="block text-[14px] font-bold text-black mb-[10px]">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Lock size={20} strokeWidth={2} className="text-[#999999]" />
-                  </div>
-                  <input
-                    id="confirm-password"
-                    name="confirm-password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={6}
-                      className={`w-full pl-[46px] pr-4 h-[52px] border rounded-[8px] text-black placeholder-[#AAAAAA] text-[20px] font-mono tracking-[0.2em] focus:outline-none transition-all duration-200 ${
-                        passwordsMismatch
-                          ? "bg-[#FFF5F5] border-[#EF5350] focus:ring-2 focus:ring-[#C62828]/20"
-                          : "bg-[#F5F5F5] border-transparent focus:ring-2 focus:ring-[#1A1A2E]/20 focus:bg-white"
-                      }`}
-                    placeholder="••••••••"
-                  />
-                </div>
-                  {passwordsMismatch && (
-                    <p className="mt-2 text-[13px] font-medium text-[#C62828]" role="alert">
-                      Passwords do not match.
-                    </p>
-                  )}
-              </div>
-            )}
           </div>
 
-          {error && (
-            <div className="flex items-start gap-2 bg-[#FFEBEE] text-[#C62828] rounded-[8px] px-4 py-3" role="alert">
-              <AlertTriangle size={16} className="mt-0.5 shrink-0" />
-              <p className="text-[13px] font-medium">{error}</p>
-            </div>
-          )}
+          {mode !== "forgot_password" ? (
+            isDevShortcut ? (
+              <div
+                style={{
+                  marginBottom: 28,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "#E8F5E9",
+                  color: "#2E7D32",
+                  borderRadius: 8,
+                  padding: "14px 16px",
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              >
+                Dev mode active
+              </div>
+            ) : (
+              <div style={{ marginBottom: 28 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: "#000" }} htmlFor="password">
+                    Password
+                  </label>
+                  {mode === "signin" ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("forgot_password");
+                        setError(null);
+                        setInfo(null);
+                      }}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "#666",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        padding: 0,
+                      }}
+                    >
+                      Forgot Password?
+                    </button>
+                  ) : null}
+                </div>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                    <Lock size={18} color="#999" />
+                  </span>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={mode === "signup" ? 6 : undefined}
+                    placeholder="••••••••"
+                    style={passwordStyle}
+                    aria-label="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((value) => !value)}
+                    style={{
+                      position: "absolute",
+                      right: 12,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#999",
+                      padding: 0,
+                    }}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <Eye size={18} color="#999" /> : <EyeOff size={18} color="#999" />}
+                  </button>
+                </div>
+              </div>
+            )
+          ) : null}
 
-          {info && (
-            <div className="bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 py-3" role="status">
-              <p className="text-[13px] font-medium">{info}</p>
+          {mode === "signup" && !isDevShortcut ? (
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#000", marginBottom: 8 }} htmlFor="confirm-password">
+                Confirm Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                  <Lock size={18} color="#999" />
+                </span>
+                <input
+                  id="confirm-password"
+                  name="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  style={{
+                    ...passwordStyle,
+                    border: passwordsMismatch ? "1px solid #EF5350" : "1px solid transparent",
+                    background: passwordsMismatch ? "#FFF5F5" : "#F5F5F5",
+                  }}
+                />
+              </div>
+              {passwordsMismatch ? (
+                <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 500, color: "#C62828" }}>Passwords do not match.</p>
+              ) : null}
             </div>
-          )}
+          ) : null}
 
-          <div className="pt-5 pb-5">
+          {error ? (
+            <div
+              role="alert"
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 8,
+                background: "#FFEBEE",
+                color: "#C62828",
+                borderRadius: 8,
+                padding: "12px 16px",
+                marginBottom: 18,
+              }}
+            >
+              <AlertTriangle size={16} style={{ marginTop: 1, flexShrink: 0 }} />
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{error}</p>
+            </div>
+          ) : null}
+
+          {info ? (
+            <div
+              role="status"
+              style={{
+                background: "#E8F5E9",
+                color: "#2E7D32",
+                borderRadius: 8,
+                padding: "12px 16px",
+                marginBottom: 18,
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{info}</p>
+            </div>
+          ) : null}
+
+          <div style={{ paddingBottom: 20 }}>
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-[52px] flex items-center justify-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#131b2e] hover:from-[#050d1a] hover:to-[#0c1526] disabled:opacity-70 text-white font-bold text-[16px] tracking-wide rounded-[8px] transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:scale-[0.99] cursor-pointer"
+              style={{
+                width: "100%",
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                background: "linear-gradient(135deg, #0f172a, #131b2e)",
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: "0.03em",
+                border: "none",
+                borderRadius: 8,
+                cursor: loading ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                transition: "all 200ms",
+                opacity: loading ? 0.7 : 1,
+              }}
             >
               {loading ? (
-                <Loader2 size={20} className="animate-spin text-white" />
+                <>
+                  <Loader2 size={18} className="animate-spin" color="#fff" />
+                  Processing...
+                </>
               ) : (
                 <>
-                  {mode === "signin" ? "Sign In" : mode === "signup" ? "Create Account" : "Reset Password"}
-                  <ArrowRight size={20} strokeWidth={2.5} className="ml-1 text-white" />
+                  {getTitle(mode)}
+                  <ArrowRight size={18} color="#fff" />
                 </>
               )}
             </button>
 
-            {mode !== "forgot_password" && (
+            {mode !== "forgot_password" ? (
               <>
-                <div className="relative flex items-center justify-center my-6">
-                  <div className="absolute inset-x-0 h-[1px] bg-[#E5E5E5]"></div>
-                  <span className="relative bg-white px-4 text-[#999999] text-[12px] font-bold uppercase tracking-widest">
+                <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", margin: "20px 0" }}>
+                  <div style={{ position: "absolute", inset: "50% 0 auto", height: 1, background: "#E5E5E5" }} />
+                  <span
+                    style={{
+                      position: "relative",
+                      background: "rgba(255,255,255,0.85)",
+                      padding: "0 14px",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "#999",
+                    }}
+                  >
                     OR
                   </span>
                 </div>
@@ -272,10 +428,27 @@ export function LoginPage() {
                   type="button"
                   onClick={handleGoogleSignIn}
                   disabled={loading}
-                  className="w-full h-[52px] flex items-center justify-center gap-3 bg-[#F5F5F5] border border-transparent hover:bg-[#EAEAEA] text-[#1A1A2E] font-bold text-[15px] tracking-wide rounded-[8px] transition-all duration-200 cursor-pointer disabled:opacity-50"
                   aria-label={mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
+                  style={{
+                    width: "100%",
+                    height: 50,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 10,
+                    background: "#F5F5F5",
+                    border: "1px solid transparent",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "#1A1A2E",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    fontFamily: "inherit",
+                    transition: "background 200ms",
+                    opacity: loading ? 0.5 : 1,
+                  }}
                 >
-                  <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -284,13 +457,13 @@ export function LoginPage() {
                   {mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
                 </button>
               </>
-            )}
+            ) : null}
           </div>
         </form>
 
-        <div className="text-center relative z-10 mb-2">
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
           {mode === "signin" ? (
-            <p className="text-[#666666] text-[14px]">
+            <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
               Don't have an account?{" "}
               <button
                 type="button"
@@ -300,14 +473,22 @@ export function LoginPage() {
                   setInfo(null);
                   setConfirmPassword("");
                 }}
-                className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+                style={{
+                  fontWeight: 700,
+                  color: "#1A1A2E",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  padding: 0,
+                }}
               >
                 Sign Up
               </button>
             </p>
           ) : mode === "signup" ? (
-            <p className="text-[#666666] text-[14px]">
-              Already have access?{" "}
+            <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
               <button
                 type="button"
                 onClick={() => {
@@ -316,23 +497,39 @@ export function LoginPage() {
                   setInfo(null);
                   setConfirmPassword("");
                 }}
-                className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+                style={{
+                  fontWeight: 700,
+                  color: "#1A1A2E",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  padding: 0,
+                }}
               >
-                Sign In
+                Back to Sign In
               </button>
             </p>
           ) : (
-            <p className="text-[#666666] text-[14px]">
-              Remember your password?{" "}
+            <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
               <button
                 type="button"
                 onClick={() => {
                   setMode("signin");
                   setError(null);
                   setInfo(null);
-                  setConfirmPassword("");
                 }}
-                className="font-bold text-[#1A1A2E] hover:text-black hover:underline cursor-pointer bg-transparent border-0 p-0"
+                style={{
+                  fontWeight: 700,
+                  color: "#1A1A2E",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  padding: 0,
+                }}
               >
                 Back to Sign In
               </button>
