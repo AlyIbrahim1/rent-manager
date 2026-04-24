@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f7f9fb; font-family: 'Inter', sans-serif; padding: 20px; display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
+  .label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #76777d; margin-bottom: 8px; }
+  /* stat cards */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .stat-card { background: #fff; border-radius: 6px; padding: 16px; box-shadow: 0 12px 40px rgba(25,28,30,0.06); }
+  .stat-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #45464d; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-value { font-family: 'Manrope', sans-serif; font-size: 2.2rem; font-weight: 700; color: #191c1e; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat-sub { font-size: 12px; margin-top: 8px; }
+  /* Progress bar */
+  .progress-track { height: 8px; background: #eceef0; border-radius: 9999px; overflow: hidden; margin-top: 12px; }
+  .progress-fill { height: 100%; background: #0f172a; border-radius: 9999px; }
+  /* Icon */
+  svg { display: block; flex-shrink: 0; }
+</style>
+</head>
+<body>
+  <div class="label">Portfolio KPI cards — staggered reveal-up animation</div>
+  <div class="stats-grid">
+    <div class="stat-card" style="grid-column: span 1">
+      <div class="stat-eyebrow">
+        Total Revenue
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#45464d" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+      <div class="stat-value">$18,200</div>
+      <div class="stat-sub" style="color:#059669">94% collection rate this cycle</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-eyebrow">
+        Occupancy
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#45464d" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </div>
+      <div class="stat-value">100%</div>
+      <div class="stat-sub" style="color:#45464d">8 units tracked</div>
+      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-eyebrow">
+        Pending Balance
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#45464d" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="stat-value">$3,300</div>
+      <div class="stat-sub" style="color:#F43F5E">2 overdue renters</div>
+    </div>
+  </div>
+</body>
+</html>

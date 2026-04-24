@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f7f9fb; font-family: 'Inter', sans-serif; padding: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #76777d; margin-bottom: 8px; }
+  /* Sidebar */
+  .sidebar { background: #f2f4f6; border-radius: 6px; padding: 20px 16px; width: 200px; }
+  .sidebar-logo { margin-bottom: 6px; }
+  .sidebar-tagline { font-size: 10px; font-weight: 600; letter-spacing: 0.20em; text-transform: uppercase; color: #45464d; margin-bottom: 20px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; color: #45464d; cursor: pointer; transition: all 200ms; margin-bottom: 2px; }
+  .nav-item.active { background: #e6e8ea; color: #059669; transform: scale(1.01); box-shadow: 0 12px 40px rgba(25,28,30,0.06); }
+  .nav-item:not(.active):hover { background: #eceef0; color: #191c1e; transform: scale(1.01); }
+  .nav-soon { margin-left: auto; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.70; }
+  .add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px; background: linear-gradient(135deg, #0f172a, #131b2e); color: #fff; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; margin-top: 16px; cursor: pointer; }
+  /* Mobile nav */
+  .mobile-nav { background: rgba(255,255,255,0.95); border-radius: 6px; padding: 10px 8px; display: flex; gap: 4px; backdrop-filter: blur(12px); width: 280px; border-top: 1px solid rgba(198,198,205,0.2); }
+  .mobile-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 4px; font-size: 10px; font-weight: 600; color: #45464d; border: none; background: transparent; cursor: pointer; }
+  .mobile-tab.active { background: #dff5ed; color: #047857; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="label">Desktop Sidebar</div>
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <img src="../assets/logo.svg" alt="The Ledger" style="height:28px;width:auto" />
+      </div>
+      <div class="sidebar-tagline">Property Management</div>
+      <nav>
+        <div class="nav-item active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Properties
+          <span class="nav-soon">Soon</span>
+        </div>
+        <div class="nav-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Tenants
+          <span class="nav-soon">Soon</span>
+        </div>
+        <div class="nav-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></svg>
+          Payments
+          <span class="nav-soon">Soon</span>
+        </div>
+        <div class="nav-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+          Reports
+          <span class="nav-soon">Soon</span>
+        </div>
+      </nav>
+      <button class="add-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        Add Renter
+      </button>
+    </div>
+  </div>
+  <div>
+    <div class="label">Mobile Bottom Nav</div>
+    <div class="mobile-nav">
+      <button class="mobile-tab active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Portfolio
+      </button>
+      <button class="mobile-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Ledger
+      </button>
+      <button class="mobile-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/></svg>
+        Payments
+      </button>
+      <button class="mobile-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+        Insight
+      </button>
+    </div>
+  </div>
+</body>
+</html>

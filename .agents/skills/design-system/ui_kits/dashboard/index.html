@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Ledger — Dashboard UI Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: radial-gradient(circle at 10% 8%, rgba(236,238,240,0.92), transparent 32%),
+                  radial-gradient(circle at 88% 14%, rgba(213,227,252,0.26), transparent 28%),
+                  linear-gradient(180deg, #f7f9fb 0%, #f4f6f8 100%);
+      color: #191c1e;
+      min-height: 100dvh;
+    }
+    @keyframes ledger-reveal-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes ledger-modal-in {
+      from { opacity: 0; transform: scale(0.972) translateY(18px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes ledger-fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    input { font-family: 'Inter', sans-serif; }
+    button { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(198,198,205,0.5); border-radius: 9999px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="Sidebar.jsx"></script>
+  <script type="text/babel" src="Header.jsx"></script>
+  <script type="text/babel" src="PortfolioStats.jsx"></script>
+  <script type="text/babel" src="RenterCard.jsx"></script>
+  <script type="text/babel" src="RenterDetails.jsx"></script>
+  <script type="text/babel" src="LoginPage.jsx"></script>
+
+  <script type="text/babel">
+    // ── Sample data ──────────────────────────────────────────────────────────
+    const SAMPLE_RENTERS = [
+      { id: "1", appartmentNumber: 3,   name: "Priya Nair",     rentAmount: 1650, rentDue: 3300,  lastMonthPayed: "2025-02", unpaidMonths: 2,
+        history: [{ month: "Feb 2025", amount: 1650 }, { month: "Jan 2025", amount: 1650 }] },
+      { id: "2", appartmentNumber: 7,   name: "Marcus Chen",    rentAmount: 2200, rentDue: 0,     lastMonthPayed: "2025-04", unpaidMonths: 0,
+        history: [{ month: "Apr 2025", amount: 2200 }, { month: "Mar 2025", amount: 2200 }, { month: "Feb 2025", amount: 2200 }] },
+      { id: "3", appartmentNumber: 12,  name: "Jordan Alcott",  rentAmount: 1850, rentDue: 0,     lastMonthPayed: "2025-04", unpaidMonths: 0,
+        history: [{ month: "Apr 2025", amount: 1850 }, { month: "Mar 2025", amount: 1850 }] },
+      { id: "4", appartmentNumber: 15,  name: "Sofia Reyes",    rentAmount: 2100, rentDue: 2100,  lastMonthPayed: "2025-03", unpaidMonths: 1,
+        history: [{ month: "Mar 2025", amount: 2100 }, { month: "Feb 2025", amount: 2100 }] },
+      { id: "5", appartmentNumber: 21,  name: "David Okonkwo",  rentAmount: 1975, rentDue: 0,     lastMonthPayed: "2025-04", unpaidMonths: 0,
+        history: [{ month: "Apr 2025", amount: 1975 }] },
+      { id: "6", appartmentNumber: 28,  name: "Yuki Tanaka",    rentAmount: 2450, rentDue: 0,     lastMonthPayed: "2025-04", unpaidMonths: 0,
+        history: [{ month: "Apr 2025", amount: 2450 }, { month: "Mar 2025", amount: 2450 }] },
+    ];
+
+    // ── Add Renter Modal ─────────────────────────────────────────────────────
+    function AddRenterModal({ isOpen, onClose, onSubmit }) {
+      const [name, setName] = React.useState("");
+      const [apt, setApt] = React.useState("");
+      const [rent, setRent] = React.useState("");
+      const [lastPaid, setLastPaid] = React.useState("");
+      const [loading, setLoading] = React.useState(false);
+
+      React.useEffect(() => {
+        if (!isOpen) { setName(""); setApt(""); setRent(""); setLastPaid(""); }
+      }, [isOpen]);
+
+      if (!isOpen) return null;
+
+      const inputStyle = {
+        width: "100%", boxSizing: "border-box",
+        padding: "11px 14px", background: "#e0e3e5", border: "none",
+        borderRadius: 12, fontSize: 14, color: "#191c1e", outline: "none",
+        fontFamily: "inherit", transition: "background 200ms, box-shadow 200ms",
+      };
+      const labelStyle = { display: "block", fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#45464d", marginBottom: 7 };
+      const sectionCard = { background: "#fff", borderRadius: 22, padding: "18px 20px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" };
+
+      async function handleSubmit(e) {
+        e.preventDefault();
+        setLoading(true);
+        await new Promise(r => setTimeout(r, 400));
+        onSubmit({ id: Date.now().toString(), name, appartmentNumber: Number(apt), rentAmount: Number(rent), lastMonthPayed: lastPaid || null, rentDue: 0, unpaidMonths: 0, history: [] });
+        setLoading(false);
+        onClose();
+      }
+
+      return React.createElement("div", {
+        style: { position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(15,23,42,0.50)", backdropFilter: "blur(2px)", padding: 24, animation: "ledger-fade-in 320ms both" },
+        onClick: e => { if (e.target === e.currentTarget) onClose(); }
+      },
+        React.createElement("form", {
+          onSubmit: handleSubmit,
+          style: { width: "100%", maxWidth: 560, background: "#fff", borderRadius: 28, overflow: "hidden", boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)", animation: "ledger-modal-in 420ms cubic-bezier(0.16,1,0.3,1) both" }
+        },
+          // Header
+          React.createElement("div", { style: { background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" } },
+            React.createElement("div", null,
+              React.createElement("h2", { style: { margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.75rem", fontWeight: 700, color: "#191c1e", lineHeight: 1.1 } }, "Add New Renter"),
+              React.createElement("p", { style: { margin: "6px 0 0", fontSize: 13, color: "#45464d", lineHeight: 1.5 } }, "Enter lease details and start tracking monthly payments from a clean ledger.")
+            ),
+            React.createElement("button", { type: "button", onClick: onClose, style: { width: 36, height: 36, borderRadius: 12, background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#45464d" } },
+              React.createElement(LucideIcon, { name: "x", size: 17, color: "#45464d" })
+            )
+          ),
+          // Body
+          React.createElement("div", { style: { background: "#f2f4f6", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 } },
+            // Basic info
+            React.createElement("div", { style: sectionCard },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
+                React.createElement("span", { style: { width: 34, height: 34, borderRadius: 16, background: "#eceef0", display: "flex", alignItems: "center", justifyContent: "center" } },
+                  React.createElement(LucideIcon, { name: "building-2", size: 16, color: "#191c1e" })
+                ),
+                React.createElement("div", null,
+                  React.createElement("p", { style: { margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.05rem", fontWeight: 700, color: "#191c1e" } }, "Basic Information"),
+                  React.createElement("p", { style: { margin: "1px 0 0", fontSize: 12, color: "#45464d" } }, "Assign the renter and unit details.")
+                )
+              ),
+              React.createElement("div", { style: { marginBottom: 12 } },
+                React.createElement("label", { style: labelStyle }, "Renter name"),
+                React.createElement("input", { type: "text", value: name, onChange: e => setName(e.target.value), required: true, placeholder: "e.g. Nadia Khalil", style: inputStyle,
+                  onFocus: e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px rgba(15,23,42,0.15)"; },
+                  onBlur: e => { e.target.style.background = "#e0e3e5"; e.target.style.boxShadow = "none"; }
+                })
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } },
+                React.createElement("div", null,
+                  React.createElement("label", { style: labelStyle }, "Apartment number"),
+                  React.createElement("input", { type: "number", min: "1", value: apt, onChange: e => setApt(e.target.value), required: true, placeholder: "12", style: inputStyle,
+                    onFocus: e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px rgba(15,23,42,0.15)"; },
+                    onBlur: e => { e.target.style.background = "#e0e3e5"; e.target.style.boxShadow = "none"; }
+                  })
+                ),
+                React.createElement("div", null,
+                  React.createElement("label", { style: labelStyle }, "Monthly rent"),
+                  React.createElement("div", { style: { position: "relative" } },
+                    React.createElement("span", { style: { position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 13, fontWeight: 500, color: "#45464d", pointerEvents: "none" } }, "$"),
+                    React.createElement("input", { type: "number", min: "0", value: rent, onChange: e => setRent(e.target.value), required: true, placeholder: "1,850", style: { ...inputStyle, paddingLeft: 28 },
+                      onFocus: e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px rgba(15,23,42,0.15)"; },
+                      onBlur: e => { e.target.style.background = "#e0e3e5"; e.target.style.boxShadow = "none"; }
+                    })
+                  )
+                )
+              )
+            ),
+            // Payment tracking
+            React.createElement("div", { style: sectionCard },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
+                React.createElement("span", { style: { width: 34, height: 34, borderRadius: 16, background: "#eceef0", display: "flex", alignItems: "center", justifyContent: "center" } },
+                  React.createElement(LucideIcon, { name: "calendar-clock", size: 16, color: "#191c1e" })
+                ),
+                React.createElement("div", null,
+                  React.createElement("p", { style: { margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.05rem", fontWeight: 700, color: "#191c1e" } }, "Payment Tracking"),
+                  React.createElement("p", { style: { margin: "1px 0 0", fontSize: 12, color: "#45464d" } }, "Set the most recent paid month.")
+                )
+              ),
+              React.createElement("label", { style: labelStyle }, "Last month paid"),
+              React.createElement("input", { type: "month", value: lastPaid, onChange: e => setLastPaid(e.target.value), style: inputStyle,
+                onFocus: e => { e.target.style.background = "#fff"; e.target.style.boxShadow = "0 0 0 2px rgba(15,23,42,0.15)"; },
+                onBlur: e => { e.target.style.background = "#e0e3e5"; e.target.style.boxShadow = "none"; }
+              }),
+              React.createElement("p", { style: { margin: "8px 0 0", fontSize: 12, color: "#45464d", lineHeight: 1.5 } }, "Leave blank when the renter has not made their first payment yet.")
+            )
+          ),
+          // Footer
+          React.createElement("div", { style: { background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 } },
+            React.createElement("button", { type: "button", onClick: onClose, style: { padding: "9px 18px", background: "#fff", color: "#191c1e", fontSize: 13, fontWeight: 600, border: "none", borderRadius: 4, cursor: "pointer", fontFamily: "inherit" } }, "Cancel"),
+            React.createElement("button", { type: "submit", disabled: loading, style: { padding: "9px 18px", background: "linear-gradient(135deg, #0f172a, #131b2e)", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", borderRadius: 4, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", gap: 7 } },
+              loading && React.createElement(LucideIcon, { name: "loader-2", size: 13, color: "#fff" }),
+              loading ? "Saving renter..." : "Save renter"
+            )
+          )
+        )
+      );
+    }
+
+    // ── Main App ──────────────────────────────────────────────────────────────
+    function App() {
+      const [screen, setScreen] = React.useState("login"); // login | dashboard
+      const [renters, setRenters] = React.useState(SAMPLE_RENTERS);
+      const [selectedId, setSelectedId] = React.useState(null);
+      const [searchQuery, setSearchQuery] = React.useState("");
+      const [showAddModal, setShowAddModal] = React.useState(false);
+
+      // Ensure lucide icons are created after mount
+      React.useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
+
+      const filtered = React.useMemo(() =>
+        renters.filter(r => !searchQuery.trim() || r.name.toLowerCase().includes(searchQuery.toLowerCase()) || String(r.appartmentNumber).includes(searchQuery)),
+        [renters, searchQuery]
+      );
+      const selectedRenter = renters.find(r => r.id === selectedId) || null;
+      const overdueRenters = renters.filter(r => (r.rentDue || 0) > 0);
+      const totalRevenue = renters.reduce((s, r) => s + r.rentAmount, 0);
+      const totalDue = renters.reduce((s, r) => s + Math.max(r.rentDue || 0, 0), 0);
+      const collectionRate = renters.length > 0 ? Math.round(((renters.length - overdueRenters.length) / renters.length) * 100) : 100;
+
+      if (screen === "login") {
+        return React.createElement(React.Fragment, null,
+          React.createElement(LedgerLoginPage, { onLogin: () => setScreen("dashboard") })
+        );
+      }
+
+      return React.createElement("div", { style: { minHeight: "100dvh" } },
+        // Sidebar (desktop)
+        React.createElement("div", { style: { display: "none", "@media(min-width:1024px)": { display: "block" } } }),
+        React.createElement(LedgerSidebar, { onAddRenter: () => setShowAddModal(true) }),
+
+        // Main content
+        React.createElement("div", { style: { paddingLeft: 272 } },
+          React.createElement(LedgerHeader, {
+            searchQuery,
+            onSearchChange: setSearchQuery,
+            onAddRenter: () => setShowAddModal(true),
+            onSignOut: () => { setScreen("login"); setSelectedId(null); setSearchQuery(""); },
+          }),
+
+          React.createElement("main", { style: { padding: "24px 32px 60px", display: "flex", flexDirection: "column", gap: 28 } },
+            // Portfolio overview
+            React.createElement(LedgerPortfolioStats, {
+              totalRevenue, collectionRate,
+              rentersCount: renters.length,
+              occupancy: 100,
+              totalDue,
+              overdueCount: overdueRenters.length,
+              canReceivePayment: Boolean(selectedRenter),
+              onReceivePayment: () => alert("Receive Payment — connect to MarkPaidModal in production"),
+            }),
+
+            // Ledger + Detail panel
+            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1.55fr) minmax(0,1fr)", gap: 20 } },
+              React.createElement(LedgerSection, {
+                renters, filteredRenters: filtered,
+                selectedId: selectedId,
+                onSelect: r => setSelectedId(prev => prev === r.id ? null : r.id),
+                onAddRenter: () => setShowAddModal(true),
+                searchQuery, onSearchChange: setSearchQuery,
+              }),
+
+              React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
+                React.createElement(LedgerRenterDetails, {
+                  renter: selectedRenter,
+                  onMarkPaid: () => alert("Receive Payment — connect to MarkPaidModal in production"),
+                  onClose: () => setSelectedId(null),
+                }),
+                // Recent activity (scaffolded)
+                React.createElement("section", { style: { background: "#f2f4f6", borderRadius: 6, padding: "18px 20px" } },
+                  React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 } },
+                    React.createElement("h3", { style: { margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#191c1e" } }, "Recent Activity"),
+                    React.createElement("span", { style: { background: "#e6e8ea", borderRadius: 9999, padding: "3px 9px", fontSize: 9, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#45464d" } }, "Scaffolded")
+                  ),
+                  React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+                    ["Payment timeline", "Lease workflow"].map(label =>
+                      React.createElement("div", { key: label, style: { background: "#fff", borderRadius: 4, padding: "12px 14px" } },
+                        React.createElement("p", { style: { margin: 0, fontSize: 13, fontWeight: 600, color: "#191c1e" } }, label),
+                        React.createElement("p", { style: { margin: "3px 0 0", fontSize: 12, color: "#45464d" } }, "Upcoming integration with backend events.")
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+
+        // Add Renter Modal
+        React.createElement(AddRenterModal, {
+          isOpen: showAddModal,
+          onClose: () => setShowAddModal(false),
+          onSubmit: newRenter => setRenters(prev => [...prev, newRenter]),
+        })
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>

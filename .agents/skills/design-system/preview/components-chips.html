@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f7f9fb; font-family: 'Inter', sans-serif; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: #fff; border-radius: 6px; padding: 16px 20px; box-shadow: 0 12px 40px rgba(25,28,30,0.06); }
+  .card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #76777d; margin-bottom: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .specimen { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+  .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+  .badge-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 9999px; font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .note { font-size: 11px; color: #76777d; margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-label">Unit badge (rounded-sm)</div>
+    <div class="row">
+      <div class="badge" style="background:#e6e8ea;color:#191c1e">Apt #12</div>
+      <div class="badge" style="background:#e6e8ea;color:#191c1e">Apt #7</div>
+      <div class="badge" style="background:#e6e8ea;color:#191c1e">Apt #103</div>
+    </div>
+    <div class="note">bg: surface-high · color: on-surface · border-radius: 4px</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Status chips (rounded-full)</div>
+    <div class="row">
+      <div class="badge-pill" style="background:#dff5ed;color:#047857">Paid</div>
+      <div class="badge-pill" style="background:#ffe9ec;color:#9f1239">⚠ Overdue</div>
+      <div class="badge-pill" style="background:#e6e8ea;color:#45464d">Scaffolded</div>
+      <div class="badge-pill" style="background:#e6e8ea;color:#45464d">Soon</div>
+    </div>
+    <div class="note">Full pill rounding contrasts with dashboard's angular squareness</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Collection rate indicator</div>
+    <div style="font-size:13px;color:#059669;font-weight:500;margin-bottom:6px">94% collection rate this cycle</div>
+    <div style="font-size:13px;color:#F43F5E;font-weight:500">2 overdue renters</div>
+    <div class="note" style="margin-top:6px">Success: #059669 · Error: #F43F5E (inline, not token)</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Nav "Soon" badge</div>
+    <div class="row">
+      <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#45464d;opacity:0.70">Soon</span>
+      <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#45464d;opacity:0.70">Properties</span>
+      <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#45464d;opacity:0.70">Payments</span>
+    </div>
+    <div class="note">opacity: 0.70 on outline color · used in disabled nav items</div>
+  </div>
+</body>
+</html>
