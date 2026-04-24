@@ -97,10 +97,10 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center bg-[#F5F5F5] font-sans text-slate-900 selection:bg-slate-900 selection:text-white p-4 relative">
+    <div className="min-h-dvh flex items-center justify-center font-sans text-slate-900 selection:bg-slate-900 selection:text-white p-4 relative">
 
       {/* Container Card */}
-      <div className="relative w-full max-w-[450px] bg-white rounded-[16px] shadow-[0_8px_16px_rgba(0,0,0,0.06)] px-10 md:px-[50px] py-[60px] overflow-hidden">
+      <div className="relative w-full max-w-[450px] bg-white/85 backdrop-blur-[24px] rounded-[16px] shadow-[0_12px_40px_rgba(25,28,30,0.06)] px-10 md:px-[50px] py-[60px] overflow-hidden">
 
         {/* Subtle pale gray circle accent */}
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-bl from-[#F2F2F2] to-transparent rounded-full opacity-60 pointer-events-none" />
@@ -142,7 +142,7 @@ export function LoginPage() {
             {/* Password Field */}
             {mode !== "forgot_password" && (
               isDevShortcut ? (
-                <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px] border border-[#A5D6A7]">
+                <div className="flex items-center gap-2 bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 h-[52px]">
                   <span className="text-[14px] font-medium">Dev mode active</span>
                 </div>
               ) : (
@@ -231,14 +231,14 @@ export function LoginPage() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 bg-[#FFEBEE] border border-[#FFCDD2] text-[#C62828] rounded-[8px] px-4 py-3" role="alert">
+            <div className="flex items-start gap-2 bg-[#FFEBEE] text-[#C62828] rounded-[8px] px-4 py-3" role="alert">
               <AlertTriangle size={16} className="mt-0.5 shrink-0" />
               <p className="text-[13px] font-medium">{error}</p>
             </div>
           )}
 
           {info && (
-            <div className="bg-[#E8F5E9] border border-[#A5D6A7] text-[#2E7D32] rounded-[8px] px-4 py-3" role="status">
+            <div className="bg-[#E8F5E9] text-[#2E7D32] rounded-[8px] px-4 py-3" role="status">
               <p className="text-[13px] font-medium">{info}</p>
             </div>
           )}
@@ -247,7 +247,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-[52px] flex items-center justify-center gap-2 bg-[#17172A] hover:bg-[#000000] disabled:bg-[#17172E]/70 text-white font-bold text-[16px] tracking-wide rounded-[8px] transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] cursor-pointer"
+              className="w-full h-[52px] flex items-center justify-center gap-2 bg-gradient-to-br from-[#0f172a] to-[#131b2e] hover:from-[#050d1a] hover:to-[#0c1526] disabled:opacity-70 text-white font-bold text-[16px] tracking-wide rounded-[8px] transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:scale-[0.99] cursor-pointer"
             >
               {loading ? (
                 <Loader2 size={20} className="animate-spin text-white" />

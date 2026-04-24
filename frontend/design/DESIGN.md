@@ -1,5 +1,5 @@
 ```markdown
-# Design System Strategy: The Curated Ledger
+# Design System Strategy: The Ledger
 
 ## 1. Overview & Creative North Star
 **Creative North Star: "The Architectural Editor"**
@@ -23,11 +23,13 @@ Think of the UI as a series of stacked, fine-paper sheets.
 - Place these cards on `surface-container` (#eceef0) backgrounds.
 - This "nesting" creates natural depth and directs the eye toward high-priority data without the need for heavy shadows or lines.
 
-### The "Glass & Gradient" Rule
-For floating elements like modals or pop-overs, use a Glassmorphism approach:
-- **Color:** `surface-container-lowest` at 80% opacity.
-- **Effect:** 20px - 32px backdrop-blur.
-- **CTA Soul:** Apply a subtle linear gradient from `primary` (#000000) to `primary-container` (#131b2e) for hero buttons. This adds a "weighted" feel that flat color lacks.
+### The "Solid Surface" Rule
+For floating elements like modals or pop-overs, use solid surfaces with meaningful elevation:
+- **Color:** `surface-container-lowest` (#ffffff) at full opacity — no transparency.
+- **Overlay:** `bg-[#0f172a]/50` with `backdrop-blur-[2px]` — barely perceptible blur focuses context without being dramatic.
+- **Shadow:** `shadow-modal` — `0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)`.
+- **Structure:** Tonal header (`surface-container-low`) + white body (`surface-container-lowest`) + tonal footer (`surface-container-low`). Zone separation by color shift, no divider lines.
+- **CTA Soul:** Apply a subtle linear gradient from `primary` (#0f172a) to `primary-container` (#131b2e) for hero buttons. This adds a "weighted" feel that flat color lacks.
 
 ---
 

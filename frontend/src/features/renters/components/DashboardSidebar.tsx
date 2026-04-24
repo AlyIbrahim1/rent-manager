@@ -31,13 +31,12 @@ export function DashboardSidebar({ logoSrc, onAddRenter, onSignOut }: Props) {
               key={item.label}
               type="button"
               disabled={!item.active}
-              className={`group relative flex w-full items-center gap-3 rounded-sm px-4 py-3 text-left transition-all duration-200 ${
+              className={`group flex w-full items-center gap-3 rounded-sm px-4 py-3 text-left transition-all duration-200 ${
                 item.active
-                  ? "bg-surface-container-high text-[#059669] shadow-layer"
-                  : "text-on-surface-muted hover:bg-surface-container hover:text-on-surface"
+                  ? "bg-surface-container-high text-[#059669] shadow-layer scale-[1.01]"
+                  : "text-on-surface-muted hover:bg-surface-container hover:text-on-surface hover:scale-[1.01]"
               }`}
             >
-              {item.active && <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[#059669]" aria-hidden="true" />}
               <Icon size={18} strokeWidth={2} />
               <span className="text-sm font-semibold">{item.label}</span>
               {!item.active && <span className="ml-auto text-[10px] uppercase tracking-[0.18em] opacity-70">Soon</span>}
