@@ -1,4 +1,4 @@
-import { Plus, LayoutDashboard, Building2, Users2, HandCoins, BarChart3, Settings } from "lucide-react";
+import { BarChart3, Building2, HandCoins, LayoutDashboard, Plus, Settings, Users2 } from "lucide-react";
 
 type Props = {
   logoSrc: string;
@@ -16,13 +16,36 @@ const navItems = [
 
 export function DashboardSidebar({ logoSrc, onAddRenter }: Props) {
   return (
-    <aside className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-72 lg:flex-col lg:bg-surface-container-low lg:px-4 lg:py-8">
-      <div className="px-4">
-        <img src={logoSrc} alt="The Ledger" className="h-10 w-auto" />
-        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-on-surface-muted">Property Management</p>
+    <aside
+      className="hidden lg:flex"
+      style={{
+        position: "fixed",
+        inset: "0 auto 0 0",
+        width: 272,
+        background: "#f2f4f6",
+        flexDirection: "column",
+        padding: "28px 16px",
+        zIndex: 20,
+      }}
+    >
+      <div style={{ padding: "0 8px", marginBottom: 28 }}>
+        <img src={logoSrc} alt="The Ledger" style={{ height: 36, width: "auto" }} />
+        <p
+          style={{
+            marginTop: 6,
+            marginBottom: 0,
+            fontSize: 10,
+            fontWeight: 600,
+            letterSpacing: "0.20em",
+            textTransform: "uppercase",
+            color: "#45464d",
+          }}
+        >
+          Property Management
+        </p>
       </div>
 
-      <nav className="mt-8 flex-1 space-y-1 px-2">
+      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -30,27 +53,60 @@ export function DashboardSidebar({ logoSrc, onAddRenter }: Props) {
               key={item.label}
               type="button"
               disabled={!item.active}
-              className={`group flex w-full items-center gap-3 rounded-sm px-4 py-3 text-left transition-all duration-200 ${
-                item.active
-                  ? "bg-surface-container-high text-[#059669] shadow-layer scale-[1.01]"
-                  : "text-on-surface-muted hover:bg-surface-container hover:text-on-surface hover:scale-[1.01]"
-              }`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "10px 14px",
+                borderRadius: 4,
+                border: "none",
+                background: item.active ? "#e6e8ea" : "transparent",
+                color: item.active ? "#059669" : "#45464d",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: item.active ? "pointer" : "default",
+                transform: item.active ? "scale(1.01)" : "none",
+                boxShadow: item.active ? "0 12px 40px rgba(25,28,30,0.06)" : "none",
+                transition: "all 200ms",
+                fontFamily: "inherit",
+                textAlign: "left",
+              }}
             >
-              <Icon size={18} strokeWidth={2} />
-              <span className="text-sm font-semibold">{item.label}</span>
-              {!item.active && <span className="ml-auto text-[10px] uppercase tracking-[0.18em] opacity-70">Soon</span>}
+              <Icon size={16} color={item.active ? "#059669" : "#45464d"} />
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {!item.active ? (
+                <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7 }}>
+                  Soon
+                </span>
+              ) : null}
             </button>
           );
         })}
       </nav>
 
-      <div className="space-y-3 px-3">
+      <div style={{ padding: "0 4px" }}>
         <button
           type="button"
           onClick={onAddRenter}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-gradient-to-br from-primary to-primary-container px-4 py-3 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            padding: "11px 16px",
+            background: "linear-gradient(135deg, #0f172a, #131b2e)",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 600,
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            transition: "opacity 200ms",
+          }}
         >
-          <Plus size={16} />
+          <Plus size={14} color="#fff" />
           Add Renter
         </button>
       </div>

@@ -1,17 +1,7 @@
 import { useEffect, useId } from "react";
-import { Loader2, LogOut } from "lucide-react";
-import {
-  MODAL_EXIT_DURATION_MS,
-  floatingSurfaceLowestStyle,
-  modalBackdropClass,
-  modalFlowClass,
-  modalPopClass,
-  modalPrimaryButtonClass,
-  modalPrimaryButtonStyle,
-  modalSecondaryButtonClass,
-  modalSecondaryButtonStyle,
-  modalShellClass,
-} from "@/shared/ui/modalActionStyles";
+import { Loader2, LogOut, X } from "lucide-react";
+
+import { MODAL_EXIT_DURATION_MS, modalBackdropClass, modalShellClass } from "@/shared/ui/modalActionStyles";
 import { useAnimatedPresence } from "@/shared/ui/useAnimatedPresence";
 
 type SignOutConfirmDialogProps = {
@@ -31,7 +21,7 @@ export function SignOutConfirmDialog({
   onCancel,
   onConfirm,
   title = "Sign Out",
-  description = "Are you sure you want to sign out of your session? Any unsaved changes to ledgers or tenant profiles may be lost.",
+  description = "Are you sure you want to sign out of this session? Unsaved workspace changes may be lost.",
   cancelLabel = "Cancel",
   confirmLabel = "Sign Out",
 }: SignOutConfirmDialogProps) {
@@ -86,8 +76,19 @@ export function SignOutConfirmDialog({
 
   return (
     <div
-      className={`fixed inset-0 z-[70] flex items-center justify-center bg-[#0f172a]/50 p-4 backdrop-blur-[2px] ${modalBackdropClass}`}
+      className={modalBackdropClass}
       data-state={state}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 70,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(15,23,42,0.50)",
+        backdropFilter: "blur(2px)",
+        padding: 24,
+      }}
       onClick={(event) => {
         if (event.target === event.currentTarget && isOpen && !isSubmitting) {
           onCancel();
@@ -99,53 +100,112 @@ export function SignOutConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
+        className={modalShellClass}
         data-state={state}
-        className={`w-full max-w-[24.5rem] overflow-hidden rounded-[1.6rem] bg-surface-container-lowest shadow-modal ${modalShellClass} ${modalFlowClass}`}
-        style={floatingSurfaceLowestStyle}
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          background: "#fff",
+          borderRadius: 28,
+          overflow: "hidden",
+          boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)",
+        }}
       >
-        <div className="space-y-5 px-5 py-5 sm:px-6">
-          <div className="flex items-start gap-4">
-            <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ffe9ec] text-[#be123c] ${modalPopClass}`} data-state={state}>
-              <LogOut size={18} />
+        <div style={{ background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+          <div id={titleId} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <span style={{ width: 34, height: 34, borderRadius: 16, background: "#ffe9ec", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <LogOut size={16} color="#9f1239" />
             </span>
-            <div className="min-w-0">
-              <h2 id={titleId} className="font-heading text-[1.7rem] font-bold leading-none text-on-surface">
+            <div>
+              <h2 style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.75rem", fontWeight: 700, color: "#191c1e", lineHeight: 1.1 }}>
                 {title}
               </h2>
+              <p style={{ margin: "6px 0 0", fontSize: 13, color: "#45464d", lineHeight: 1.5 }}>{description}</p>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            aria-label="Close"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 12,
+              background: "transparent",
+              border: "none",
+              cursor: isSubmitting ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#45464d",
+              opacity: isSubmitting ? 0.45 : 1,
+            }}
+          >
+            <X size={17} color="#45464d" />
+          </button>
+        </div>
 
-          <p id={descriptionId} className="max-w-[30ch] text-[0.96rem] leading-8 text-on-surface-muted">
-            {description}
-          </p>
-
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={isSubmitting}
-              className={modalSecondaryButtonClass}
-              style={modalSecondaryButtonStyle}
-            >
-              {cancelLabel}
-            </button>
-            <button
-              type="button"
-              onClick={onConfirm}
-              disabled={isSubmitting}
-              className={modalPrimaryButtonClass}
-              style={modalPrimaryButtonStyle}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  Signing out...
-                </>
-              ) : (
-                confirmLabel
-              )}
-            </button>
+        <div id={descriptionId} style={{ background: "#f2f4f6", padding: "12px 14px" }}>
+          <div style={{ background: "#fff", borderRadius: 22, padding: "18px 20px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" }}>
+            <p style={{ margin: 0, fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#45464d" }}>
+              Session action
+            </p>
+            <p style={{ margin: "10px 0 0", fontSize: 13, color: "#191c1e", lineHeight: 1.65 }}>
+              This will end the current workspace session and return the app to the Ledger sign-in screen.
+            </p>
           </div>
+        </div>
+
+        <div style={{ background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            style={{
+              padding: "9px 18px",
+              background: "#fff",
+              color: "#191c1e",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderRadius: 4,
+              cursor: isSubmitting ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              opacity: isSubmitting ? 0.7 : 1,
+            }}
+          >
+            {cancelLabel}
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isSubmitting}
+            style={{
+              padding: "9px 18px",
+              background: "linear-gradient(135deg, #0f172a, #131b2e)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderRadius: 4,
+              cursor: isSubmitting ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              opacity: isSubmitting ? 0.7 : 1,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+            }}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Signing out...
+              </>
+            ) : (
+              confirmLabel
+            )}
+          </button>
         </div>
       </div>
     </div>

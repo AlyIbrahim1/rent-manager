@@ -1,20 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, CircleHelp, LogOut, Plus, Search, Settings, UserRound } from "lucide-react";
-import {
-  MODAL_EXIT_DURATION_MS,
-  floatingSurfaceLowestStyle,
-  modalFlowClass,
-  modalPopClass,
-  modalShellClass,
-} from "@/shared/ui/modalActionStyles";
-import { useAnimatedPresence } from "@/shared/ui/useAnimatedPresence";
+import { Bell, CircleHelp, LogOut, Search, Settings, UserRound } from "lucide-react";
 
 type Props = {
   logoSrc: string;
   userEmail?: string;
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  onAddRenter: () => void;
   onOpenNotifications: () => void;
   onOpenProfile: () => void;
   onOpenSettings: () => void;
@@ -22,100 +13,13 @@ type Props = {
   onSignOut: () => void;
 };
 
-type ProfileAvatarProps = {
-  initials: string;
-  size: "trigger" | "menu";
-  animatedState?: "open" | "closed";
-};
-
 function getProfileInitials(userEmail?: string) {
   const fallback = "PM";
-
   if (!userEmail) {
     return fallback;
   }
-
-  const localPart = userEmail.split("@")[0] ?? "";
-  const segments = localPart
-    .split(/[._\-\s]+/)
-    .map((segment) => segment.trim())
-    .filter(Boolean);
-
-  if (segments.length >= 2) {
-    return `${segments[0][0] ?? ""}${segments[1][0] ?? ""}`.toUpperCase();
-  }
-
-  const compact = localPart.replace(/[^a-zA-Z0-9]/g, "");
-  if (!compact) {
-    return fallback;
-  }
-
-  return compact.slice(0, 2).toUpperCase();
-}
-
-function getProfileName(userEmail?: string) {
-  if (!userEmail) {
-    return "Portfolio Manager";
-  }
-
-  if (userEmail === "dev@local") {
-    return "Dev Workspace";
-  }
-
-  const localPart = userEmail.split("@")[0] ?? "";
-  const segments = localPart
-    .split(/[._\-\s]+/)
-    .map((segment) => segment.trim())
-    .filter(Boolean);
-
-  if (segments.length === 0) {
-    return "Portfolio Manager";
-  }
-
-  return segments
-    .slice(0, 2)
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(" ");
-}
-
-function ProfileAvatar({ initials, size, animatedState }: ProfileAvatarProps) {
-  const isMenu = size === "menu";
-  const avatarSize = isMenu ? 56 : 32;
-  const fontSize = isMenu ? "0.92rem" : "0.525rem";
-  const indicatorSize = isMenu ? 14 : 8;
-  const indicatorOffset = isMenu ? 4 : 2;
-  const indicatorBorder = isMenu ? 3 : 2;
-  const shadow = isMenu
-    ? "0 10px 18px rgba(15,23,42,0.14)"
-    : "0 6px 12px rgba(15,23,42,0.14)";
-
-  return (
-    <span
-      className={`relative inline-flex items-center justify-center rounded-full bg-primary font-heading font-bold tracking-[0.12em] text-[#f8fbff] ${animatedState ? modalPopClass : ""}`}
-      data-state={animatedState}
-      style={{
-        width: `${avatarSize}px`,
-        height: `${avatarSize}px`,
-        fontSize,
-        backgroundColor: "#131b2e",
-        backgroundImage: "linear-gradient(160deg, #243049 0%, #131b2e 72%)",
-        boxShadow: shadow,
-      }}
-    >
-      <span className="relative z-[1]">{initials}</span>
-      <span
-        className="absolute rounded-full bg-[#34d399]"
-        style={{
-          right: `${indicatorOffset}px`,
-          bottom: `${indicatorOffset}px`,
-          width: `${indicatorSize}px`,
-          height: `${indicatorSize}px`,
-          border: `${indicatorBorder}px solid #131b2e`,
-        }}
-        aria-hidden="true"
-      />
-    </span>
-  );
+  const compact = (userEmail.split("@")[0] || fallback).replace(/[^a-zA-Z0-9]/g, "");
+  return compact.slice(0, 2).toUpperCase() || fallback;
 }
 
 export function DashboardHeader({
@@ -123,195 +27,304 @@ export function DashboardHeader({
   userEmail,
   searchQuery,
   onSearchChange,
-  onAddRenter,
   onOpenNotifications,
   onOpenProfile,
   onOpenSettings,
   onOpenSupport,
   onSignOut,
 }: Props) {
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
-  const { isMounted: isProfileMenuMounted, state: profileMenuState } = useAnimatedPresence(
-    isProfileMenuOpen,
-    MODAL_EXIT_DURATION_MS,
-  );
-  const profileInitials = useMemo(() => getProfileInitials(userEmail), [userEmail]);
-  const profileName = useMemo(() => getProfileName(userEmail), [userEmail]);
-  const profileRole = userEmail === "dev@local" ? "Local development session" : "Portfolio manager";
+  const initials = useMemo(() => getProfileInitials(userEmail), [userEmail]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
   const menuItems = [
     { label: "View Profile", icon: UserRound, onSelect: onOpenProfile },
     { label: "Account Settings", icon: Settings, onSelect: onOpenSettings },
     { label: "Help & Support", icon: CircleHelp, onSelect: onOpenSupport },
   ] as const;
 
-  useEffect(() => {
-    if (!isProfileMenuMounted) {
-      return;
-    }
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (isProfileMenuOpen && !profileMenuRef.current?.contains(event.target as Node)) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isProfileMenuOpen) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isProfileMenuMounted, isProfileMenuOpen]);
-
-  const profileMenuIntroStyle = { backgroundColor: "#f2f4f6" } as const;
-  const profileMenuSectionStyle = { backgroundColor: "#ffffff" } as const;
-  const profileMenuIconStyle = { backgroundColor: "#eceef0" } as const;
-  const signOutActionStyle = { backgroundColor: "#ffffff" } as const;
-
   return (
-    <header className="sticky top-0 z-40 bg-surface-container-lowest/85 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-10">
-      <div className="flex items-center justify-between gap-3 rounded-md bg-surface-container-low px-3 py-3 sm:px-4">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <img src={logoSrc} alt="The Ledger" className="h-7 w-auto lg:hidden" />
-          <label className="hidden min-w-0 flex-1 items-center gap-2 rounded-sm bg-surface-container-highest px-3 py-2 text-sm text-on-surface-muted md:flex">
-            <Search size={16} />
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 30,
+        background: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(16px)",
+        padding: "12px 24px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          background: "#f2f4f6",
+          borderRadius: 6,
+          padding: "10px 14px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+          <img src={logoSrc} alt="The Ledger" className="lg:hidden" style={{ height: 28, width: "auto" }} />
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              flex: 1,
+              background: "#e0e3e5",
+              borderRadius: 4,
+              padding: "8px 12px",
+              cursor: "text",
+            }}
+          >
+            <Search size={15} color="#45464d" />
             <input
               type="text"
               value={searchQuery}
               onChange={(event) => onSearchChange(event.target.value)}
-              aria-label="Search"
               placeholder="Search properties, tenants..."
-              className="w-full bg-transparent text-sm text-on-surface placeholder:text-on-surface-muted focus:outline-none"
+              aria-label="Search"
+              style={{
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                fontSize: 13,
+                color: "#191c1e",
+                width: "100%",
+                fontFamily: "inherit",
+              }}
             />
           </label>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             type="button"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-sm bg-surface-container-high text-on-surface-muted transition-colors hover:bg-surface-container"
-            aria-label="Open notifications"
             onClick={onOpenNotifications}
+            aria-label="Open notifications"
+            style={{
+              position: "relative",
+              width: 38,
+              height: 38,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#e6e8ea",
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+              color: "#45464d",
+            }}
           >
-            <Bell size={17} />
-            <span className="absolute right-[0.5rem] top-[0.45rem] h-1.5 w-1.5 rounded-full bg-[#34d399]" aria-hidden="true" />
+            <Bell size={16} color="#45464d" />
+            <span
+              style={{
+                position: "absolute",
+                top: 9,
+                right: 8,
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#34d399",
+              }}
+            />
           </button>
-          <button
-            type="button"
-            className="hidden h-10 w-10 items-center justify-center rounded-sm bg-surface-container-high text-on-surface-muted transition-colors hover:bg-surface-container sm:inline-flex"
-            aria-label="Open help and support"
-            onClick={onOpenSupport}
-          >
-            <CircleHelp size={17} />
-          </button>
-          <span className="hidden h-8 w-px bg-outline-variant/45 sm:block" aria-hidden="true" />
-          <button
-            type="button"
-            onClick={onAddRenter}
-            className="hidden items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 sm:inline-flex lg:hidden"
-          >
-            <Plus size={14} />
-            Add Renter
-          </button>
-          <div className="relative" ref={profileMenuRef}>
+
+          <span style={{ width: 1, height: 28, background: "rgba(198,198,205,0.45)" }} />
+          <div ref={profileMenuRef} style={{ position: "relative" }}>
             <button
               type="button"
-              onClick={() => setIsProfileMenuOpen((current) => !current)}
-              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-surface-container-high p-1.5 text-on-surface transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-[1px] hover:bg-surface-container hover:shadow-[0_10px_22px_rgba(15,23,42,0.08)] active:translate-y-0 active:scale-[0.985]"
+              onClick={() => setMenuOpen((value) => !value)}
               aria-label="Open profile menu"
               aria-haspopup="menu"
-              aria-expanded={isProfileMenuOpen}
+              aria-expanded={menuOpen}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                border: "none",
+                background: "linear-gradient(160deg, #243049 0%, #131b2e 72%)",
+                color: "#f8fbff",
+                fontSize: "0.52rem",
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                cursor: "pointer",
+                fontFamily: "Manrope, sans-serif",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 6px 12px rgba(15,23,42,0.14)",
+              }}
             >
-              <ProfileAvatar initials={profileInitials} size="trigger" />
+              {initials}
             </button>
 
-            {isProfileMenuMounted && (
+            {menuOpen ? (
               <div
                 role="menu"
                 aria-label="Profile options"
-                data-state={profileMenuState}
-                className={`absolute right-0 top-[calc(100%+0.7rem)] w-[20.75rem] origin-top-right overflow-hidden rounded-[1.1rem] bg-surface-container-lowest shadow-modal ${modalShellClass} ${modalFlowClass} ${profileMenuState === "closed" ? "pointer-events-none" : ""}`}
-                style={floatingSurfaceLowestStyle}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "calc(100% + 10px)",
+                  width: 240,
+                  background: "#fff",
+                  borderRadius: 18,
+                  boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)",
+                  overflow: "hidden",
+                  zIndex: 50,
+                }}
               >
-                <div className="px-4 py-4" style={profileMenuIntroStyle}>
-                  <div className="flex items-center gap-3">
-                    <ProfileAvatar initials={profileInitials} size="menu" animatedState={profileMenuState} />
-                    <div className="min-w-0">
-                      <p className="truncate font-heading text-[1.2rem] font-bold leading-none text-on-surface">
-                        {profileName}
+                <div style={{ background: "#f2f4f6", padding: "14px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        background: "linear-gradient(160deg, #243049, #131b2e)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#f8fbff",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontFamily: "Manrope, sans-serif",
+                        letterSpacing: "0.12em",
+                      }}
+                    >
+                      {initials}
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: "#191c1e" }}>
+                        Portfolio Manager
                       </p>
-                      <p className="mt-1 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-on-surface-muted">
-                        {profileRole}
-                      </p>
-                      <p className="mt-2 truncate text-xs text-on-surface-muted">
-                        {userEmail ?? "signed-in workspace"}
-                      </p>
+                      <p style={{ margin: "2px 0 0", fontSize: 11, color: "#45464d" }}>{userEmail}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="px-3 py-3" style={profileMenuSectionStyle}>
-                  <div className="space-y-1.5">
-                    {menuItems.map((item) => {
-                      const Icon = item.icon;
-
-                      return (
-                        <button
-                          key={item.label}
-                          type="button"
-                          role="menuitem"
-                          onClick={() => {
-                            setIsProfileMenuOpen(false);
-                            item.onSelect();
+                <div style={{ padding: "8px 10px" }}>
+                  {menuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          item.onSelect();
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          width: "100%",
+                          padding: "10px 10px",
+                          background: "transparent",
+                          border: "none",
+                          borderRadius: 4,
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "#191c1e",
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          textAlign: "left",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 30,
+                            height: 30,
+                            borderRadius: "50%",
+                            background: "#eceef0",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
                           }}
-                          className="flex min-h-[48px] w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-on-surface transition-[background-color,transform,box-shadow] duration-200 hover:scale-[1.01] hover:bg-secondary-container/40 active:scale-[0.99]"
                         >
-                          <span
-                            className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-on-surface ${modalPopClass}`}
-                            data-state={profileMenuState}
-                            style={profileMenuIconStyle}
-                          >
-                            <Icon size={16} />
-                          </span>
-                          <span className="min-w-0 flex-1 text-sm font-semibold">{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                          <Icon size={14} color="#191c1e" />
+                        </span>
+                        {item.label}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div className="px-3 pb-3 pt-1" style={signOutActionStyle}>
+                <div style={{ padding: "4px 10px 10px" }}>
                   <button
                     type="button"
                     role="menuitem"
                     onClick={() => {
-                      setIsProfileMenuOpen(false);
+                      setMenuOpen(false);
                       onSignOut();
                     }}
-                    className="flex min-h-[48px] w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left transition-[background-color,transform,box-shadow] duration-200 hover:scale-[1.01] hover:bg-[#fff4f3] active:scale-[0.99]"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      width: "100%",
+                      padding: "10px 10px",
+                      background: "transparent",
+                      border: "none",
+                      borderRadius: 4,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#d44f46",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      textAlign: "left",
+                    }}
                   >
                     <span
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-[#d44f46] ${modalPopClass}`}
-                      data-state={profileMenuState}
-                      style={profileMenuIconStyle}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: "50%",
+                        background: "#eceef0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
                     >
-                      <LogOut size={16} />
+                      <LogOut size={14} color="#d44f46" />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-[#d44f46]">Sign Out</span>
-                    </span>
+                    Sign Out
                   </button>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

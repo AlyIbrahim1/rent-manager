@@ -1,6 +1,7 @@
-import { Plus, ChevronRight, Loader2, AlertCircle } from "lucide-react";
-import type { Renter } from "@/shared/api/types";
+import { AlertCircle, Loader2, Plus } from "lucide-react";
+
 import { RenterCard } from "@/features/renters/components/RenterCard";
+import type { Renter } from "@/shared/api/types";
 
 type Props = {
   isLoading: boolean;
@@ -25,80 +26,113 @@ export function RentersLedgerSection({
   onAddRenter,
   onClearSearch,
 }: Props) {
+  const isEmpty = filteredRenters.length === 0;
+
   return (
-    <div className="space-y-5 rounded-md bg-surface-container-low p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h2 className="font-heading text-[1.35rem] font-bold text-on-surface sm:text-2xl">Renters Ledger</h2>
-          <span className="inline-flex items-center rounded-full bg-surface-container-high px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-on-surface-muted">
-            {filteredRenters.length}
-          </span>
+    <div style={{ background: "#f2f4f6", borderRadius: 6, padding: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div>
+          <h3 style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.2rem", fontWeight: 700, color: "#191c1e" }}>
+            Renters Ledger
+          </h3>
+          <p style={{ margin: "3px 0 0", fontSize: 12, color: "#45464d" }}>{renters.length} active units</p>
         </div>
-        <button
-          type="button"
-          onClick={onAddRenter}
-          className="inline-flex items-center gap-1.5 rounded-sm bg-surface-container-high px-3 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
+        <span
+          style={{
+            background: "#e6e8ea",
+            borderRadius: 9999,
+            padding: "3px 10px",
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#191c1e",
+          }}
         >
-          Add
-          <ChevronRight size={14} />
-        </button>
+          {renters.length}
+        </span>
       </div>
 
-      {isLoading && (
-        <div className="flex items-center justify-center gap-3 rounded-md bg-surface-container-lowest py-14 text-on-surface-muted">
-          <Loader2 size={20} className="animate-spin" />
-          <span>Loading renters...</span>
+      {isLoading ? (
+        <div style={{ background: "#fff", borderRadius: 6, padding: "32px", textAlign: "center", color: "#45464d" }}>
+          <Loader2 size={18} className="animate-spin" style={{ marginBottom: 8 }} />
+          <p style={{ margin: 0, fontSize: 13 }}>Loading renters...</p>
         </div>
-      )}
+      ) : null}
 
-      {isError && (
-        <div className="flex items-start gap-3 rounded-md bg-[#ffe9ec] px-5 py-4 text-[#9f1239]">
-          <AlertCircle size={18} className="mt-0.5 shrink-0" />
-          <p className="text-sm">Unable to load renters. Check your connection and try again.</p>
+      {isError ? (
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, background: "#ffe9ec", borderRadius: 6, padding: "14px 16px", color: "#9f1239" }}>
+          <AlertCircle size={16} color="#9f1239" style={{ marginTop: 1, flexShrink: 0 }} />
+          <p style={{ margin: 0, fontSize: 13 }}>Unable to load renters. Check your connection and try again.</p>
         </div>
-      )}
+      ) : null}
 
-      {hasData && renters.length === 0 && (
-        <div className="rounded-md bg-surface-container-lowest px-6 py-16 text-center">
-          <p className="font-heading text-3xl font-semibold text-on-surface">No renters yet</p>
-          <p className="mt-2 text-sm text-on-surface-muted">Start your ledger with the first active unit.</p>
+      {hasData && renters.length === 0 ? (
+        <div style={{ background: "#fff", borderRadius: 6, padding: "32px", textAlign: "center" }}>
+          <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 600, color: "#191c1e" }}>No renters found</p>
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#45464d" }}>Try a different search or add a new renter.</p>
           <button
             type="button"
             onClick={onAddRenter}
-            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
+            style={{
+              marginTop: 14,
+              padding: "8px 16px",
+              background: "linear-gradient(135deg, #0f172a, #131b2e)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
           >
-            <Plus size={15} />
+            <Plus size={13} color="#fff" />
             Add Renter
           </button>
         </div>
-      )}
+      ) : null}
 
-      {hasData && renters.length > 0 && filteredRenters.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {filteredRenters.map((renter) => (
-            <RenterCard
-              key={renter.id}
-              renter={renter}
-              isSelected={selectedRenterId === renter.id}
-              onSelect={onSelectRenter}
-            />
-          ))}
-        </div>
-      )}
-
-      {hasData && renters.length > 0 && filteredRenters.length === 0 && (
-        <div className="rounded-md bg-surface-container-lowest px-6 py-16 text-center">
-          <p className="font-heading text-3xl font-semibold text-on-surface">No renters match your search</p>
-          <p className="mt-2 text-sm text-on-surface-muted">Try a renter name or apartment number.</p>
+      {hasData && renters.length > 0 && isEmpty ? (
+        <div style={{ background: "#fff", borderRadius: 6, padding: "32px", textAlign: "center" }}>
+          <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 600, color: "#191c1e" }}>
+            No renters match your search
+          </p>
+          <p style={{ margin: "6px 0 0", fontSize: 13, color: "#45464d" }}>Try a different search or add a new renter.</p>
           <button
             type="button"
             onClick={onClearSearch}
-            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
+            style={{
+              marginTop: 14,
+              padding: "8px 16px",
+              background: "linear-gradient(135deg, #0f172a, #131b2e)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 600,
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
           >
             Clear search
           </button>
         </div>
-      )}
+      ) : null}
+
+      {hasData && renters.length > 0 && !isEmpty ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filteredRenters.map((renter) => (
+            <RenterCard
+              key={renter.id}
+              renter={renter}
+              isSelected={renter.id === selectedRenterId}
+              onSelect={onSelectRenter}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
