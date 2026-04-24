@@ -25,7 +25,7 @@ export function RenterCard({ renter, isSelected, onSelect }: Props) {
           Apt #{renter.appartmentNumber}
         </span>
         {isOverdue && (
-          <span className="inline-flex items-center gap-1.5 rounded-sm bg-[#ffe9ec] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#9f1239]">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ffe9ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#9f1239]">
             <AlertTriangle size={12} strokeWidth={3} />
             Overdue
           </span>

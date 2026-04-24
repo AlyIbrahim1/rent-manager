@@ -35,7 +35,7 @@ export function RenterDetailsPanel({ renter, onMarkPaid, onClose, variant = "def
               Apt #{renter.appartmentNumber}
             </span>
             {isOverdue && (
-              <span className="inline-flex items-center gap-1 rounded-sm bg-[#ffe9ec] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#9f1239]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#ffe9ec] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#9f1239]">
                 <AlertTriangle size={11} />
                 Overdue
               </span>

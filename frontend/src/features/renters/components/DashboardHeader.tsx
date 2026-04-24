@@ -38,7 +38,7 @@ export function DashboardHeader({ logoSrc, searchQuery, onSearchChange, onAddRen
           <button
             type="button"
             onClick={onAddRenter}
-            className="hidden items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container sm:inline-flex lg:hidden"
+            className="hidden items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-4 py-2 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 sm:inline-flex lg:hidden"
           >
             <Plus size={14} />
             Add Renter

@@ -65,7 +65,7 @@ export function RentersLedgerSection({
           <button
             type="button"
             onClick={onAddRenter}
-            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container"
+            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
           >
             <Plus size={15} />
             Add Renter
@@ -93,7 +93,7 @@ export function RentersLedgerSection({
           <button
             type="button"
             onClick={onClearSearch}
-            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container"
+            className="mt-6 inline-flex items-center gap-2 rounded-sm bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
           >
             Clear search
           </button>
