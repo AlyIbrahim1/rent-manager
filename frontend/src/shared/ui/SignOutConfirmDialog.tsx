@@ -1,17 +1,18 @@
 import { useEffect, useId } from "react";
 import { Loader2, LogOut } from "lucide-react";
-
-const dialogShellStyle = { backgroundColor: "#ffffff" } as const;
-const secondaryButtonClass =
-  "inline-flex h-[52px] items-center justify-center rounded-[8px] px-5 text-[15px] font-bold text-on-surface shadow-[0_4px_12px_rgba(25,28,30,0.06)] transition-all duration-200 hover:brightness-[1.02] hover:shadow-[0_2px_4px_rgba(0,0,0,0.08)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60";
-const primaryButtonClass =
-  "inline-flex h-[52px] items-center justify-center gap-2 rounded-[8px] px-5 text-[16px] font-bold tracking-wide text-on-primary shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-all duration-200 hover:brightness-[1.06] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70";
-const secondaryButtonStyle = { backgroundColor: "#f5f5f5" } as const;
-const primaryButtonStyle = {
-  backgroundColor: "#0f172a",
-  backgroundImage: "linear-gradient(135deg, #0f172a 0%, #131b2e 100%)",
-  color: "#ffffff",
-} as const;
+import {
+  MODAL_EXIT_DURATION_MS,
+  floatingSurfaceLowestStyle,
+  modalBackdropClass,
+  modalFlowClass,
+  modalPopClass,
+  modalPrimaryButtonClass,
+  modalPrimaryButtonStyle,
+  modalSecondaryButtonClass,
+  modalSecondaryButtonStyle,
+  modalShellClass,
+} from "@/shared/ui/modalActionStyles";
+import { useAnimatedPresence } from "@/shared/ui/useAnimatedPresence";
 
 type SignOutConfirmDialogProps = {
   isOpen: boolean;
@@ -36,24 +37,25 @@ export function SignOutConfirmDialog({
 }: SignOutConfirmDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const { isMounted, state } = useAnimatedPresence(isOpen, MODAL_EXIT_DURATION_MS);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isMounted) {
       return;
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !isSubmitting) {
+      if (event.key === "Escape" && isOpen && !isSubmitting) {
         onCancel();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, isSubmitting, onCancel]);
+  }, [isMounted, isOpen, isSubmitting, onCancel]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isMounted) {
       return;
     }
 
@@ -76,17 +78,18 @@ export function SignOutConfirmDialog({
       bodyStyle.paddingRight = previousBodyPaddingRight;
       htmlStyle.overflow = previousHtmlOverflow;
     };
-  }, [isOpen]);
+  }, [isMounted]);
 
-  if (!isOpen) {
+  if (!isMounted) {
     return null;
   }
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-[#0f172a]/50 p-4 backdrop-blur-[2px]"
+      className={`fixed inset-0 z-[70] flex items-center justify-center bg-[#0f172a]/50 p-4 backdrop-blur-[2px] ${modalBackdropClass}`}
+      data-state={state}
       onClick={(event) => {
-        if (event.target === event.currentTarget && !isSubmitting) {
+        if (event.target === event.currentTarget && isOpen && !isSubmitting) {
           onCancel();
         }
       }}
@@ -96,12 +99,13 @@ export function SignOutConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="animate-modal-in w-full max-w-[24.5rem] overflow-hidden rounded-[1.6rem] bg-surface-container-lowest shadow-modal"
-        style={dialogShellStyle}
+        data-state={state}
+        className={`w-full max-w-[24.5rem] overflow-hidden rounded-[1.6rem] bg-surface-container-lowest shadow-modal ${modalShellClass} ${modalFlowClass}`}
+        style={floatingSurfaceLowestStyle}
       >
         <div className="space-y-5 px-5 py-5 sm:px-6">
           <div className="flex items-start gap-4">
-            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ffe9ec] text-[#be123c]">
+            <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ffe9ec] text-[#be123c] ${modalPopClass}`} data-state={state}>
               <LogOut size={18} />
             </span>
             <div className="min-w-0">
@@ -120,8 +124,8 @@ export function SignOutConfirmDialog({
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className={secondaryButtonClass}
-              style={secondaryButtonStyle}
+              className={modalSecondaryButtonClass}
+              style={modalSecondaryButtonStyle}
             >
               {cancelLabel}
             </button>
@@ -129,8 +133,8 @@ export function SignOutConfirmDialog({
               type="button"
               onClick={onConfirm}
               disabled={isSubmitting}
-              className={primaryButtonClass}
-              style={primaryButtonStyle}
+              className={modalPrimaryButtonClass}
+              style={modalPrimaryButtonStyle}
             >
               {isSubmitting ? (
                 <>

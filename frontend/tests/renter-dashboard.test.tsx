@@ -62,7 +62,7 @@ function renderDashboard() {
 
   render(
     <QueryClientProvider client={queryClient}>
-      <RenterDashboardPage />
+      <RenterDashboardPage user={{ id: "user-1", email: "manager@ledger.test" }} />
     </QueryClientProvider>
   );
 }
@@ -125,27 +125,47 @@ describe("RenterDashboardPage", () => {
     expect(getReceivePaymentButtons().every((button) => button.disabled)).toBe(true);
   });
 
-  it("wires each sign-out trigger to the confirmation dialog", async () => {
+  it("opens sign-out from the profile menu", async () => {
     renderDashboard();
 
     await screen.findByText(/Apt #101/);
 
-    const signOutButtons = screen.getAllByRole("button", { name: /sign out/i });
-    expect(signOutButtons.length).toBeGreaterThanOrEqual(2);
+    fireEvent.click(screen.getByRole("button", { name: /open profile menu/i }));
 
-    for (const trigger of signOutButtons) {
-      fireEvent.click(trigger);
+    expect(screen.getByRole("menuitem", { name: /view profile/i })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /account settings/i })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /help & support/i })).toBeInTheDocument();
+    expect(screen.getByText(/manager@ledger\.test/i)).toBeInTheDocument();
 
-      expect(screen.getByRole("heading", { name: /confirm sign out/i })).toBeInTheDocument();
-      expect(signOutMock).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("menuitem", { name: /sign out/i }));
 
-      fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(screen.getByRole("heading", { name: /^sign out$/i })).toBeInTheDocument();
+    expect(signOutMock).not.toHaveBeenCalled();
 
-      await waitFor(() => {
-        expect(screen.queryByRole("heading", { name: /confirm sign out/i })).not.toBeInTheDocument();
-      });
-      expect(signOutMock).not.toHaveBeenCalled();
-    }
+    fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: /^sign out$/i })).not.toBeInTheDocument();
+    });
+    expect(signOutMock).not.toHaveBeenCalled();
+  });
+
+  it("opens scaffolded profile actions from the menu", async () => {
+    renderDashboard();
+
+    await screen.findByText(/Apt #101/);
+
+    fireEvent.click(screen.getByRole("button", { name: /open profile menu/i }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /view profile/i }));
+
+    expect(screen.getByRole("heading", { name: /view profile/i })).toBeInTheDocument();
+    expect(screen.getByText(/manager details and workspace membership/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /close/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: /view profile/i })).not.toBeInTheDocument();
+    });
   });
 
   it("opens a sign-out confirmation screen before logging out", async () => {
@@ -153,14 +173,17 @@ describe("RenterDashboardPage", () => {
 
     await screen.findByText(/Apt #101/);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /sign out/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /open profile menu/i }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /sign out/i }));
 
-    expect(screen.getByRole("heading", { name: /confirm sign out/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^sign out$/i })).toBeInTheDocument();
     expect(signOutMock).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
 
-    expect(screen.queryByRole("heading", { name: /confirm sign out/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: /^sign out$/i })).not.toBeInTheDocument();
+    });
     expect(signOutMock).not.toHaveBeenCalled();
   });
 
@@ -169,8 +192,9 @@ describe("RenterDashboardPage", () => {
 
     await screen.findByText(/Apt #101/);
 
-    fireEvent.click(screen.getAllByRole("button", { name: /sign out/i })[0]);
-    fireEvent.click(screen.getByRole("button", { name: /yes, sign out/i }));
+    fireEvent.click(screen.getByRole("button", { name: /open profile menu/i }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /sign out/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^sign out$/i }));
 
     await waitFor(() => {
       expect(signOutMock).toHaveBeenCalledTimes(1);

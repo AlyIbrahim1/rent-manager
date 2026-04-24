@@ -1,6 +1,20 @@
 import { useEffect, useId, useState } from "react";
 import { Building2, CalendarClock, Loader2, WalletCards, X } from "lucide-react";
 import type { CreateRenterInput } from "@/shared/api/types";
+import {
+  MODAL_EXIT_DURATION_MS,
+  floatingSurfaceLowStyle,
+  floatingSurfaceLowestStyle,
+  modalBackdropClass,
+  modalFlowClass,
+  modalPopClass,
+  modalPrimaryButtonClass,
+  modalPrimaryButtonStyle,
+  modalSecondaryButtonClass,
+  modalSecondaryButtonStyle,
+  modalShellClass,
+} from "@/shared/ui/modalActionStyles";
+import { useAnimatedPresence } from "@/shared/ui/useAnimatedPresence";
 
 type Props = {
   isOpen: boolean;
@@ -13,24 +27,11 @@ const inputClass =
 const labelClass =
   "mb-2 block text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-on-surface-muted";
 const sectionCardClass = "rounded-[1.35rem] bg-surface-container-lowest p-5 shadow-[0_12px_40px_rgba(25,28,30,0.06)] sm:p-[1.35rem]";
-const secondaryButtonClass =
-  "inline-flex h-[52px] items-center justify-center rounded-[8px] px-5 text-[15px] font-bold text-on-surface shadow-[0_4px_12px_rgba(25,28,30,0.06)] transition-all duration-200 hover:brightness-[1.02] hover:shadow-[0_2px_4px_rgba(0,0,0,0.08)] active:scale-[0.99]";
-const primaryButtonClass =
-  "inline-flex h-[52px] items-center justify-center gap-2 rounded-[8px] px-5 text-[16px] font-bold tracking-wide text-on-primary shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-all duration-200 hover:brightness-[1.06] hover:shadow-[0_2px_4px_rgba(0,0,0,0.1)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70";
-const modalShellStyle = { backgroundColor: "#ffffff" } as const;
-const tonalZoneStyle = { backgroundColor: "#f2f3ff" } as const;
-const sectionCardStyle = { backgroundColor: "#ffffff" } as const;
-const previewCardStyle = { backgroundColor: "#f2f3ff" } as const;
-const secondaryButtonStyle = { backgroundColor: "#f5f5f5" } as const;
-const primaryButtonStyle = {
-  backgroundColor: "#0f172a",
-  backgroundImage: "linear-gradient(135deg, #0f172a 0%, #131b2e 100%)",
-  color: "#ffffff",
-} as const;
 
 export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
   const titleId = useId();
   const descriptionId = useId();
+  const { isMounted, state } = useAnimatedPresence(isOpen, MODAL_EXIT_DURATION_MS);
   const [name, setName] = useState("");
   const [appartmentNumber, setAppartmentNumber] = useState(0);
   const [rentAmount, setRentAmount] = useState(0);
@@ -38,16 +39,16 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && isOpen) onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onClose]);
+  }, [isMounted, isOpen, onClose]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMounted) return;
 
     const { style: bodyStyle } = document.body;
     const { style: htmlStyle } = document.documentElement;
@@ -71,9 +72,9 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
       bodyStyle.touchAction = previousBodyTouchAction;
       htmlStyle.overflow = previousHtmlOverflow;
     };
-  }, [isOpen]);
+  }, [isMounted]);
 
-  if (!isOpen) return null;
+  if (!isMounted) return null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,8 +93,9 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/50 p-4 backdrop-blur-[2px] sm:p-6"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/50 p-4 backdrop-blur-[2px] sm:p-6 ${modalBackdropClass}`}
+      data-state={state}
+      onClick={(e) => { if (e.target === e.currentTarget && isOpen) onClose(); }}
     >
       <form
         onSubmit={handleSubmit}
@@ -101,10 +103,12 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="animate-modal-in w-full max-w-[42rem] overflow-hidden rounded-[1.75rem] bg-surface-container-lowest shadow-modal"
-        style={modalShellStyle}
+        aria-busy={loading}
+        data-state={state}
+        className={`w-full max-w-[42rem] overflow-hidden rounded-[1.75rem] bg-surface-container-lowest shadow-modal ${modalShellClass} ${modalFlowClass}`}
+        style={floatingSurfaceLowestStyle}
       >
-        <div className="flex items-start justify-between gap-4 bg-surface-container-low px-5 py-5 sm:px-6 sm:py-5" style={tonalZoneStyle}>
+        <div className="flex items-start justify-between gap-4 bg-surface-container-low px-5 py-5 sm:px-6 sm:py-5" style={floatingSurfaceLowStyle}>
           <div className="max-w-[32rem]">
             <h2 id={titleId} className="font-heading text-[1.75rem] font-bold leading-[1.05] text-on-surface sm:text-[1.85rem]">
               Add New Renter
@@ -116,17 +120,18 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-on-surface-muted transition-all duration-200 hover:bg-surface-container-high hover:text-on-surface active:scale-[0.97]"
+            disabled={loading}
+            className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-on-surface-muted transition-[background-color,color,transform,box-shadow] duration-200 hover:-translate-y-[1px] hover:bg-surface-container-high hover:text-on-surface hover:shadow-[0_10px_22px_rgba(15,23,42,0.08)] active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f2f4f6] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             aria-label="Close"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="space-y-4 bg-surface-container-low px-4 py-4 sm:px-5 sm:py-5" style={tonalZoneStyle}>
-          <section className={sectionCardClass} style={sectionCardStyle}>
+        <div className="space-y-4 bg-surface-container-low px-4 py-4 sm:px-5 sm:py-5" style={floatingSurfaceLowStyle}>
+          <section className={sectionCardClass} style={floatingSurfaceLowestStyle}>
             <div className="mb-4 flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-surface-container text-on-surface">
+              <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-surface-container text-on-surface ${modalPopClass}`} data-state={state}>
                 <Building2 size={18} />
               </span>
               <div>
@@ -135,7 +140,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
               </div>
             </div>
 
-              <div className="space-y-3.5">
+            <div className="space-y-3.5">
               <div>
                 <label htmlFor="add-name" className={labelClass}>
                   Renter name
@@ -193,9 +198,9 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
             </div>
           </section>
 
-          <section className={sectionCardClass} style={sectionCardStyle}>
+          <section className={sectionCardClass} style={floatingSurfaceLowestStyle}>
             <div className="mb-4 flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-surface-container text-on-surface">
+              <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-surface-container text-on-surface ${modalPopClass}`} data-state={state}>
                 <CalendarClock size={18} />
               </span>
               <div>
@@ -221,13 +226,13 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
                 </p>
               </div>
 
-              <aside className="rounded-[1.2rem] bg-surface-container-low p-4 text-sm text-on-surface" style={previewCardStyle}>
+              <aside className="rounded-[1.2rem] bg-surface-container-low p-4 text-sm text-on-surface" style={floatingSurfaceLowStyle}>
                 <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-on-surface-muted">
                   <WalletCards size={15} />
                   Ledger preview
                 </div>
                 <div className="mt-4 space-y-3">
-                  <div className="rounded-xl bg-surface-container-lowest px-4 py-3" style={sectionCardStyle}>
+                  <div className="rounded-xl bg-surface-container-lowest px-4 py-3" style={floatingSurfaceLowestStyle}>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-on-surface-muted">Expected rent</p>
                     <p className="mt-1 font-heading text-2xl font-bold leading-none text-on-surface">
                       ${rentAmount > 0 ? rentAmount.toLocaleString() : "0"}
@@ -242,20 +247,21 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
           </section>
         </div>
 
-        <div className="flex flex-col-reverse gap-3 bg-surface-container-low px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-5 sm:py-4" style={tonalZoneStyle}>
+        <div className="flex flex-col-reverse gap-3 bg-surface-container-low px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-5 sm:py-4" style={floatingSurfaceLowStyle}>
           <button
             type="button"
             onClick={onClose}
-            className={secondaryButtonClass}
-            style={secondaryButtonStyle}
+            disabled={loading}
+            className={modalSecondaryButtonClass}
+            style={modalSecondaryButtonStyle}
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className={primaryButtonClass}
-            style={primaryButtonStyle}
+            className={modalPrimaryButtonClass}
+            style={modalPrimaryButtonStyle}
           >
             {loading ? (
               <>
