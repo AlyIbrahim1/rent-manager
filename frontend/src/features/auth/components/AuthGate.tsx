@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
+import { AUTH_ROUTE_CHANGE_EVENT, getAuthModeFromPath } from "@/features/auth/lib/authRoute";
+import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { SignupPage } from "@/features/auth/pages/SignupPage";
 import { RenterDashboardPage } from "@/features/renters/pages/RenterDashboardPage";
 import type { AuthUser } from "@/shared/lib/supabase";
 import { supabase } from "@/shared/lib/supabase";
 import { ledgerPageShellClass } from "@/shared/ui/ledgerPrimitives";
-
 
 function hasActiveDevSession() {
   const token = sessionStorage.getItem("dev_token");
@@ -66,8 +68,28 @@ function useAuthSession() {
   return { user, loading };
 }
 
+function useAuthRouteMode() {
+  const [mode, setMode] = useState(() => getAuthModeFromPath(window.location.pathname));
+
+  useEffect(() => {
+    const syncMode = () => {
+      setMode(getAuthModeFromPath(window.location.pathname));
+    };
+
+    window.addEventListener("popstate", syncMode);
+    window.addEventListener(AUTH_ROUTE_CHANGE_EVENT, syncMode);
+    return () => {
+      window.removeEventListener("popstate", syncMode);
+      window.removeEventListener(AUTH_ROUTE_CHANGE_EVENT, syncMode);
+    };
+  }, []);
+
+  return mode;
+}
+
 export function AuthGate() {
   const { user, loading } = useAuthSession();
+  const authRouteMode = useAuthRouteMode();
 
   if (loading) {
     return (
@@ -77,6 +99,16 @@ export function AuthGate() {
     );
   }
 
-  if (!user) return <LoginPage />;
+  if (!user) {
+    if (authRouteMode === "signup") {
+      return <SignupPage />;
+    }
+
+    if (authRouteMode === "forgot_password") {
+      return <ForgotPasswordPage />;
+    }
+
+    return <LoginPage />;
+  }
   return <RenterDashboardPage user={user} />;
 }
