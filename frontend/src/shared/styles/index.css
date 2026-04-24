@@ -4,11 +4,14 @@
 
 :root {
   color-scheme: light;
-  --bg-page: #f8fafc;
-  --bg-layer: #f2f3ff;
+  --bg-page: #f7f9fb;
+  --bg-layer: #f2f4f6;
   --color-primary: #0f172a;
-  --color-text: #131b2e;
-  --color-muted: #64748b;
+  --color-text: #191c1e;
+  --color-muted: #45464d;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   font-family: "Inter", "Segoe UI", sans-serif;
 }
 
@@ -16,9 +19,9 @@ body {
   margin: 0;
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 8% 6%, rgba(218, 226, 253, 0.42), transparent 34%),
-    radial-gradient(circle at 90% 16%, rgba(133, 248, 196, 0.14), transparent 30%),
-    linear-gradient(180deg, var(--bg-page) 0%, #f5f7fb 100%);
+    radial-gradient(circle at 10% 8%, rgba(236, 238, 240, 0.92), transparent 32%),
+    radial-gradient(circle at 88% 14%, rgba(213, 227, 252, 0.26), transparent 28%),
+    linear-gradient(180deg, var(--bg-page) 0%, #f4f6f8 100%);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -45,6 +48,159 @@ body {
 
 .animate-modal-in {
   animation: modal-in 0.24s ease-out forwards;
+}
+
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-backdrop-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-shell-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.972);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes modal-shell-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.985);
+  }
+}
+
+@keyframes modal-flow-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes modal-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modal-sheet-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes modal-sheet-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+}
+
+.modal-backdrop-motion,
+.modal-sheet-backdrop-motion {
+  will-change: opacity;
+}
+
+.modal-backdrop-motion[data-state="open"],
+.modal-sheet-backdrop-motion[data-state="open"] {
+  animation: modal-backdrop-in 320ms var(--ease-out-quart) both;
+}
+
+.modal-backdrop-motion[data-state="closed"],
+.modal-sheet-backdrop-motion[data-state="closed"] {
+  animation: modal-backdrop-out 220ms var(--ease-out-quart) both;
+}
+
+.modal-shell-motion,
+.modal-sheet-panel-motion {
+  will-change: opacity, transform;
+}
+
+.modal-shell-motion[data-state="open"] {
+  animation: modal-shell-in 420ms var(--ease-out-expo) both;
+}
+
+.modal-shell-motion[data-state="closed"] {
+  animation: modal-shell-out 220ms var(--ease-out-quart) both;
+}
+
+.modal-sheet-panel-motion[data-state="open"] {
+  animation: modal-sheet-in 380ms var(--ease-out-expo) both;
+}
+
+.modal-sheet-panel-motion[data-state="closed"] {
+  animation: modal-sheet-out 220ms var(--ease-out-quart) both;
+}
+
+.modal-flow-motion[data-state="open"] > * {
+  animation: modal-flow-in 460ms var(--ease-out-quart) both;
+}
+
+.modal-flow-motion[data-state="open"] > :nth-child(1) {
+  animation-delay: 70ms;
+}
+
+.modal-flow-motion[data-state="open"] > :nth-child(2) {
+  animation-delay: 130ms;
+}
+
+.modal-flow-motion[data-state="open"] > :nth-child(3) {
+  animation-delay: 190ms;
+}
+
+.modal-flow-motion[data-state="open"] > :nth-child(4) {
+  animation-delay: 250ms;
+}
+
+.modal-pop-motion[data-state="open"] {
+  animation: modal-pop-in 360ms var(--ease-out-quint) both;
+  animation-delay: 110ms;
 }
 
 @keyframes reveal-up {
@@ -89,4 +245,27 @@ input[type="number"] {
 input[type="month"]::-webkit-calendar-picker-indicator {
   opacity: 0.5;
   cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-modal-in,
+  .animate-reveal-up,
+  .modal-backdrop-motion,
+  .modal-sheet-backdrop-motion,
+  .modal-shell-motion,
+  .modal-sheet-panel-motion,
+  .modal-flow-motion[data-state="open"] > *,
+  .modal-pop-motion[data-state="open"] {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .modal-backdrop-motion,
+  .modal-sheet-backdrop-motion,
+  .modal-shell-motion,
+  .modal-sheet-panel-motion,
+  .modal-flow-motion > *,
+  .modal-pop-motion {
+    transition-duration: 0.01ms !important;
+  }
 }
