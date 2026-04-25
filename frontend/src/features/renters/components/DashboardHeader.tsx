@@ -80,6 +80,7 @@ export function DashboardHeader({
       }}
     >
       <div
+        className="ledger-dashboard-header-shell ledger-dashboard-header-row"
         style={{
           display: "flex",
           alignItems: "center",
@@ -90,9 +91,10 @@ export function DashboardHeader({
           padding: "10px 14px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+        <div className="ledger-dashboard-search-row" style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
           <img src={logoSrc} alt="The Ledger" className="lg:hidden" style={{ height: 28, width: "auto" }} />
           <label
+            className="ledger-dashboard-search-input"
             style={{
               display: "flex",
               alignItems: "center",

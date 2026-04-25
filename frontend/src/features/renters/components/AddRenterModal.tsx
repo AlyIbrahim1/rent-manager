@@ -121,7 +121,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
 
   return (
     <div
-      className={modalBackdropClass}
+      className={`${modalBackdropClass} ledger-responsive-dialog-overlay`}
       data-state={state}
       style={{
         position: "fixed",
@@ -142,7 +142,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
     >
       <form
         onSubmit={handleSubmit}
-        className={modalShellClass}
+        className={`${modalShellClass} ledger-responsive-dialog`}
         data-state={state}
         style={{
           width: "100%",
@@ -153,7 +153,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
           boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)",
         }}
       >
-        <div style={{ background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div className="ledger-responsive-dialog-header" style={{ background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <h2 style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.75rem", fontWeight: 700, color: "#191c1e", lineHeight: 1.1 }}>
               Add New Renter
@@ -183,8 +183,8 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
           </button>
         </div>
 
-        <div style={{ background: "#f2f4f6", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={sectionCard}>
+        <div className="ledger-responsive-dialog-body" style={{ background: "#f2f4f6", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="ledger-responsive-dialog-section" style={sectionCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
               <span style={{ width: 34, height: 34, borderRadius: 16, background: "#eceef0", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Building2 size={16} color="#191c1e" />
@@ -200,7 +200,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
               <input id="renter-name" type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="e.g. Nadia Khalil" style={inputStyle} />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div className="ledger-responsive-dialog-grid">
               <div>
                 <label style={labelStyle} htmlFor="apartment-number">Apartment number</label>
                 <input id="apartment-number" type="number" min="1" value={apt} onChange={(e) => setApt(e.target.value)} required placeholder="12" style={inputStyle} />
@@ -224,7 +224,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
             </div>
           </div>
 
-          <div style={sectionCard}>
+          <div className="ledger-responsive-dialog-section" style={sectionCard}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
               <span style={{ width: 34, height: 34, borderRadius: 16, background: "#eceef0", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <CalendarClock size={16} color="#191c1e" />
@@ -242,7 +242,7 @@ export function AddRenterModal({ isOpen, onClose, onSubmit }: Props) {
           </div>
         </div>
 
-        <div style={{ background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div className="ledger-responsive-dialog-footer" style={{ background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
           <button
             type="button"
             onClick={onClose}

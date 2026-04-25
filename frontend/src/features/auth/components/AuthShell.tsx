@@ -32,12 +32,12 @@ export function AuthShell({
   description: string;
 }) {
   return (
-    <div style={authPageStyle}>
-      <div style={authPageColumnStyle}>
-        <div style={authCardStyle}>
+    <div style={authPageStyle} className="ledger-auth-page">
+      <div style={authPageColumnStyle} className="ledger-auth-column">
+        <div style={authCardStyle} className="ledger-auth-card">
           <div style={authCardGlowStyle} />
 
-          <div style={authHeaderStyle}>
+          <div style={authHeaderStyle} className="ledger-auth-header">
             <img src={logoSvg} alt="The Ledger" style={authLogoStyle} />
             <span style={visuallyHiddenStyle}>Rent Manager</span>
             <div style={authHeadingBlockStyle}>

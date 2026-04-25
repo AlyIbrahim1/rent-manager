@@ -32,9 +32,17 @@ export function PortfolioOverviewSection({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-        <div>
+    <section style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ maxWidth: 620 }}>
           <h1
             style={{
               margin: 0,
@@ -51,7 +59,7 @@ export function PortfolioOverviewSection({
             Status summary and current renter ledger across active units.
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
           <button
             type="button"
             style={{
@@ -94,7 +102,7 @@ export function PortfolioOverviewSection({
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-[1.2fr_1fr_1fr]">
+      <div className="grid gap-4 md:grid-cols-[1.2fr_1fr_1fr]">
         <article style={{ ...cardStyle, animationDelay: "30ms" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#45464d" }}>
@@ -141,6 +149,6 @@ export function PortfolioOverviewSection({
           </p>
         </article>
       </div>
-    </div>
+    </section>
   );
 }

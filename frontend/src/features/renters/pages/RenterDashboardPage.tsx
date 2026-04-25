@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BarChart3, HandCoins, LayoutDashboard, Users2 } from "lucide-react";
+import { BarChart3, HandCoins, LayoutDashboard, Plus, Users2 } from "lucide-react";
 
 import { AddRenterModal } from "@/features/renters/components/AddRenterModal";
 import { DashboardHeader } from "@/features/renters/components/DashboardHeader";
@@ -152,7 +152,7 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
     <div style={{ minHeight: "100dvh" }}>
       <DashboardSidebar logoSrc={logoSvg} onAddRenter={() => setShowAddModal(true)} />
 
-      <div className="lg:block" style={{ paddingLeft: 272 }}>
+      <div className="lg:pl-[272px]">
         <DashboardHeader
           logoSrc={logoSvg}
           userEmail={user.email}
@@ -165,70 +165,106 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
           onSignOut={() => setShowSignOutConfirm(true)}
         />
 
-        <main style={{ padding: "24px 32px 60px", display: "flex", flexDirection: "column", gap: 28 }}>
-          <PortfolioOverviewSection
-            totalMonthlyRevenue={totalMonthlyRevenue}
-            totalDue={totalDue}
-            collectionRate={collectionRate}
-            rentersCount={renters.length}
-            overdueCount={overdueRenters.length}
-            canReceivePayment={Boolean(selectedRenter)}
-            onReceivePayment={() => setShowMarkPaidModal(true)}
-          />
-
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <RentersLedgerSection
-              isLoading={rentersQuery.isLoading}
-              isError={rentersQuery.isError}
-              hasData={Boolean(rentersQuery.data)}
-              renters={renters}
-              filteredRenters={filteredRenters}
-              selectedRenterId={selectedRenter?.id ?? null}
-              onSelectRenter={(renter) => setSelectedRenterId((prev) => (prev === renter.id ? null : renter.id))}
-              onAddRenter={() => setShowAddModal(true)}
-              onClearSearch={() => setSearchQuery("")}
+        <main className="ledger-dashboard-main">
+          <div className="ledger-dashboard-shell">
+            <PortfolioOverviewSection
+              totalMonthlyRevenue={totalMonthlyRevenue}
+              totalDue={totalDue}
+              collectionRate={collectionRate}
+              rentersCount={renters.length}
+              overdueCount={overdueRenters.length}
+              canReceivePayment={Boolean(selectedRenter)}
+              onReceivePayment={() => setShowMarkPaidModal(true)}
             />
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <RenterDetailsPanel
-                renter={selectedRenter}
+            <div className="ledger-dashboard-split">
+              <RentersLedgerSection
+                isLoading={rentersQuery.isLoading}
+                isError={rentersQuery.isError}
+                hasData={Boolean(rentersQuery.data)}
+                renters={renters}
+                filteredRenters={filteredRenters}
+                selectedRenterId={selectedRenter?.id ?? null}
+                selectedRenter={selectedRenter}
+                onSelectRenter={(renter) => setSelectedRenterId((prev) => (prev === renter.id ? null : renter.id))}
+                onAddRenter={() => setShowAddModal(true)}
+                onClearSearch={() => setSearchQuery("")}
+                onCloseSelectedRenter={() => setSelectedRenterId(null)}
                 onMarkPaid={() => setShowMarkPaidModal(true)}
-                onClose={() => setSelectedRenterId(null)}
               />
 
-              <section style={{ background: "#f2f4f6", borderRadius: 6, padding: "18px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h3 style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#191c1e" }}>
+              <div className="ledger-dashboard-rail hidden lg:flex">
+                <RenterDetailsPanel
+                  renter={selectedRenter}
+                  onMarkPaid={() => setShowMarkPaidModal(true)}
+                  onClose={() => setSelectedRenterId(null)}
+                />
+              </div>
+            </div>
+
+            <section style={{ background: "#f2f4f6", borderRadius: 6, padding: "22px 20px 20px" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+                <div style={{ maxWidth: 560 }}>
+                  <p style={{ margin: 0, fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#45464d" }}>
+                    Supporting surface
+                  </p>
+                  <h3 style={{ margin: "8px 0 0", fontFamily: "Manrope, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#191c1e" }}>
                     Recent Activity
                   </h3>
-                  <span
-                    style={{
-                      background: "#e6e8ea",
-                      borderRadius: 9999,
-                      padding: "3px 9px",
-                      fontSize: 9,
-                      fontWeight: 600,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      color: "#45464d",
-                    }}
-                  >
-                    Scaffolded
-                  </span>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "#45464d" }}>
+                    Reserved space for payment events and lease workflow updates without crowding the detail panel.
+                  </p>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {["Payment timeline", "Lease workflow"].map((label) => (
-                    <div key={label} style={{ background: "#fff", borderRadius: 4, padding: "12px 14px" }}>
-                      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#191c1e" }}>{label}</p>
-                      <p style={{ margin: "3px 0 0", fontSize: 12, color: "#45464d" }}>Upcoming integration with backend events.</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
+                <span
+                  style={{
+                    background: "#e6e8ea",
+                    borderRadius: 9999,
+                    padding: "3px 9px",
+                    fontSize: 9,
+                    fontWeight: 600,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "#45464d",
+                  }}
+                >
+                  Scaffolded
+                </span>
+              </div>
+              <div className="ledger-support-grid">
+                {["Payment timeline", "Lease workflow"].map((label) => (
+                  <div key={label} style={{ background: "#fff", borderRadius: 4, padding: "16px 16px 14px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" }}>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: "#191c1e" }}>{label}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: 12, color: "#45464d", lineHeight: 1.55 }}>Upcoming integration with backend events.</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         </main>
       </div>
+
+      <button
+        type="button"
+        onClick={() => setShowAddModal(true)}
+        className="ledger-mobile-fab lg:hidden"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "12px 16px",
+          borderRadius: 9999,
+          border: "none",
+          background: "linear-gradient(135deg, #0f172a, #131b2e)",
+          color: "#fff",
+          fontSize: 13,
+          fontWeight: 700,
+          fontFamily: "inherit",
+          boxShadow: "0 16px 32px rgba(15,23,42,0.22)",
+        }}
+      >
+        <Plus size={15} color="#fff" />
+        Add Renter
+      </button>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-black/5 bg-white/95 px-2 py-3 backdrop-blur-xl lg:hidden">
         <div className="grid grid-cols-4 gap-1">
