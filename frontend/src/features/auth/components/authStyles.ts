@@ -5,20 +5,26 @@ export const authPageStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: 16,
+  padding: "24px 16px",
   fontFamily: "Inter, sans-serif",
   background:
     "radial-gradient(circle at 10% 8%, rgba(236,238,240,0.92), transparent 32%), radial-gradient(circle at 88% 14%, rgba(213,227,252,0.26), transparent 28%), linear-gradient(180deg, #f7f9fb 0%, #f4f6f8 100%)",
 };
 
+export const authPageColumnStyle: CSSProperties = {
+  width: "100%",
+  maxWidth: 452,
+  display: "grid",
+  gap: 18,
+};
+
 export const authCardStyle: CSSProperties = {
   width: "100%",
-  maxWidth: 440,
   background: "rgba(255,255,255,0.85)",
   backdropFilter: "blur(24px)",
   borderRadius: 16,
   boxShadow: "0 12px 40px rgba(25,28,30,0.06)",
-  padding: "56px 44px",
+  padding: "clamp(2.25rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 2.75rem) clamp(1.75rem, 3vw, 2.25rem)",
   position: "relative",
   overflow: "hidden",
 };
@@ -42,15 +48,17 @@ export const authSectionStyle: CSSProperties = {
 
 export const authHeaderStyle: CSSProperties = {
   textAlign: "center",
-  marginBottom: 28,
+  marginBottom: 30,
   position: "relative",
   zIndex: 1,
+  display: "grid",
+  gap: 14,
 };
 
 export const authLogoStyle: CSSProperties = {
   height: 44,
   width: "auto",
-  margin: "0 auto 10px",
+  margin: "0 auto",
   display: "block",
 };
 
@@ -64,10 +72,34 @@ export const visuallyHiddenStyle: CSSProperties = {
 
 export const authTaglineStyle: CSSProperties = {
   margin: 0,
-  color: "#666",
+  color: "#6A6D76",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+};
+
+export const authHeadingBlockStyle: CSSProperties = {
+  display: "grid",
+  gap: 8,
+  justifyItems: "center",
+};
+
+export const authTitleStyle: CSSProperties = {
+  margin: 0,
+  color: "#191c1e",
+  fontFamily: '"Manrope", "Inter", sans-serif',
+  fontSize: 28,
+  lineHeight: 1.1,
+  fontWeight: 700,
+};
+
+export const authDescriptionStyle: CSSProperties = {
+  margin: 0,
+  maxWidth: "38ch",
+  color: "#5C606B",
   fontSize: 14,
-  fontWeight: 500,
-  letterSpacing: "0.03em",
+  lineHeight: 1.6,
 };
 
 export const formStyle: CSSProperties = {
@@ -76,15 +108,15 @@ export const formStyle: CSSProperties = {
 };
 
 export const fieldGroupStyle: CSSProperties = {
-  marginBottom: 20,
+  marginBottom: 18,
 };
 
 export const passwordFieldGroupStyle: CSSProperties = {
-  marginBottom: 28,
+  marginBottom: 24,
 };
 
 export const confirmPasswordFieldGroupStyle: CSSProperties = {
-  marginBottom: 24,
+  marginBottom: 20,
 };
 
 export const fieldLabelStyle: CSSProperties = {
@@ -142,7 +174,7 @@ export const inputStyle: CSSProperties = {
   boxSizing: "border-box",
   paddingLeft: 44,
   paddingRight: 16,
-  height: 50,
+  height: 52,
   background: "#F5F5F5",
   border: "1px solid transparent",
   borderRadius: 8,
@@ -167,7 +199,7 @@ export const successBannerStyle: CSSProperties = {
   color: "#2E7D32",
   borderRadius: 8,
   padding: "12px 16px",
-  marginBottom: 18,
+  marginBottom: 16,
 };
 
 export const errorBannerStyle: CSSProperties = {
@@ -178,11 +210,11 @@ export const errorBannerStyle: CSSProperties = {
   color: "#C62828",
   borderRadius: 8,
   padding: "12px 16px",
-  marginBottom: 18,
+  marginBottom: 16,
 };
 
 export const devBannerStyle: CSSProperties = {
-  marginBottom: 28,
+  marginBottom: 24,
   display: "flex",
   alignItems: "center",
   gap: 8,
@@ -202,7 +234,7 @@ export const helperErrorTextStyle: CSSProperties = {
 };
 
 export const actionsWrapStyle: CSSProperties = {
-  paddingBottom: 20,
+  marginTop: 8,
 };
 
 export const primaryButtonStyle: CSSProperties = {
@@ -229,7 +261,7 @@ export const dividerWrapStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "20px 0",
+  margin: "18px 0",
 };
 
 export const dividerLineStyle: CSSProperties = {
@@ -271,6 +303,7 @@ export const footerWrapStyle: CSSProperties = {
   textAlign: "center",
   position: "relative",
   zIndex: 1,
+  marginTop: 24,
 };
 
 export const footerTextStyle: CSSProperties = {
@@ -288,4 +321,165 @@ export const footerLinkButtonStyle: CSSProperties = {
   fontFamily: "inherit",
   fontSize: 13,
   padding: 0,
+};
+
+export const legalLinksRowStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexWrap: "wrap",
+  gap: 12,
+};
+
+export const legalLinkStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: 0,
+  color: "#616779",
+  fontFamily: "inherit",
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: "0.16em",
+  textTransform: "uppercase",
+};
+
+export const legalLinksDividerStyle: CSSProperties = {
+  color: "#C7CCD4",
+  fontSize: 11,
+  fontWeight: 700,
+};
+
+export const legalNoticeStyle: CSSProperties = {
+  margin: "6px auto 0",
+  maxWidth: "33ch",
+  color: "#7A808E",
+  fontSize: 12,
+  lineHeight: 1.6,
+  textAlign: "center",
+};
+
+export const authBelowCardStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  paddingTop: 2,
+};
+
+export const legalDocumentCardStyle: CSSProperties = {
+  position: "relative",
+  zIndex: 1,
+  background: "#FFFFFF",
+  borderRadius: 14,
+  padding: "28px 28px 10px",
+};
+
+export const legalModalOverlayStyle: CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  zIndex: 40,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 20,
+  background: "rgba(15,23,42,0.50)",
+  backdropFilter: "blur(2px)",
+};
+
+export const legalModalStyle: CSSProperties = {
+  width: "100%",
+  maxWidth: 656,
+  maxHeight: "min(86dvh, 920px)",
+  overflow: "hidden",
+  borderRadius: 28,
+  background: "#FFFFFF",
+  boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)",
+};
+
+export const legalHeaderStyle: CSSProperties = {
+  padding: "24px 32px 22px",
+  background: "#f2f4f6",
+  position: "relative",
+};
+
+export const legalBackButtonStyle: CSSProperties = {
+  position: "absolute",
+  top: 18,
+  right: 20,
+  background: "none",
+  border: "none",
+  width: 32,
+  height: 32,
+  borderRadius: 10,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#4B5563",
+  fontFamily: "inherit",
+  cursor: "pointer",
+  transition: "background 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart)",
+};
+
+export const legalModalBodyStyle: CSSProperties = {
+  padding: "0 12px 12px",
+  overflowY: "auto",
+  maxHeight: "calc(min(86dvh, 920px) - 200px)",
+  background: "#f2f4f6",
+};
+
+export const legalDocumentEyebrowStyle: CSSProperties = {
+  margin: "0 0 10px",
+  color: "#76777d",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+};
+
+export const legalDocumentTitleStyle: CSSProperties = {
+  margin: "0 0 10px",
+  color: "#111111",
+  fontFamily: '"Manrope", "Inter", sans-serif',
+  fontSize: 29,
+  lineHeight: 1.08,
+  fontWeight: 700,
+  paddingRight: 40,
+};
+
+export const legalDocumentUpdatedStyle: CSSProperties = {
+  margin: 0,
+  color: "#5F636D",
+  fontSize: 13,
+  lineHeight: 1.55,
+  maxWidth: "58ch",
+};
+
+export const legalDocumentIntroStyle: CSSProperties = {
+  display: "inline",
+};
+
+export const legalSectionStyle: CSSProperties = {
+  marginTop: 0,
+};
+
+export const legalSectionTitleStyle: CSSProperties = {
+  margin: "0 0 8px",
+  color: "#111111",
+  fontFamily: '"Manrope", "Inter", sans-serif',
+  fontSize: 15,
+  fontWeight: 700,
+  lineHeight: 1.3,
+};
+
+export const legalSectionBodyStyle: CSSProperties = {
+  margin: 0,
+  color: "#474B55",
+  fontSize: 14,
+  lineHeight: 1.75,
+};
+
+export const legalFooterStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  padding: "16px 24px 22px",
+  background: "#f2f4f6",
 };
