@@ -13,8 +13,22 @@ type Props = {
 export function RenterDetailsPanel({ renter, onMarkPaid, onClose, variant = "default" }: Props) {
   if (!renter) {
     return (
-      <div style={{ background: "#f2f4f6", borderRadius: 6, padding: 20 }}>
-        <div style={{ background: "#fff", borderRadius: 4, padding: "40px 24px", textAlign: "center" }}>
+      <section style={{ background: "#f2f4f6", borderRadius: 6, padding: 20, minHeight: 280 }}>
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 4,
+            padding: "44px 24px",
+            textAlign: "center",
+            minHeight: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#45464d" }}>
+            Detail panel
+          </p>
           <p style={{ margin: 0, fontFamily: "Manrope, sans-serif", fontSize: "1.2rem", fontWeight: 600, color: "#191c1e" }}>
             No renter selected
           </p>
@@ -22,18 +36,25 @@ export function RenterDetailsPanel({ renter, onMarkPaid, onClose, variant = "def
             Select a card from the ledger to inspect payment and due status.
           </p>
         </div>
-      </div>
+      </section>
     );
   }
 
   const isOverdue = (renter.rentDue || 0) > 0;
   const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between" };
   const iconRowStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: 8, color: "#45464d" };
-  const outerPadding = variant === "sheet" ? 16 : 20;
+  const outerPadding = variant === "sheet" ? 0 : 20;
+  const sectionStyle: React.CSSProperties =
+    variant === "sheet"
+      ? { background: "transparent", borderRadius: 0, padding: outerPadding }
+      : { background: "#f2f4f6", borderRadius: 6, padding: outerPadding };
 
   return (
-    <section style={{ background: "#f2f4f6", borderRadius: 6, padding: outerPadding }}>
+    <section style={sectionStyle}>
       <div style={{ background: "#fff", borderRadius: 4, padding: "18px 20px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" }}>
+        <p style={{ margin: "0 0 14px", fontSize: 10, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#45464d" }}>
+          Detail panel
+        </p>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
           <div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>

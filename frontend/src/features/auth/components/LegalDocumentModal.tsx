@@ -49,17 +49,17 @@ export function LegalDocumentModal({
   }, [onClose]);
 
   return (
-    <div style={legalModalOverlayStyle} className="modal-backdrop-motion" data-state="open" onClick={onClose}>
+    <div style={legalModalOverlayStyle} className="modal-backdrop-motion ledger-auth-legal-modal-overlay" data-state="open" onClick={onClose}>
       <div
         style={legalModalStyle}
-        className="ledger-modal-shell modal-shell-motion"
+        className="ledger-modal-shell modal-shell-motion ledger-auth-legal-modal"
         data-state="open"
         role="dialog"
         aria-modal="true"
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
       >
-        <header style={legalHeaderStyle}>
+        <header style={legalHeaderStyle} className="ledger-auth-legal-header">
           <button type="button" onClick={onClose} style={legalBackButtonStyle} aria-label="Close">
             <X size={16} aria-hidden="true" />
           </button>
@@ -70,8 +70,8 @@ export function LegalDocumentModal({
           </p>
         </header>
 
-        <div style={legalModalBodyStyle}>
-          <div style={legalDocumentCardStyle}>
+        <div style={legalModalBodyStyle} className="ledger-auth-legal-body">
+          <div style={legalDocumentCardStyle} className="ledger-auth-legal-card">
             {sections.map((section, index) => (
               <div
                 key={section.title}

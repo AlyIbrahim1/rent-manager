@@ -80,7 +80,7 @@ export function FeatureScaffoldDialog({ feature, onClose }: FeatureScaffoldDialo
 
   return (
     <div
-      className={modalBackdropClass}
+      className={`${modalBackdropClass} ledger-responsive-dialog-overlay`}
       data-state={state}
       style={{
         position: "fixed",
@@ -104,7 +104,7 @@ export function FeatureScaffoldDialog({ feature, onClose }: FeatureScaffoldDialo
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className={modalShellClass}
+        className={`${modalShellClass} ledger-responsive-dialog`}
         data-state={state}
         style={{
           width: "100%",
@@ -115,7 +115,7 @@ export function FeatureScaffoldDialog({ feature, onClose }: FeatureScaffoldDialo
           boxShadow: "0 24px 48px -8px rgba(15,23,42,0.28), 0 8px 16px -4px rgba(15,23,42,0.12)",
         }}
       >
-        <div style={{ background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+        <div className="ledger-responsive-dialog-header" style={{ background: "#f2f4f6", padding: "22px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
           <div id={titleId} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
             <span style={{ width: 34, height: 34, borderRadius: 16, background: "#eceef0", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Icon size={16} color="#191c1e" />
@@ -149,8 +149,8 @@ export function FeatureScaffoldDialog({ feature, onClose }: FeatureScaffoldDialo
           </button>
         </div>
 
-        <div style={{ background: "#f2f4f6", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
-          <div id={descriptionId} style={{ background: "#fff", borderRadius: 22, padding: "18px 20px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" }}>
+        <div className="ledger-responsive-dialog-body" style={{ background: "#f2f4f6", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div id={descriptionId} className="ledger-responsive-dialog-section" style={{ background: "#fff", borderRadius: 22, padding: "18px 20px", boxShadow: "0 12px 40px rgba(25,28,30,0.06)" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {feature.highlights.map((highlight) => (
                 <div key={highlight} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
@@ -172,7 +172,7 @@ export function FeatureScaffoldDialog({ feature, onClose }: FeatureScaffoldDialo
           </div>
         </div>
 
-        <div style={{ background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div className="ledger-responsive-dialog-footer" style={{ background: "#f2f4f6", padding: "12px 16px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
           <button
             type="button"
             onClick={onClose}
