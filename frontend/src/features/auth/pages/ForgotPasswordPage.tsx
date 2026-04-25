@@ -8,6 +8,7 @@ import {
   InfoMessage,
   SubmitButton,
 } from "@/features/auth/components/AuthFormFields";
+import { AuthLegalLinks } from "@/features/auth/components/AuthLegalLinks";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { footerLinkButtonStyle, footerTextStyle, footerWrapStyle } from "@/features/auth/components/authStyles";
 import { syncAuthPath } from "@/features/auth/lib/authRoute";
@@ -40,6 +41,8 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthShell
+      title="Reset password"
+      description="Request a reset link for the email connected to your workspace access."
       footer={
         <div style={footerWrapStyle}>
           <p style={footerTextStyle}>
@@ -48,6 +51,12 @@ export function ForgotPasswordPage() {
             </button>
           </p>
         </div>
+      }
+      belowCard={
+        <AuthLegalLinks
+          onOpenPrivacyPolicy={() => window.dispatchEvent(new CustomEvent("open-privacy-policy"))}
+          onOpenTermsOfService={() => window.dispatchEvent(new CustomEvent("open-terms-of-service"))}
+        />
       }
     >
       <AuthForm onSubmit={handleSubmit}>

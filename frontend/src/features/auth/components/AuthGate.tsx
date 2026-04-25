@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 
 import { AUTH_ROUTE_CHANGE_EVENT, getAuthModeFromPath } from "@/features/auth/lib/authRoute";
 import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
+import { LegalDocumentModal } from "@/features/auth/components/LegalDocumentModal";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { SignupPage } from "@/features/auth/pages/SignupPage";
+import { privacyPolicyContent, termsOfServiceContent } from "@/features/auth/lib/legalContent";
 import { RenterDashboardPage } from "@/features/renters/pages/RenterDashboardPage";
 import type { AuthUser } from "@/shared/lib/supabase";
 import { supabase } from "@/shared/lib/supabase";
@@ -90,6 +92,20 @@ function useAuthRouteMode() {
 export function AuthGate() {
   const { user, loading } = useAuthSession();
   const authRouteMode = useAuthRouteMode();
+  const [openLegalDocument, setOpenLegalDocument] = useState<"privacy" | "terms" | null>(null);
+
+  useEffect(() => {
+    const openPrivacy = () => setOpenLegalDocument("privacy");
+    const openTerms = () => setOpenLegalDocument("terms");
+
+    window.addEventListener("open-privacy-policy", openPrivacy);
+    window.addEventListener("open-terms-of-service", openTerms);
+
+    return () => {
+      window.removeEventListener("open-privacy-policy", openPrivacy);
+      window.removeEventListener("open-terms-of-service", openTerms);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -100,15 +116,26 @@ export function AuthGate() {
   }
 
   if (!user) {
-    if (authRouteMode === "signup") {
-      return <SignupPage />;
-    }
+    const baseAuthScreen =
+      authRouteMode === "signup" ? (
+        <SignupPage />
+      ) : authRouteMode === "forgot_password" ? (
+        <ForgotPasswordPage />
+      ) : (
+        <LoginPage />
+      );
 
-    if (authRouteMode === "forgot_password") {
-      return <ForgotPasswordPage />;
-    }
-
-    return <LoginPage />;
+    return (
+      <>
+        {baseAuthScreen}
+        {openLegalDocument ? (
+          <LegalDocumentModal
+            {...(openLegalDocument === "privacy" ? privacyPolicyContent : termsOfServiceContent)}
+            onClose={() => setOpenLegalDocument(null)}
+          />
+        ) : null}
+      </>
+    );
   }
   return <RenterDashboardPage user={user} />;
 }

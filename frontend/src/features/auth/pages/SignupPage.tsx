@@ -11,8 +11,13 @@ import {
   SocialDivider,
   SubmitButton,
 } from "@/features/auth/components/AuthFormFields";
+import { AuthLegalLinks } from "@/features/auth/components/AuthLegalLinks";
 import { AuthShell } from "@/features/auth/components/AuthShell";
-import { footerLinkButtonStyle, footerTextStyle, footerWrapStyle } from "@/features/auth/components/authStyles";
+import {
+  footerLinkButtonStyle,
+  footerTextStyle,
+  footerWrapStyle,
+} from "@/features/auth/components/authStyles";
 import { setAuthFlashMessage, syncAuthPath } from "@/features/auth/lib/authRoute";
 import { supabase } from "@/shared/lib/supabase";
 
@@ -62,6 +67,8 @@ export function SignupPage() {
 
   return (
     <AuthShell
+      title="Create workspace access"
+      description="Set account credentials for the ledger and return with confirmed access to the workspace."
       footer={
         <div style={footerWrapStyle}>
           <p style={footerTextStyle}>
@@ -70,6 +77,12 @@ export function SignupPage() {
             </button>
           </p>
         </div>
+      }
+      belowCard={
+        <AuthLegalLinks
+          onOpenPrivacyPolicy={() => window.dispatchEvent(new CustomEvent("open-privacy-policy"))}
+          onOpenTermsOfService={() => window.dispatchEvent(new CustomEvent("open-terms-of-service"))}
+        />
       }
     >
       <AuthForm onSubmit={handleSubmit}>

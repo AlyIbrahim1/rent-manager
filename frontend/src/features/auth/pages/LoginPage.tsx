@@ -13,6 +13,7 @@ import {
   SocialDivider,
   SubmitButton,
 } from "@/features/auth/components/AuthFormFields";
+import { AuthLegalLinks } from "@/features/auth/components/AuthLegalLinks";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { footerLinkButtonStyle, footerTextStyle, footerWrapStyle } from "@/features/auth/components/authStyles";
 import { consumeAuthFlashMessage, syncAuthPath } from "@/features/auth/lib/authRoute";
@@ -86,6 +87,8 @@ export function LoginPage() {
 
   return (
     <AuthShell
+      title="Sign in to the ledger"
+      description="Review portfolio health, renter balances, and payment activity from one calm workspace."
       footer={
         <div style={footerWrapStyle}>
           <p style={footerTextStyle}>
@@ -95,6 +98,12 @@ export function LoginPage() {
             </button>
           </p>
         </div>
+      }
+      belowCard={
+        <AuthLegalLinks
+          onOpenPrivacyPolicy={() => window.dispatchEvent(new CustomEvent("open-privacy-policy"))}
+          onOpenTermsOfService={() => window.dispatchEvent(new CustomEvent("open-terms-of-service"))}
+        />
       }
     >
       <AuthForm onSubmit={handleSubmit}>
