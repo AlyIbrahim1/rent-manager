@@ -123,6 +123,11 @@ GitHub Actions workflow in `.github/workflows/ci.yml` runs:
 
 Private / Personal Use. All rights reserved.
 
+## Legal
+
+- Privacy Policy: `docs/legal/privacy-policy.md`
+- Terms of Service: `docs/legal/terms-of-service.md`
+
 ---
 
 Last updated: 2026-04-16
