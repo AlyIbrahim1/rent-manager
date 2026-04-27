@@ -76,7 +76,7 @@ export function DashboardHeader({
         zIndex: 30,
         background: "rgba(255,255,255,0.85)",
         backdropFilter: "blur(16px)",
-        padding: "12px 24px",
+        padding: "16px 32px",
       }}
     >
       <div
@@ -86,9 +86,6 @@ export function DashboardHeader({
           alignItems: "center",
           justifyContent: "space-between",
           gap: 12,
-          background: "#f2f4f6",
-          borderRadius: 6,
-          padding: "10px 14px",
         }}
       >
         <div className="ledger-dashboard-search-row" style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
