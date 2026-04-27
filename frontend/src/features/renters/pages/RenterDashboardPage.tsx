@@ -246,9 +246,8 @@ export function RenterDashboardPage({ user }: RenterDashboardPageProps) {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="ledger-mobile-fab lg:hidden"
+        className="ledger-mobile-fab inline-flex lg:hidden"
         style={{
-          display: "inline-flex",
           alignItems: "center",
           gap: 8,
           padding: "12px 16px",
